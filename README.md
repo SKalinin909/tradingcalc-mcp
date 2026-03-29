@@ -2,7 +2,7 @@
 
 **Deterministic crypto futures calculations for AI agents.**
 
-8 calculators for perpetual futures trading: PnL, liquidation price, break-even, target exit, position sizing, funding cost, average entry, and scenario analysis.
+9 calculators for perpetual futures trading: PnL, liquidation price, break-even, target exit, position sizing, funding cost, average entry, scenario analysis, and max safe leverage.
 
 > Not estimates — exact numbers your trading bot can trust.
 
@@ -74,6 +74,7 @@ curl -X POST https://tradingcalc.io/api/mcp \
 | `funding_cost` | Cumulative funding cost over a holding period |
 | `average_entry` | Average entry price after adding to a position (DCA) |
 | `scenario` | Multi-scenario P&L analysis across price targets |
+| `max_leverage` | Maximum safe leverage based on drawdown tolerance and asset volatility |
 
 Formulas normalized across 7 exchanges: **Binance, Bybit, OKX, Hyperliquid, Aster, KuCoin, MEXC**.
 
