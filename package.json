@@ -1,0 +1,24 @@
+{
+  "name": "tradingcalc-mcp",
+  "version": "1.0.0",
+  "description": "Deterministic crypto futures calculations for AI agents — PnL, liquidation, break-even, position sizing and more.",
+  "keywords": [
+    "mcp",
+    "crypto",
+    "trading",
+    "futures",
+    "calculator",
+    "pnl",
+    "liquidation",
+    "binance",
+    "bybit",
+    "okx"
+  ],
+  "homepage": "https://tradingcalc.io",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SKalinin909/tradingcalc-mcp"
+  },
+  "license": "MIT",
+  "author": "TradingCalc <sk@blockbitcap.com>"
+}
