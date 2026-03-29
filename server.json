@@ -1,0 +1,9 @@
+{
+  "name": "tradingcalc-mcp",
+  "description": "Deterministic crypto futures calculations for AI agents. 8 tools: PnL, liquidation price, break-even, target exit, position sizing, funding cost, average entry, and scenario analysis. Formulas normalized across 7 exchanges (Binance, Bybit, OKX, Hyperliquid, Aster, KuCoin, MEXC).",
+  "url": "https://tradingcalc.io/api/mcp",
+  "transport": "streamable-http",
+  "license": "MIT",
+  "homepage": "https://tradingcalc.io",
+  "repository": "https://github.com/SKalinin909/tradingcalc-mcp"
+}
