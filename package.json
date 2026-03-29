@@ -1,6 +1,6 @@
 {
   "name": "tradingcalc-mcp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Deterministic crypto futures calculations for AI agents — PnL, liquidation, break-even, position sizing and more.",
   "mcpName": "tradingcalc-mcp",
   "keywords": [
