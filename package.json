@@ -1,7 +1,7 @@
 {
   "name": "tradingcalc-mcp",
-  "version": "1.0.1",
-  "description": "Deterministic crypto futures calculations for AI agents — PnL, liquidation, break-even, position sizing and more.",
+  "version": "1.1.0",
+  "description": "12 deterministic crypto futures calculators across 3 suites: trade planning (pnl, breakeven, target_exit, position_sizer, average_entry, scenario), risk & margin (liquidation, max_leverage, hedge_ratio), funding & carry (funding_cost, funding_arb, compound_funding). Formulas normalized across 7 exchanges. Not AI estimates — exact numbers your trading bot can trust.",
   "mcpName": "tradingcalc-mcp",
   "keywords": [
     "mcp",
@@ -11,9 +11,16 @@
     "calculator",
     "pnl",
     "liquidation",
+    "breakeven",
+    "position-sizing",
+    "funding-rate",
+    "hedge",
     "binance",
     "bybit",
-    "okx"
+    "okx",
+    "hyperliquid",
+    "kucoin",
+    "mexc"
   ],
   "homepage": "https://tradingcalc.io",
   "repository": {
