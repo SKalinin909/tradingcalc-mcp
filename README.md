@@ -1,5 +1,7 @@
 # TradingCalc MCP Server
 
+[![MCP Badge](https://lobehub.com/badge/mcp/skalinin909-tradingcalc-mcp)](https://lobehub.com/mcp/skalinin909-tradingcalc-mcp)
+
 **Deterministic crypto futures calculations for AI agents.**
 
 12 calculators for perpetual futures trading: PnL, liquidation price, break-even, target exit, position sizing, funding cost, average entry, scenario analysis, max safe leverage, funding rate arbitrage, hedge ratio, and compound funding.
