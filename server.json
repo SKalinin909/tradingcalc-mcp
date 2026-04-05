@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.SKalinin909/tradingcalc",
   "title": "TradingCalc MCP",
-  "version": "1.2.1",
+  "version": "1.4.0",
   "description": "13 deterministic crypto futures calculators across 3 suites + composite pre-trade workflow: trade planning (pnl, breakeven, target_exit, position_sizer, average_entry, scenario), risk & margin (liquidation, max_leverage, hedge_ratio), funding & carry (funding_cost, funding_arb, compound_funding), advanced (pre_trade_check). Formulas normalized across 7 exchanges. Not AI estimates — exact numbers your trading bot can trust.",
   "repository": {
     "url": "https://github.com/SKalinin909/tradingcalc-mcp",
