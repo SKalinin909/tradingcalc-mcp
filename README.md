@@ -4,7 +4,7 @@
 
 **Deterministic crypto futures calculations for AI agents and developer integrations.**
 
-13 tools across 3 suites + 1 composite intent: 12 primitive calculators (pnl, liquidation, breakeven, target exit, position sizing, average entry, scenario, max leverage, hedge ratio, funding cost, funding arb, compound funding) + `pre_trade_check` composite workflow.
+13 tools across 3 suites + 1 composite decision workflow: primitives (average entry, hedge ratio) and workflows (pnl planning, breakeven, exit target, position sizing, scenario, liquidation safety, max leverage, funding cost, funding arbitrage, compound funding) + `workflow.run_pre_trade_check` integrated decision.
 
 Two access surfaces: **MCP** (Claude Desktop / Cursor / VS Code) and **REST API** (`/v1/primitives`, `/v1/workflows`).
 
@@ -59,67 +59,98 @@ curl -X POST https://tradingcalc.io/api/mcp \
     "id": 1,
     "method": "tools/call",
     "params": {
-      "name": "liquidation",
+      "name": "workflow.run_liquidation_safety",
       "arguments": {
         "side": "long",
         "entryPrice": 95000,
-        "leverage": 10,
-        "marginType": "isolated"
+        "leverage": 10
       }
     }
   }'
 ```
 
-## Tools (13)
+## Tools (14)
+
+Tool naming follows the `workflow.run_*` / `primitive.*` / `system.*` namespace convention.
+Old flat names (`pnl`, `liquidation`, etc.) are accepted for backward compatibility.
+
+### Standard Workflows — 5 credits each (via MCP or `POST /v1/workflows/:id`)
+
+**Trade Planning**
+| Tool | REST endpoint | Description |
+|---|---|---|
+| `workflow.run_pnl_planning` | `/v1/workflows/pnl-planning` | Net PnL, fees and gross profit/loss for a futures trade |
+| `workflow.run_breakeven_planning` | `/v1/workflows/breakeven-planning` | Break-even price accounting for entry/exit fees |
+| `workflow.run_exit_target` | `/v1/workflows/exit-target` | Exit price required to hit a target PnL or ROE |
+| `workflow.run_scenario_planning` | `/v1/workflows/scenario-planning` | Multi-scenario P&L analysis across price targets |
+
+**Risk & Margin**
+| Tool | REST endpoint | Description |
+|---|---|---|
+| `workflow.run_liquidation_safety` | `/v1/workflows/liquidation-safety` | Liquidation price for long/short isolated margin |
+| `workflow.run_position_sizing` | `/v1/workflows/position-sizing` | Position size based on account size and max risk % |
+| `workflow.run_max_leverage` | `/v1/workflows/max-leverage` | Maximum safe leverage based on drawdown tolerance and volatility |
+
+**Funding & Carry**
+| Tool | REST endpoint | Description |
+|---|---|---|
+| `workflow.run_funding_cost` | `/v1/workflows/funding-cost` | Cumulative funding cost over a holding period |
+| `workflow.run_funding_arbitrage` | `/v1/workflows/funding-arbitrage` | Annualized yield from long/short basis trades across two exchanges |
+| `workflow.run_compound_funding` | `/v1/workflows/compound-funding` | Capital growth projection from reinvesting funding income |
 
 ### Primitives — 1 credit each (via MCP or `POST /v1/primitives/:id`)
 
-**Trade Planning**
-| Tool | Description |
-|---|---|
-| `pnl` | Net PnL, ROE, fees and gross profit/loss for a futures trade |
-| `breakeven` | Break-even price accounting for entry/exit fees |
-| `target_exit` | Exit price required to hit a target PnL or ROE |
-| `risk_sizer` | Position size based on account size and max risk % |
-| `average_entry` | Average entry price after adding to a position (DCA) |
-| `scenario` | Multi-scenario P&L analysis across price targets |
+| Tool | REST endpoint | Description |
+|---|---|---|
+| `primitive.average_entry` | `/v1/primitives/average_entry` | Average entry price after DCA into a position |
+| `primitive.hedge_ratio` | `/v1/primitives/hedge_ratio` | Short perp size and funding cost to hedge a spot position |
 
-**Risk & Margin**
-| Tool | Description |
-|---|---|
-| `liquidation` | Liquidation price for long/short with cross or isolated margin |
-| `max_leverage` | Maximum safe leverage based on drawdown tolerance and asset volatility |
-| `hedge_ratio` | Short perp size, required margin, and funding cost to hedge a spot position |
+### Integrated Decision Workflow — 10 credits
 
-**Funding & Carry**
-| Tool | Description |
-|---|---|
-| `funding_cost` | Cumulative funding cost over a holding period |
-| `funding_arb` | Annualized yield and net profit from long/short basis trades across two exchanges |
-| `compound_funding` | Capital growth projection from reinvesting perpetual futures funding income |
+| Tool | REST endpoint | Description |
+|---|---|---|
+| `workflow.run_pre_trade_check` | `/v1/workflows/pre-trade-check` | Full pre-trade decision: position size, liquidation, breakeven, funding cost, go/no-go signal. Accepts live exchange + symbol. |
 
-### Composite Workflow — 10 credits (via MCP or `POST /v1/workflows/pre-trade-check`)
+### System
 
 | Tool | Description |
 |---|---|
-| `pre_trade_check` | Full pre-trade decision: position size, liquidation price, breakeven, funding cost, go/no-go signal. Accepts live exchange + symbol to fetch funding rate automatically. |
+| `system.verify` | Run 22 canonical test vectors against all calculators. Returns pass/fail report. |
 
 Formulas normalized across 7 exchanges: **Binance, Bybit, OKX, Hyperliquid, Aster, KuCoin, MEXC**.
 
 ## Rate Limits & Pricing
 
-| Plan | Limit | Credits/mo | Price |
+| Plan | Req/day | Credits/mo | Price |
 |---|---|---|---|
-| Anonymous | 20 req/day | — | Free |
-| Free API key | 200 req/day | — | Free |
-| Trader | 10,000 req/day | 250 | $19/mo |
-| Builder | 10,000 req/day | 5,000 | $79/mo |
+| Anonymous | 20 | — | Free |
+| Free API key | 200 | — | Free |
+| Trader | 2,500 | 250 | $19/mo |
+| Builder | 50,000 | 5,000 | $79/mo |
+| Team | 250,000 | 25,000 | $249/mo |
+| Growth | Unlimited | High-volume | $599/mo |
 
-Credits: primitive = 1 cr · standard workflow = 5 cr · pre-trade-check = 10 cr
+Credits: primitive = 1 cr · standard workflow = 5 cr · pre-trade-check = 10 cr · verification bundle = +2 cr
 
 Get your API key → email [hi@tradingcalc.io](mailto:hi@tradingcalc.io) or see [tradingcalc.io/pricing](https://tradingcalc.io/pricing)
 
 Pass key as: `Authorization: Bearer <your-api-key>`
+
+## Self-Verification
+
+Agents can verify all 22 canonical test vectors before trusting results:
+
+```json
+{
+  "jsonrpc": "2.0", "id": 1,
+  "method": "tools/call",
+  "params": { "name": "system.verify", "arguments": {} }
+}
+```
+
+Response: `{ "status": "pass", "passed": 22, "failed": 0, "total": 22 }`
+
+Live proof: [tradingcalc.io/verify](https://tradingcalc.io/verify)
 
 ## Use Cases
 
