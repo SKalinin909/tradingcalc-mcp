@@ -1,7 +1,7 @@
 {
   "name": "tradingcalc-mcp",
-  "version": "1.2.1",
-  "description": "13 deterministic crypto futures calculators across 3 suites + composite pre-trade workflow: trade planning (pnl, breakeven, target_exit, position_sizer, average_entry, scenario), risk & margin (liquidation, max_leverage, hedge_ratio), funding & carry (funding_cost, funding_arb, compound_funding), advanced (pre_trade_check). Formulas normalized across 7 exchanges. Not AI estimates — exact numbers your trading bot can trust.",
+  "version": "1.5.0",
+  "description": "19 deterministic crypto futures tools: trade planning (pnl, breakeven, exit_target, scenario, dca_entry, scale_out), risk (liquidation, position_sizing, max_leverage, risk_reward), funding & carry (funding_cost, funding_arb, compound_funding, funding_breakeven, carry_trade), primitives (average_entry, hedge_ratio), integrated decision (pre_trade_check). Formulas normalized across 7 exchanges. Not AI estimates — exact numbers your trading bot can trust.",
   "mcpName": "tradingcalc-mcp",
   "keywords": [
     "mcp",

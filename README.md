@@ -4,7 +4,7 @@
 
 **Deterministic crypto futures calculations for AI agents and developer integrations.**
 
-13 tools across 3 suites + 1 composite decision workflow: primitives (average entry, hedge ratio) and workflows (pnl planning, breakeven, exit target, position sizing, scenario, liquidation safety, max leverage, funding cost, funding arbitrage, compound funding) + `workflow.run_pre_trade_check` integrated decision.
+19 tools: 12 primitives + 16 workflows across 5 families — trade planning (PnL, breakeven, exit target, scenario, DCA entry, scale-out), risk (liquidation, position sizing, max leverage, risk/reward), funding & carry (funding cost, arb, compound, funding breakeven, carry trade setup) + `workflow.run_pre_trade_check` integrated decision.
 
 Two access surfaces: **MCP** (Claude Desktop / Cursor / VS Code) and **REST API** (`/v1/primitives`, `/v1/workflows`).
 
@@ -69,7 +69,7 @@ curl -X POST https://tradingcalc.io/api/mcp \
   }'
 ```
 
-## Tools (14)
+## Tools (19)
 
 Tool naming follows the `workflow.run_*` / `primitive.*` / `system.*` namespace convention.
 Old flat names (`pnl`, `liquidation`, etc.) are accepted for backward compatibility.
@@ -83,6 +83,8 @@ Old flat names (`pnl`, `liquidation`, etc.) are accepted for backward compatibil
 | `workflow.run_breakeven_planning` | `/v1/workflows/breakeven-planning` | Break-even price accounting for entry/exit fees |
 | `workflow.run_exit_target` | `/v1/workflows/exit-target` | Exit price required to hit a target PnL or ROE |
 | `workflow.run_scenario_planning` | `/v1/workflows/scenario-planning` | Multi-scenario P&L analysis across price targets |
+| `workflow.run_dca_entry` | `/v1/workflows/dca-entry` | DCA across N price levels → avg entry, breakeven, level contribution |
+| `workflow.run_scale_out` | `/v1/workflows/scale-out` | Partial exits at multiple levels → P&L per exit, weighted avg, overall ROI |
 
 **Risk & Margin**
 | Tool | REST endpoint | Description |
@@ -97,6 +99,14 @@ Old flat names (`pnl`, `liquidation`, etc.) are accepted for backward compatibil
 | `workflow.run_funding_cost` | `/v1/workflows/funding-cost` | Cumulative funding cost over a holding period |
 | `workflow.run_funding_arbitrage` | `/v1/workflows/funding-arbitrage` | Annualized yield from long/short basis trades across two exchanges |
 | `workflow.run_compound_funding` | `/v1/workflows/compound-funding` | Capital growth projection from reinvesting funding income |
+| `workflow.run_funding_breakeven` | `/v1/workflows/funding-breakeven` | Price move needed to cover funding cost + fees over holding period |
+
+### Advanced Workflows — 8 credits each
+
+| Tool | REST endpoint | Description |
+|---|---|---|
+| `workflow.run_risk_reward` | `/v1/workflows/risk-reward` | Full R:R analysis: sizing + liquidation + breakeven + P&L at stop and target |
+| `workflow.run_carry_trade` | `/v1/workflows/carry-trade` | Delta-neutral carry setup: net yield, ROI, breakeven days, verdict |
 
 ### Primitives — 1 credit each (via MCP or `POST /v1/primitives/:id`)
 
@@ -128,9 +138,9 @@ Formulas normalized across 7 exchanges: **Binance, Bybit, OKX, Hyperliquid, Aste
 | Trader | 2,500 | 250 | $19/mo |
 | Builder | 50,000 | 5,000 | $79/mo |
 | Team | 250,000 | 25,000 | $249/mo |
-| Growth | Unlimited | High-volume | $599/mo |
+| Growth | 2,000,000 | 150,000 | $599/mo |
 
-Credits: primitive = 1 cr · standard workflow = 5 cr · pre-trade-check = 10 cr · verification bundle = +2 cr
+Credits: primitive = 1 cr · standard workflow = 5 cr · advanced workflow = 8 cr · pre-trade-check = 10 cr · verification bundle = +2 cr
 
 Get your API key → email [hi@tradingcalc.io](mailto:hi@tradingcalc.io) or see [tradingcalc.io/pricing](https://tradingcalc.io/pricing)
 
