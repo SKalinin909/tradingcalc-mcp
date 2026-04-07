@@ -9,6 +9,10 @@
     "source": "github",
     "id": "SKalinin909/tradingcalc-mcp"
   },
+  "category": "finance",
+  "type": "deterministic",
+  "verification": true,
+  "use_cases": ["trading-bots", "ai-agents", "risk-management", "multi-agent-systems"],
   "homepage": "https://tradingcalc.io",
   "license": "MIT",
   "remotes": [
