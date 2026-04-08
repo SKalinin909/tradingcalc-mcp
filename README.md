@@ -205,6 +205,31 @@ Live proof: [tradingcalc.io/verify](https://tradingcalc.io/verify)
 
 LLMs asked directly give plausible but potentially wrong numbers. TradingCalc MCP returns exact calculations — same inputs always produce the same outputs. No hallucination risk for financial data.
 
+## TypeScript SDK
+
+For code-first integrations, use `tradingcalc-sdk` instead of raw JSON-RPC:
+
+```bash
+npm install tradingcalc-sdk
+```
+
+```typescript
+import { TradingCalcClient } from 'tradingcalc-sdk';
+
+const tc = new TradingCalcClient({ apiKey: 'tc_your_key' });
+
+// Workflows — orchestrated decisions
+const check = await tc.workflows.preTradeCheck({ side: 'long', entry_price: 83000, leverage: 5, funding_rate: 0.0001, account_balance: 5000 });
+
+// Primitives — single formula
+const avg = await tc.primitives.averageEntry({ symbol: 'BTCUSDT', input: { fills: [{ price: 83000, quantity: 0.1 }] } });
+
+// System
+const report = await tc.system.verify();
+```
+
+`tc.call()` is available for raw MCP access. Full docs: [npmjs.com/package/tradingcalc-sdk](https://www.npmjs.com/package/tradingcalc-sdk)
+
 ## Links
 
 - API docs: [tradingcalc.io/docs](https://tradingcalc.io/docs)

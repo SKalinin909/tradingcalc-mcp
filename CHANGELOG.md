@@ -6,6 +6,18 @@ Format: **Tool Changes · Verification Changes · MCP/API Changes · Breaking Ch
 
 ---
 
+## [2.0.0] — 2026-04-08
+
+### Breaking Changes
+- `tradingcalc-sdk@2.0.0`: flat methods removed (`tc.pnl()`, `tc.verify()`, etc.)
+- New namespace API: `tc.workflows.*` / `tc.primitives.*` / `tc.system.*`
+- `tc.call()` unchanged — raw MCP access still works
+
+### TypeScript SDK
+- `PrimitivesNamespace`, `WorkflowsNamespace`, `SystemNamespace` exported as first-class types
+
+---
+
 ## [1.5.2] — 2026-04-07
 
 ### Other
