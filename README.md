@@ -2,13 +2,15 @@
 
 [![MCP Badge](https://lobehub.com/badge/mcp/skalinin909-tradingcalc-mcp)](https://lobehub.com/mcp/skalinin909-tradingcalc-mcp)
 
-**Deterministic crypto futures calculations for AI agents and developer integrations.**
+Ask Claude or Cursor trade questions and get exact numbers back — not AI guesses.
 
-19 tools: 12 primitives + 16 workflows across 5 families — trade planning (PnL, breakeven, exit target, scenario, DCA entry, scale-out), risk (liquidation, position sizing, max leverage, risk/reward), funding & carry (funding cost, arb, compound, funding breakeven, carry trade setup) + `workflow.run_pre_trade_check` integrated decision.
+> "What's my PnL if I buy 0.5 BTC at $80k and sell at $95k with 5x leverage?"
+> "Size my position: $10k account, 1% risk, long BTC at $83k, stop at $81k."
+> "Is this carry trade worth it? 0.01% funding long, 0.05% short, $50k, 30 days."
+
+19 deterministic tools across trade planning, risk & margin, and funding/carry. Formulas verified against 22 canonical test vectors — same inputs always produce the same outputs.
 
 Two access surfaces: **MCP** (Claude Desktop / Cursor / VS Code) and **REST API** (`/v1/primitives`, `/v1/workflows`).
-
-> Not estimates — exact numbers your trading bot can trust.
 
 ## Endpoints
 
@@ -68,6 +70,36 @@ curl -X POST https://tradingcalc.io/api/mcp \
     }
   }'
 ```
+
+## Example prompts
+
+After connecting, just ask naturally — the AI picks the right tool automatically:
+
+**Trade P&L**
+> "I bought 0.5 BTC at $80,000 and want to sell at $95,000 with 5x leverage. What's my net profit after fees?"
+
+**Position sizing**
+> "I have a $10,000 account and want to risk 1% going long BTC at $83,000 with a stop at $81,000. How many coins should I buy?"
+
+**Liquidation check**
+> "Long ETH at $3,200 with 10x leverage — where do I get liquidated?"
+
+**Full pre-trade check**
+> "Analyze this setup: long BTC at $83,000, stop $81,000, target $90,000, $10k account, 1% risk, 5x leverage. Is it worth taking?"
+
+**Funding cost**
+> "I'm holding 0.5 BTC long on Bybit at $83,000 with 0.01% funding rate. How much will funding cost me over 3 days?"
+
+**Carry trade**
+> "Is this carry trade worth it? Long on Bybit at 0.01% funding, short on Binance at 0.05%, $50k notional, 30 days."
+
+**DCA average entry**
+> "I bought BTC at $78k (0.2 BTC), $80k (0.3 BTC), and $82k (0.1 BTC). What's my average entry and breakeven?"
+
+**Scale-out plan**
+> "I'm long 1 BTC from $80k. I want to close 30% at $88k, 40% at $92k, 30% at $96k. What's my total P&L?"
+
+---
 
 ## Tools (19)
 
