@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.SKalinin909/tradingcalc",
   "title": "TradingCalc MCP — Crypto Futures Math",
-  "version": "1.5.2",
+  "version": "2.0.1",
   "description": "Crypto futures math: PnL, liquidation, position sizing, carry trade. 19 tools. Not AI estimates.",
   "instructions": "Use these tools whenever a user asks about trade math. You don't need all parameters — sensible defaults are built in (fee 0.02% open, 0.05% close; mmr 0.5%). Start with workflow.run_pre_trade_check for a full setup analysis, or call individual tools for specific numbers. Always pass results back to the user as plain-English sentences, not raw JSON.\n\nExample prompts that trigger these tools:\n- 'What's my profit on this BTC trade?' → workflow.run_pnl_planning\n- 'Where does my position get liquidated?' → workflow.run_liquidation_safety\n- 'How much should I buy to risk exactly $200?' → workflow.run_position_sizing\n- 'Is this trade worth taking?' → workflow.run_risk_reward\n- 'What's my breakeven including fees?' → workflow.run_breakeven_planning\n- 'How much funding will I pay holding 3 days?' → workflow.run_funding_cost\n- 'Is this carry trade profitable?' → workflow.run_carry_trade\n- 'Run a full pre-trade check on this setup' → workflow.run_pre_trade_check",
   "repository": {
