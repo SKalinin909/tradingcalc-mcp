@@ -6,6 +6,19 @@ Format: **Tool Changes · Verification Changes · MCP/API Changes · Breaking Ch
 
 ---
 
+## [2.0.1] — 2026-04-09
+
+### SDK Fix
+- `tradingcalc-sdk@2.0.1`: fixes `PreTradeCheckOutput` missing `verdict` / `verdict_summary` in dist types
+
+### Examples
+- `examples/risk-agent-wrapper.ts` — drop-in TypeScript risk gate for agent frameworks
+  - `RiskAgent` class with `evaluate()` / `isSafe()` / configurable gates
+  - `preTradeGate()` standalone function
+  - `examples/package.json` + `tsconfig.json` — runnable via `npm run risk-agent`
+
+---
+
 ## [2.0.0] — 2026-04-08
 
 ### Breaking Changes
