@@ -6,6 +6,24 @@ Format: **Tool Changes · Verification Changes · MCP/API Changes · Breaking Ch
 
 ---
 
+## [2.2.0] — 2026-04-09
+
+### Other
+- `/what-is-deterministic-computation-layer` — concept page: 4 properties (idempotent / traceable / verifiable / composable), contrast table vs LLM / spreadsheet, use-case matrix
+- `/deterministic-workflows` — product hub: Primitive → Analyzer → Workflow taxonomy, all 6 workflows with primitives and verdicts, REST example
+- `/docs` sidebar Concepts section added; `/for-agents` "Why deterministic" links updated
+
+---
+
+## [2.1.0] — 2026-04-09
+
+### Other
+- `/methodology` — formula derivation reference: all 12 calculators, exchange doc sources, 3-layer verification system
+- `/why-ai-agents-need-exact-calculations` — SEO article: LLM vs deterministic tool, architecture pattern, critical calculation types
+- 55 exchange-specific calculator pages indexed in sitemap (Binance/Bybit/OKX/Hyperliquid/Aster/KuCoin/MEXC × 7–8 calculators)
+
+---
+
 ## [2.0.1] — 2026-04-09
 
 ### SDK Fix
