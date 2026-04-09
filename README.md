@@ -205,6 +205,36 @@ Live proof: [tradingcalc.io/verify](https://tradingcalc.io/verify)
 
 LLMs asked directly give plausible but potentially wrong numbers. TradingCalc MCP returns exact calculations — same inputs always produce the same outputs. No hallucination risk for financial data.
 
+## Risk Agent Wrapper
+
+`examples/risk-agent-wrapper.ts` — a drop-in TypeScript wrapper for risk-gated trade execution.
+Integrates with any agent framework (ElizaOS, CrewAI, AutoGen, Hummingbot, Freqtrade).
+
+```typescript
+import { RiskAgent, preTradeGate } from './examples/risk-agent-wrapper';
+
+const agent = new RiskAgent({ apiKey: 'tc_your_key', minLiqDistancePct: 3.0 });
+
+const result = await agent.evaluate({
+  symbol: 'BTCUSDT', exchange: 'bybit',
+  side: 'long', entry_price: 83000, stop_loss: 81000,
+  account_balance: 10000, risk_pct: 1, leverage: 5,
+  funding_rate: 0.0001, hold_hours: 24,
+});
+
+if (result.approved) {
+  // execute trade — result.recommended_size, result.liquidation_price
+} else {
+  console.log('Rejected:', result.rejection_reason);
+}
+
+// Binary gate for execution bots
+const ok = await agent.isSafe({ symbol: 'ETHUSDT', side: 'short', ... });
+
+// Standalone function (minimal integration)
+const { approved, size, liqPrice } = await preTradeGate({ ... }, 'tc_your_key');
+```
+
 ## TypeScript SDK
 
 For code-first integrations, use `tradingcalc-sdk` instead of raw JSON-RPC:

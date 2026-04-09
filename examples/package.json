@@ -1,0 +1,16 @@
+{
+  "name": "tradingcalc-examples",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "risk-agent": "npx --yes tsx risk-agent-wrapper.ts"
+  },
+  "dependencies": {
+    "tradingcalc-sdk": "^2.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.4.0"
+  }
+}
