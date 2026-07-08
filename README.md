@@ -174,7 +174,7 @@ Formulas normalized across 7 exchanges: **Binance, Bybit, OKX, Hyperliquid, Aste
 
 Credits: primitive = 1 cr · standard workflow = 5 cr · advanced workflow = 8 cr · pre-trade-check = 10 cr · verification bundle = +2 cr
 
-Get your API key → email [hi@tradingcalc.io](mailto:hi@tradingcalc.io) or see [tradingcalc.io/pricing](https://tradingcalc.io/pricing)
+Get your API key → email [hi@tradingcalc.io](mailto:hi@tradingcalc.io)
 
 Pass key as: `Authorization: Bearer <your-api-key>`
 
@@ -263,7 +263,6 @@ const report = await tc.system.verify();
 ## Links
 
 - API docs: [tradingcalc.io/docs](https://tradingcalc.io/docs)
-- Pricing: [tradingcalc.io/pricing](https://tradingcalc.io/pricing)
+- For agents: [tradingcalc.io/for-agents](https://tradingcalc.io/for-agents)
 - Verification proof: [tradingcalc.io/verify](https://tradingcalc.io/verify)
 - Web calculators: [tradingcalc.io](https://tradingcalc.io)
-- Telegram Mini App: [@perpcalcbot](https://t.me/perpcalcbot)
