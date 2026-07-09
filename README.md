@@ -10,17 +10,15 @@ Ask Claude or Cursor trade questions and get exact numbers back — not AI guess
 
 23 deterministic tools across trade planning, risk & margin, funding/carry, and market-structure (Market Profile) analysis. Formulas verified against 22 canonical test vectors — same inputs always produce the same outputs. Free, no signup.
 
-Two access surfaces: **MCP** (Claude Desktop / Cursor / VS Code) and **REST API** (`/v1/primitives`, `/v1/workflows`).
+Access via **MCP** (Claude Desktop / Cursor / VS Code) or a plain HTTP POST to the MCP endpoint. Free, no signup.
 
 ## Endpoints
 
 | Surface | URL | Auth |
 |---|---|---|
-| MCP | `https://tradingcalc.io/api/mcp` | Bearer optional |
-| REST primitives | `https://tradingcalc.io/v1/primitives/:id` | Bearer required |
-| REST workflows | `https://tradingcalc.io/v1/workflows/:id` | Bearer required |
-| Discovery | `https://tradingcalc.io/v1/primitives` | None |
-| Docs | `https://tradingcalc.io/docs` | None |
+| MCP | `https://tradingcalc.io/api/mcp` | Bearer optional (free) |
+| For agents / setup | `https://tradingcalc.io/for-agents` | None |
+| Verification proof | `https://tradingcalc.io/verify` | None |
 
 MCP transport: **Streamable HTTP** (MCP spec 2024-11-05)
 
