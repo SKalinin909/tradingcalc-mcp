@@ -260,7 +260,7 @@ const report = await tc.system.verify();
 
 ## Links
 
-- API docs: [tradingcalc.io/docs](https://tradingcalc.io/docs)
+- For agents: [tradingcalc.io/for-agents](https://tradingcalc.io/for-agents)
 - For agents: [tradingcalc.io/for-agents](https://tradingcalc.io/for-agents)
 - Verification proof: [tradingcalc.io/verify](https://tradingcalc.io/verify)
 - Web calculators: [tradingcalc.io](https://tradingcalc.io)
