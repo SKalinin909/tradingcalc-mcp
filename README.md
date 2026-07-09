@@ -8,7 +8,7 @@ Ask Claude or Cursor trade questions and get exact numbers back — not AI guess
 > "Size my position: $10k account, 1% risk, long BTC at $83k, stop at $81k."
 > "Is this carry trade worth it? 0.01% funding long, 0.05% short, $50k, 30 days."
 
-19 deterministic tools across trade planning, risk & margin, and funding/carry. Formulas verified against 22 canonical test vectors — same inputs always produce the same outputs.
+23 deterministic tools across trade planning, risk & margin, funding/carry, and market-structure (Market Profile) analysis. Formulas verified against 22 canonical test vectors — same inputs always produce the same outputs. Free, no signup.
 
 Two access surfaces: **MCP** (Claude Desktop / Cursor / VS Code) and **REST API** (`/v1/primitives`, `/v1/workflows`).
 
@@ -101,57 +101,63 @@ After connecting, just ask naturally — the AI picks the right tool automatical
 
 ---
 
-## Tools (19)
+## Tools (23)
 
 Tool naming follows the `workflow.run_*` / `primitive.*` / `system.*` namespace convention.
-Old flat names (`pnl`, `liquidation`, etc.) are accepted for backward compatibility.
+Old flat names (`pnl`, `liquidation`, etc.) are accepted for backward compatibility. All tools are
+free via MCP — no signup; 20 calls/day anonymously, 200/day with a free API key.
 
-### Standard Workflows — 5 credits each (via MCP or `POST /v1/workflows/:id`)
+### Trade Planning
 
-**Trade Planning**
-| Tool | REST endpoint | Description |
-|---|---|---|
-| `workflow.run_pnl_planning` | `/v1/workflows/pnl-planning` | Net PnL, fees and gross profit/loss for a futures trade |
-| `workflow.run_breakeven_planning` | `/v1/workflows/breakeven-planning` | Break-even price accounting for entry/exit fees |
-| `workflow.run_exit_target` | `/v1/workflows/exit-target` | Exit price required to hit a target PnL or ROE |
-| `workflow.run_scenario_planning` | `/v1/workflows/scenario-planning` | Multi-scenario P&L analysis across price targets |
-| `workflow.run_dca_entry` | `/v1/workflows/dca-entry` | DCA across N price levels → avg entry, breakeven, level contribution |
-| `workflow.run_scale_out` | `/v1/workflows/scale-out` | Partial exits at multiple levels → P&L per exit, weighted avg, overall ROI |
+| Tool | Description |
+|---|---|
+| `workflow.run_pnl_planning` | Net PnL, fees and gross profit/loss for a futures trade |
+| `workflow.run_breakeven_planning` | Break-even price accounting for entry/exit fees |
+| `workflow.run_exit_target` | Exit price required to hit a target PnL or ROE |
+| `workflow.run_scenario_planning` | Multi-scenario P&L analysis across price targets |
+| `workflow.run_dca_entry` | DCA across N price levels → avg entry, breakeven, level contribution |
+| `workflow.run_scale_out` | Partial exits at multiple levels → P&L per exit, weighted avg, overall ROI |
 
-**Risk & Margin**
-| Tool | REST endpoint | Description |
-|---|---|---|
-| `workflow.run_liquidation_safety` | `/v1/workflows/liquidation-safety` | Liquidation price for long/short isolated margin |
-| `workflow.run_position_sizing` | `/v1/workflows/position-sizing` | Position size based on account size and max risk % |
-| `workflow.run_max_leverage` | `/v1/workflows/max-leverage` | Maximum safe leverage based on drawdown tolerance and volatility |
+### Risk & Margin
 
-**Funding & Carry**
-| Tool | REST endpoint | Description |
-|---|---|---|
-| `workflow.run_funding_cost` | `/v1/workflows/funding-cost` | Cumulative funding cost over a holding period |
-| `workflow.run_funding_arbitrage` | `/v1/workflows/funding-arbitrage` | Annualized yield from long/short basis trades across two exchanges |
-| `workflow.run_compound_funding` | `/v1/workflows/compound-funding` | Capital growth projection from reinvesting funding income |
-| `workflow.run_funding_breakeven` | `/v1/workflows/funding-breakeven` | Price move needed to cover funding cost + fees over holding period |
+| Tool | Description |
+|---|---|
+| `workflow.run_liquidation_safety` | Liquidation price for long/short isolated margin |
+| `workflow.run_position_sizing` | Position size based on account size and max risk % |
+| `workflow.run_max_leverage` | Maximum safe leverage based on drawdown tolerance and volatility |
+| `workflow.run_risk_reward` | Full R:R analysis: sizing + liquidation + breakeven + P&L at stop and target |
 
-### Advanced Workflows — 8 credits each
+### Funding & Carry
 
-| Tool | REST endpoint | Description |
-|---|---|---|
-| `workflow.run_risk_reward` | `/v1/workflows/risk-reward` | Full R:R analysis: sizing + liquidation + breakeven + P&L at stop and target |
-| `workflow.run_carry_trade` | `/v1/workflows/carry-trade` | Delta-neutral carry setup: net yield, ROI, breakeven days, verdict |
+| Tool | Description |
+|---|---|
+| `workflow.run_funding_cost` | Cumulative funding cost over a holding period |
+| `workflow.run_funding_arbitrage` | Annualized yield from long/short basis trades across two exchanges |
+| `workflow.run_compound_funding` | Capital growth projection from reinvesting funding income |
+| `workflow.run_funding_breakeven` | Price move needed to cover funding cost + fees over holding period |
+| `workflow.run_carry_trade` | Delta-neutral carry setup: net yield, ROI, breakeven days, verdict |
 
-### Primitives — 1 credit each (via MCP or `POST /v1/primitives/:id`)
+### Market Structure (Market Profile)
 
-| Tool | REST endpoint | Description |
-|---|---|---|
-| `primitive.average_entry` | `/v1/primitives/average_entry` | Average entry price after DCA into a position |
-| `primitive.hedge_ratio` | `/v1/primitives/hedge_ratio` | Short perp size and funding cost to hedge a spot position |
+| Tool | Description |
+|---|---|
+| `workflow.run_open_analysis` | Open location + type (OD/OTD/ORR/OAIR), VAH/VAL/VPOC/IB, scenario framing |
+| `workflow.run_session_structure` | Day-type classifier — trend / balance / neutral_trend / normal / normal_var |
+| `workflow.run_value_migration` | Value-area migration across sessions — directional conviction vs balance |
+| `workflow.run_breakout_acceptance` | Breakout acceptance vs rejection beyond the value area (optional delta) |
 
-### Integrated Decision Workflow — 10 credits
+### Primitives
 
-| Tool | REST endpoint | Description |
-|---|---|---|
-| `workflow.run_pre_trade_check` | `/v1/workflows/pre-trade-check` | Full pre-trade decision: position size, liquidation, breakeven, funding cost, go/no-go signal. Accepts live exchange + symbol. |
+| Tool | Description |
+|---|---|
+| `primitive.average_entry` | Average entry price after DCA into a position |
+| `primitive.hedge_ratio` | Short perp size and funding cost to hedge a spot position |
+
+### Integrated Decision
+
+| Tool | Description |
+|---|---|
+| `workflow.run_pre_trade_check` | Full pre-trade decision: position size, liquidation, breakeven, funding cost, go/no-go signal. Accepts live exchange + symbol. |
 
 ### System
 
@@ -161,20 +167,14 @@ Old flat names (`pnl`, `liquidation`, etc.) are accepted for backward compatibil
 
 Formulas normalized across 7 exchanges: **Binance, Bybit, OKX, Hyperliquid, Aster, KuCoin, MEXC**.
 
-## Rate Limits & Pricing
+## Rate Limits
 
-| Plan | Req/day | Credits/mo | Price |
-|---|---|---|---|
-| Anonymous | 20 | — | Free |
-| Free API key | 200 | — | Free |
-| Trader | 2,500 | 250 | $19/mo |
-| Builder | 50,000 | 5,000 | $79/mo |
-| Team | 250,000 | 25,000 | $249/mo |
-| Growth | 2,000,000 | 150,000 | $599/mo |
+| Access | Req/day | Price |
+|---|---|---|
+| Anonymous | 20 | Free |
+| Free API key | 200 | Free |
 
-Credits: primitive = 1 cr · standard workflow = 5 cr · advanced workflow = 8 cr · pre-trade-check = 10 cr · verification bundle = +2 cr
-
-Get your API key → email [hi@tradingcalc.io](mailto:hi@tradingcalc.io)
+The Service is free. Need a higher-limit key → email [hi@tradingcalc.io](mailto:hi@tradingcalc.io).
 
 Pass key as: `Authorization: Bearer <your-api-key>`
 
