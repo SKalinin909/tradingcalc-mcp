@@ -2,13 +2,13 @@
 
 [![MCP Badge](https://lobehub.com/badge/mcp/skalinin909-tradingcalc-mcp)](https://lobehub.com/mcp/skalinin909-tradingcalc-mcp)
 
-Ask Claude or Cursor trade questions and get exact numbers back — not AI guesses.
+Ask Claude or Cursor trade questions and get exact numbers back, not AI guesses.
 
 > "What's my PnL if I buy 0.5 BTC at $80k and sell at $95k with 5x leverage?"
 > "Size my position: $10k account, 1% risk, long BTC at $83k, stop at $81k."
 > "Is this carry trade worth it? 0.01% funding long, 0.05% short, $50k, 30 days."
 
-23 deterministic tools across trade planning, risk & margin, funding/carry, and market-structure (Market Profile) analysis. Formulas verified against 22 canonical test vectors — same inputs always produce the same outputs. Free, no signup.
+23 deterministic tools across trade planning, risk & margin, funding/carry, and market-structure (Market Profile) analysis. Formulas verified against 35 canonical test vectors: same inputs always produce the same outputs. Free, no signup.
 
 Access via **MCP** (Claude Desktop / Cursor / VS Code) or a plain HTTP POST to the MCP endpoint. Free, no signup.
 
@@ -71,7 +71,7 @@ curl -X POST https://tradingcalc.io/api/mcp \
 
 ## Example prompts
 
-After connecting, just ask naturally — the AI picks the right tool automatically:
+After connecting, just ask naturally: the AI picks the right tool automatically:
 
 **Trade P&L**
 > "I bought 0.5 BTC at $80,000 and want to sell at $95,000 with 5x leverage. What's my net profit after fees?"
@@ -80,7 +80,7 @@ After connecting, just ask naturally — the AI picks the right tool automatical
 > "I have a $10,000 account and want to risk 1% going long BTC at $83,000 with a stop at $81,000. How many coins should I buy?"
 
 **Liquidation check**
-> "Long ETH at $3,200 with 10x leverage — where do I get liquidated?"
+> "Long ETH at $3,200 with 10x leverage, where do I get liquidated?"
 
 **Full pre-trade check**
 > "Analyze this setup: long BTC at $83,000, stop $81,000, target $90,000, $10k account, 1% risk, 5x leverage. Is it worth taking?"
@@ -103,7 +103,7 @@ After connecting, just ask naturally — the AI picks the right tool automatical
 
 Tool naming follows the `workflow.run_*` / `primitive.*` / `system.*` namespace convention.
 Old flat names (`pnl`, `liquidation`, etc.) are accepted for backward compatibility. All tools are
-free via MCP — no signup; 20 calls/day anonymously, 200/day with a free API key.
+free via MCP, no signup; 20 calls/day anonymously, 200/day with a free API key.
 
 ### Trade Planning
 
@@ -140,8 +140,8 @@ free via MCP — no signup; 20 calls/day anonymously, 200/day with a free API ke
 | Tool | Description |
 |---|---|
 | `workflow.run_open_analysis` | Open location + type (OD/OTD/ORR/OAIR), VAH/VAL/VPOC/IB, scenario framing |
-| `workflow.run_session_structure` | Day-type classifier — trend / balance / neutral_trend / normal / normal_var |
-| `workflow.run_value_migration` | Value-area migration across sessions — directional conviction vs balance |
+| `workflow.run_session_structure` | Day-type classifier: trend / balance / neutral_trend / normal / normal_var |
+| `workflow.run_value_migration` | Value-area migration across sessions, directional conviction vs balance |
 | `workflow.run_breakout_acceptance` | Breakout acceptance vs rejection beyond the value area (optional delta) |
 
 ### Primitives
@@ -161,9 +161,9 @@ free via MCP — no signup; 20 calls/day anonymously, 200/day with a free API ke
 
 | Tool | Description |
 |---|---|
-| `system.verify` | Run 22 canonical test vectors against all calculators. Returns pass/fail report. |
+| `system.verify` | Run 35 canonical test vectors against all calculators. Returns pass/fail report. |
 
-Formulas normalized across 7 exchanges: **Binance, Bybit, OKX, Hyperliquid, Aster, KuCoin, MEXC**.
+Formulas normalized across 17 exchanges: **Binance, OKX, Bybit, Aster, Hyperliquid, MEXC, KuCoin, Gate, Deribit, Kraken, HTX, WOO, Phemex, Blofin, Backpack, CoinEx, dYdX**.
 
 ## Rate Limits
 
@@ -178,7 +178,7 @@ Pass key as: `Authorization: Bearer <your-api-key>`
 
 ## Self-Verification
 
-Agents can verify all 22 canonical test vectors before trusting results:
+Agents can verify all 35 canonical test vectors before trusting results:
 
 ```json
 {
@@ -188,24 +188,24 @@ Agents can verify all 22 canonical test vectors before trusting results:
 }
 ```
 
-Response: `{ "status": "pass", "passed": 22, "failed": 0, "total": 22 }`
+Response: `{ "status": "pass", "passed": 35, "failed": 0, "total": 35 }`
 
 Live proof: [tradingcalc.io/verify](https://tradingcalc.io/verify)
 
 ## Use Cases
 
-- **Trading bots** — check liquidation price before every trade
-- **AI agents** — deterministic risk calculations without hallucination risk
-- **Multi-agent systems** — drop-in risk management agent in analyst + risk + execution pipelines
-- **Dashboards** — embed calculations programmatically
+- **Trading bots**: check liquidation price before every trade
+- **AI agents**: deterministic risk calculations without hallucination risk
+- **Multi-agent systems**: drop-in risk management agent in analyst + risk + execution pipelines
+- **Dashboards**: embed calculations programmatically
 
 ## Why deterministic?
 
-LLMs asked directly give plausible but potentially wrong numbers. TradingCalc MCP returns exact calculations — same inputs always produce the same outputs. No hallucination risk for financial data.
+LLMs asked directly give plausible but potentially wrong numbers. TradingCalc MCP returns exact calculations: same inputs always produce the same outputs. No hallucination risk for financial data.
 
 ## Risk Agent Wrapper
 
-`examples/risk-agent-wrapper.ts` — a drop-in TypeScript wrapper for risk-gated trade execution.
+`examples/risk-agent-wrapper.ts`: a drop-in TypeScript wrapper for risk-gated trade execution.
 Integrates with any agent framework (ElizaOS, CrewAI, AutoGen, Hummingbot, Freqtrade).
 
 ```typescript
@@ -221,7 +221,7 @@ const result = await agent.evaluate({
 });
 
 if (result.approved) {
-  // execute trade — result.recommended_size, result.liquidation_price
+  // execute trade: result.recommended_size, result.liquidation_price
 } else {
   console.log('Rejected:', result.rejection_reason);
 }
@@ -246,10 +246,10 @@ import { TradingCalcClient } from 'tradingcalc-sdk';
 
 const tc = new TradingCalcClient({ apiKey: 'tc_your_key' });
 
-// Workflows — orchestrated decisions
+// Workflows: orchestrated decisions
 const check = await tc.workflows.preTradeCheck({ side: 'long', entry_price: 83000, leverage: 5, funding_rate: 0.0001, account_balance: 5000 });
 
-// Primitives — single formula
+// Primitives: single formula
 const avg = await tc.primitives.averageEntry({ symbol: 'BTCUSDT', input: { fills: [{ price: 83000, quantity: 0.1 }] } });
 
 // System
@@ -260,7 +260,6 @@ const report = await tc.system.verify();
 
 ## Links
 
-- For agents: [tradingcalc.io/for-agents](https://tradingcalc.io/for-agents)
 - For agents: [tradingcalc.io/for-agents](https://tradingcalc.io/for-agents)
 - Verification proof: [tradingcalc.io/verify](https://tradingcalc.io/verify)
 - Web calculators: [tradingcalc.io](https://tradingcalc.io)
