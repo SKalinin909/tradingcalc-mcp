@@ -3,6 +3,13 @@
   "version": "2.0.1",
   "description": "23 deterministic crypto futures tools: trade planning (pnl, breakeven, exit_target, scenario, dca_entry, scale_out), risk (liquidation, position_sizing, max_leverage, risk_reward), funding & carry (funding_cost, funding_arb, compound_funding, funding_breakeven, carry_trade), market structure (open_analysis, session_structure, value_migration, breakout_acceptance), primitives (average_entry, hedge_ratio), integrated decision (pre_trade_check). Formulas normalized across 17 exchanges, linear and inverse contracts. Not AI estimates, exact numbers your trading bot can trust.",
   "mcpName": "tradingcalc-mcp",
+  "files": [
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "server.json",
+    "examples/"
+  ],
   "keywords": [
     "mcp",
     "crypto",

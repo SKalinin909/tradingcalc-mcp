@@ -1,6 +1,8 @@
 # Secrets — never commit
 .mcpregistry_github_token
 .mcpregistry_registry_token
+.blogger-oauth-client.json
+.blogger-token.json
 
 # Binaries
 mcp-publisher.exe
