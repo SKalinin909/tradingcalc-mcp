@@ -6,6 +6,23 @@ Format: **Tool Changes · Verification Changes · MCP/API Changes · Breaking Ch
 
 ---
 
+## [2.3.0] — 2026-09-16
+
+### Tool Changes
+- New tool `workflow.run_token_risk_check` (24 tools total) — Solana token rug-pull mechanism check.
+  Scores only rug MECHANISMS: mint authority, freeze authority, LP-lock %, mutable metadata, and
+  RugCheck's own named scam-pattern flags (e.g. copycat-token detection). Holder concentration and
+  top-holder dump-impact are returned as informational `market_context`, not scored — live testing
+  showed large legitimate tokens (BONK/WIF/JUP) landing in the worst score band purely for being
+  large and liquid when those were included.
+- Facts that can't be verified when the primary data source (RugCheck) is unavailable come back as
+  `null` and are excluded from scoring rather than defaulted to a guessed value.
+
+### MCP/API Changes
+- Exchange matrix corrected to 16 (CoinEx removed — exchange shut down 2026-09).
+
+---
+
 ## [2.2.0] — 2026-04-09
 
 ### Other
