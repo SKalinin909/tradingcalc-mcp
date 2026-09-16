@@ -8,7 +8,7 @@ Ask Claude or Cursor trade questions and get exact numbers back, not AI guesses.
 > "Size my position: $10k account, 1% risk, long BTC at $83k, stop at $81k."
 > "Is this carry trade worth it? 0.01% funding long, 0.05% short, $50k, 30 days."
 
-24 deterministic tools across trade planning, risk & margin, funding/carry, market-structure (Market Profile) analysis, and Solana token safety checks. Formulas verified against 35 canonical test vectors: same inputs always produce the same outputs. Free, no signup.
+25 deterministic tools across trade planning, risk & margin, funding/carry, market-structure (Market Profile) analysis, and Solana on-chain tools (token safety, swap price impact). Formulas verified against 35 canonical test vectors: same inputs always produce the same outputs. Free, no signup.
 
 Access via **MCP** (Claude Desktop / Cursor / VS Code) or a plain HTTP POST to the MCP endpoint. Free, no signup.
 
@@ -100,9 +100,12 @@ After connecting, just ask naturally: the AI picks the right tool automatically:
 **Token safety check**
 > "Is this Solana token a rug pull risk? Mint: DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263"
 
+**Swap price impact**
+> "How much slippage will I eat swapping 50,000,000 BONK to USDC?"
+
 ---
 
-## Tools (24)
+## Tools (25)
 
 Tool naming follows the `workflow.run_*` / `primitive.*` / `system.*` namespace convention.
 Old flat names (`pnl`, `liquidation`, etc.) are accepted for backward compatibility. All tools are
@@ -160,11 +163,12 @@ free via MCP, no signup; 20 calls/day anonymously, 200/day with a free API key.
 |---|---|
 | `workflow.run_pre_trade_check` | Full pre-trade decision: position size, liquidation, breakeven, funding cost, go/no-go signal. Accepts live exchange + symbol. |
 
-### Token Safety
+### On-chain (Solana)
 
 | Tool | Description |
 |---|---|
-| `workflow.run_token_risk_check` | Solana token rug-pull mechanism check: mint/freeze authority, LP-lock %, mutable metadata, named scam-pattern flags. Holder concentration and dump-impact are returned separately as informational market context, not scored. |
+| `workflow.run_token_risk_check` | Rug-pull mechanism check: mint/freeze authority, LP-lock %, mutable metadata, named scam-pattern flags. Holder concentration and dump-impact are returned separately as informational market context, not scored. |
+| `workflow.run_swap_price_impact` | Live price-impact quote for a swap, routed through Jupiter across every pool it knows about — not a single-pool estimate. |
 
 ### System
 

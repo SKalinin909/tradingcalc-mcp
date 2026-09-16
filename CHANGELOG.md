@@ -6,6 +6,19 @@ Format: **Tool Changes · Verification Changes · MCP/API Changes · Breaking Ch
 
 ---
 
+## [2.4.0] — 2026-09-16
+
+### Tool Changes
+- New tool `workflow.run_swap_price_impact` (25 tools total) — live price-impact quote for a
+  Solana swap, routed through Jupiter across every pool it knows about, not a single-pool
+  estimate. Shows expected output amount, price impact %, and effective price vs current market
+  price.
+- Second On-chain-domain tool (after `workflow.run_token_risk_check`) — the tool catalog now
+  groups these under their own "On-chain (Solana)" section rather than folding them into an
+  unrelated category.
+
+---
+
 ## [2.3.0] — 2026-09-16
 
 ### Tool Changes
