@@ -6,6 +6,19 @@ Format: **Tool Changes · Verification Changes · MCP/API Changes · Breaking Ch
 
 ---
 
+## [2.5.0] — 2026-09-17
+
+### Tool Changes
+- New tool `workflow.run_bonding_curve` (26 tools total) — exact tokens received, price impact,
+  and graduation progress for a pump.fun-style bonding curve buy. Pure constant-product (Uniswap
+  V2) math using pump.fun's own documented reserve constants
+  (github.com/pump-fun/pump-public-docs) — no live lookup needed. Graduation threshold (~85 SOL
+  raised) is derived from those constants, not hardcoded.
+- Third On-chain tool, and the first with no live-data dependency at all — confirms domain (chain
+  scope) and data tier are independent classifications, not the same thing.
+
+---
+
 ## [2.4.0] — 2026-09-16
 
 ### Tool Changes
