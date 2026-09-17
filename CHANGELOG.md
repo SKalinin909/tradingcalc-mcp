@@ -6,6 +6,17 @@ Format: **Tool Changes · Verification Changes · MCP/API Changes · Breaking Ch
 
 ---
 
+## [2.6.0] — 2026-09-17
+
+### Tool Changes
+- New tool `workflow.run_market_cap_comparison` (27 tools total) — projects what an investment
+  would be worth if one token's market cap matched a second token's, using live market caps.
+  Deliberately narrative-agnostic (works for any token pair, not one hype cycle).
+- Fourth On-chain tool, and the first needing two independent live identifier lookups instead of
+  one (every prior on-chain tool took a single token address).
+
+---
+
 ## [2.5.0] — 2026-09-17
 
 ### Tool Changes
