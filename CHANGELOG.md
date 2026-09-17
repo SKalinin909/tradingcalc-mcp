@@ -6,6 +6,24 @@ Format: **Tool Changes · Verification Changes · MCP/API Changes · Breaking Ch
 
 ---
 
+## [2.8.0] — 2026-09-17
+
+### MCP/API Changes
+- `workflow.run_market_cap_comparison` and `workflow.run_wallet_flag_check` are no longer
+  Solana-only — both now accept `chain`/`tokenChain`/`compareToChain` (`solana`, `ethereum`,
+  `base`, `bsc`, `arbitrum`, `polygon`, default `solana`). The two tokens in a market-cap
+  comparison can be on different chains. Backward compatible: omitting the new parameter
+  defaults to Solana, matching the previous behavior exactly.
+- `workflow.run_wallet_flag_check` gains a third source on EVM chains: ScamSniffer's public
+  phishing/drainer blacklist (not applicable on Solana — their database has zero Solana coverage).
+
+### Tool Changes
+- The other three on-chain tools (`token_risk_check`, `swap_price_impact`, `bonding_curve`) stay
+  Solana-only — their primary vendors (RugCheck, Jupiter, pump.fun) are Solana-specific by nature,
+  not by an unexamined default like the two above were.
+
+---
+
 ## [2.7.0] — 2026-09-17
 
 ### Tool Changes

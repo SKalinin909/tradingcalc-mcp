@@ -8,7 +8,7 @@ Ask Claude or Cursor trade questions and get exact numbers back, not AI guesses.
 > "Size my position: $10k account, 1% risk, long BTC at $83k, stop at $81k."
 > "Is this carry trade worth it? 0.01% funding long, 0.05% short, $50k, 30 days."
 
-28 deterministic tools across trade planning, risk & margin, funding/carry, market-structure (Market Profile) analysis, and Solana on-chain tools (token safety, swap price impact, bonding curve, market cap comparison, wallet flag check). Formulas verified against 35 canonical test vectors: same inputs always produce the same outputs. Free, no signup.
+28 deterministic tools across trade planning, risk & margin, funding/carry, market-structure (Market Profile) analysis, and chain-agnostic on-chain tools — Solana (token safety, swap price impact, bonding curve) plus Solana + 5 EVM chains for market cap comparison and wallet flag check. Formulas verified against 35 canonical test vectors: same inputs always produce the same outputs. Free, no signup.
 
 Access via **MCP** (Claude Desktop / Cursor / VS Code) or a plain HTTP POST to the MCP endpoint. Free, no signup.
 
@@ -110,7 +110,7 @@ After connecting, just ask naturally: the AI picks the right tool automatically:
 > "If I put $1,000 into BONK and it reaches JUP's market cap, what's it worth?"
 
 **Wallet flag check**
-> "Is this Solana wallet address flagged for anything? [address]"
+> "Is this wallet address flagged for anything? [address]" (Solana or EVM)
 
 ---
 
@@ -172,15 +172,15 @@ free via MCP, no signup; 20 calls/day anonymously, 200/day with a free API key.
 |---|---|
 | `workflow.run_pre_trade_check` | Full pre-trade decision: position size, liquidation, breakeven, funding cost, go/no-go signal. Accepts live exchange + symbol. |
 
-### On-chain (Solana)
+### On-chain (chain-agnostic — Solana + 5 EVM chains where the vendor supports it)
 
-| Tool | Description |
-|---|---|
-| `workflow.run_token_risk_check` | Rug-pull mechanism check: mint/freeze authority, LP-lock %, mutable metadata, named scam-pattern flags. Holder concentration and dump-impact are returned separately as informational market context, not scored. |
-| `workflow.run_swap_price_impact` | Live price-impact quote for a swap, routed through Jupiter across every pool it knows about — not a single-pool estimate. |
-| `workflow.run_bonding_curve` | Pump.fun-style bonding curve calculator: exact tokens received, price impact, graduation progress. Pure constant-product math from pump.fun's official reserve constants — no live lookup needed. |
-| `workflow.run_market_cap_comparison` | Projects what an investment is worth if one token's market cap matched a second token's, using live market caps. Narrative-agnostic — works for any token pair. |
-| `workflow.run_wallet_flag_check` | Checks a wallet against two independent sources (GoPlus, Webacy) and returns each one's own facts separately — never merged into one invented score. |
+| Tool | Chains | Description |
+|---|---|---|
+| `workflow.run_token_risk_check` | Solana | Rug-pull mechanism check: mint/freeze authority, LP-lock %, mutable metadata, named scam-pattern flags. Holder concentration and dump-impact are returned separately as informational market context, not scored. |
+| `workflow.run_swap_price_impact` | Solana | Live price-impact quote for a swap, routed through Jupiter across every pool it knows about — not a single-pool estimate. |
+| `workflow.run_bonding_curve` | Solana | Pump.fun-style bonding curve calculator: exact tokens received, price impact, graduation progress. Pure constant-product math from pump.fun's official reserve constants — no live lookup needed. |
+| `workflow.run_market_cap_comparison` | Solana, Ethereum, Base, BSC, Arbitrum, Polygon (mix and match) | Projects what an investment is worth if one token's market cap matched a second token's, using live market caps. Narrative-agnostic — works for any token pair on any supported chain. |
+| `workflow.run_wallet_flag_check` | Solana, Ethereum, Base, BSC, Arbitrum, Polygon | Checks a wallet against independent sources (GoPlus, Webacy, and on EVM chains ScamSniffer) and returns each one's own facts separately — never merged into one invented score. |
 
 ### System
 

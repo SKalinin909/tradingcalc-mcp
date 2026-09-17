@@ -1,7 +1,7 @@
 {
   "name": "tradingcalc-mcp",
-  "version": "2.7.0",
-  "description": "28 deterministic crypto futures tools: trade planning (pnl, breakeven, exit_target, scenario, dca_entry, scale_out), risk (liquidation, position_sizing, max_leverage, risk_reward), funding & carry (funding_cost, funding_arb, compound_funding, funding_breakeven, carry_trade), market structure (open_analysis, session_structure, value_migration, breakout_acceptance), primitives (average_entry, hedge_ratio), integrated decision (pre_trade_check), on-chain (token_risk_check, swap_price_impact, bonding_curve, market_cap_comparison, wallet_flag_check). Formulas normalized across 16 exchanges, linear and inverse contracts. Not AI estimates, exact numbers your trading bot can trust.",
+  "version": "2.8.0",
+  "description": "28 deterministic crypto futures tools: trade planning (pnl, breakeven, exit_target, scenario, dca_entry, scale_out), risk (liquidation, position_sizing, max_leverage, risk_reward), funding & carry (funding_cost, funding_arb, compound_funding, funding_breakeven, carry_trade), market structure (open_analysis, session_structure, value_migration, breakout_acceptance), primitives (average_entry, hedge_ratio), integrated decision (pre_trade_check), chain-agnostic on-chain (token_risk_check, swap_price_impact, bonding_curve on Solana; market_cap_comparison and wallet_flag_check on Solana + 5 EVM chains). Formulas normalized across 16 exchanges, linear and inverse contracts. Not AI estimates, exact numbers your trading bot can trust.",
   "mcpName": "tradingcalc-mcp",
   "files": [
     "README.md",
