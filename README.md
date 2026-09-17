@@ -8,7 +8,7 @@ Ask Claude or Cursor trade questions and get exact numbers back, not AI guesses.
 > "Size my position: $10k account, 1% risk, long BTC at $83k, stop at $81k."
 > "Is this carry trade worth it? 0.01% funding long, 0.05% short, $50k, 30 days."
 
-28 deterministic tools across trade planning, risk & margin, funding/carry, market-structure (Market Profile) analysis, and chain-agnostic on-chain tools — Solana (token safety, swap price impact, bonding curve) plus Solana + 5 EVM chains for market cap comparison and wallet flag check. Formulas verified against 35 canonical test vectors: same inputs always produce the same outputs. Free, no signup.
+31 deterministic tools across trade planning, risk & margin, funding/carry, market-structure (Market Profile) analysis, chain-agnostic on-chain tools — Solana (token safety, swap price impact, bonding curve) plus Solana + 5 EVM chains for market cap comparison and wallet flag check — and prediction-market odds from Kalshi's public crypto-price category. Formulas verified against 35 canonical test vectors: same inputs always produce the same outputs. Free, no signup.
 
 Access via **MCP** (Claude Desktop / Cursor / VS Code) or a plain HTTP POST to the MCP endpoint. Free, no signup.
 
@@ -112,9 +112,18 @@ After connecting, just ask naturally: the AI picks the right tool automatically:
 **Wallet flag check**
 > "Is this wallet address flagged for anything? [address]" (Solana or EVM)
 
+**Odds converter**
+> "What odds does a 35% probability work out to?"
+
+**Market-implied odds**
+> "What does the market think BTC will be worth by year end?"
+
+**Prediction market edge**
+> "I think this event is 60% likely but the market prices it at 40%. Should I bet, and how much with a $10k bankroll?"
+
 ---
 
-## Tools (28)
+## Tools (31)
 
 Tool naming follows the `workflow.run_*` / `primitive.*` / `system.*` namespace convention.
 Old flat names (`pnl`, `liquidation`, etc.) are accepted for backward compatibility. All tools are
@@ -181,6 +190,14 @@ free via MCP, no signup; 20 calls/day anonymously, 200/day with a free API key.
 | `workflow.run_bonding_curve` | Solana | Pump.fun-style bonding curve calculator: exact tokens received, price impact, graduation progress. Pure constant-product math from pump.fun's official reserve constants — no live lookup needed. |
 | `workflow.run_market_cap_comparison` | Solana, Ethereum, Base, BSC, Arbitrum, Polygon (mix and match) | Projects what an investment is worth if one token's market cap matched a second token's, using live market caps. Narrative-agnostic — works for any token pair on any supported chain. |
 | `workflow.run_wallet_flag_check` | Solana, Ethereum, Base, BSC, Arbitrum, Polygon | Checks a wallet against independent sources (GoPlus, Webacy, and on EVM chains ScamSniffer) and returns each one's own facts separately — never merged into one invented score. |
+
+### Prediction Markets (Kalshi crypto-price category, keyless)
+
+| Tool | Description |
+|---|---|
+| `workflow.run_odds_converter` | Probability (manual or a live Kalshi ticker) → decimal/American odds, breakeven win rate, and vig when a live market gives both sides of the price. |
+| `workflow.run_market_implied_odds` | Full BTC/ETH year-end price ladder → median/mode bucket, probability at any real bucket boundary. No expected value or interpolation — the open-ended top/bottom buckets would need an invented assumption. |
+| `workflow.run_prediction_market_edge` | Your probability estimate vs the market's price → fractional (quarter-)Kelly recommended stake and verdict. |
 
 ### System
 

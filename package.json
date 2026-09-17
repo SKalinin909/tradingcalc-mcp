@@ -1,7 +1,7 @@
 {
   "name": "tradingcalc-mcp",
-  "version": "2.8.0",
-  "description": "28 deterministic crypto futures tools: trade planning (pnl, breakeven, exit_target, scenario, dca_entry, scale_out), risk (liquidation, position_sizing, max_leverage, risk_reward), funding & carry (funding_cost, funding_arb, compound_funding, funding_breakeven, carry_trade), market structure (open_analysis, session_structure, value_migration, breakout_acceptance), primitives (average_entry, hedge_ratio), integrated decision (pre_trade_check), chain-agnostic on-chain (token_risk_check, swap_price_impact, bonding_curve on Solana; market_cap_comparison and wallet_flag_check on Solana + 5 EVM chains). Formulas normalized across 16 exchanges, linear and inverse contracts. Not AI estimates, exact numbers your trading bot can trust.",
+  "version": "2.9.0",
+  "description": "31 deterministic crypto futures tools: trade planning (pnl, breakeven, exit_target, scenario, dca_entry, scale_out), risk (liquidation, position_sizing, max_leverage, risk_reward), funding & carry (funding_cost, funding_arb, compound_funding, funding_breakeven, carry_trade), market structure (open_analysis, session_structure, value_migration, breakout_acceptance), primitives (average_entry, hedge_ratio), integrated decision (pre_trade_check), chain-agnostic on-chain (token_risk_check, swap_price_impact, bonding_curve on Solana; market_cap_comparison and wallet_flag_check on Solana + 5 EVM chains), prediction markets on Kalshi's crypto-price category (odds_converter, market_implied_odds, prediction_market_edge). Formulas normalized across 16 exchanges, linear and inverse contracts. Not AI estimates, exact numbers your trading bot can trust.",
   "mcpName": "tradingcalc-mcp",
   "files": [
     "README.md",
@@ -29,7 +29,9 @@
     "okx",
     "hyperliquid",
     "kucoin",
-    "mexc"
+    "mexc",
+    "prediction-markets",
+    "kalshi"
   ],
   "homepage": "https://tradingcalc.io",
   "repository": {

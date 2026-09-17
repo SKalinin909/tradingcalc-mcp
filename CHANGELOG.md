@@ -6,6 +6,26 @@ Format: **Tool Changes · Verification Changes · MCP/API Changes · Breaking Ch
 
 ---
 
+## [2.9.0] — 2026-09-17
+
+### Tool Changes
+- Three new tools (31 total), a new domain — Prediction Markets, reading Kalshi's public,
+  keyless crypto-price category (a CFTC-regulated exchange; settlement sourced to CF Benchmarks'
+  BRTI index):
+  - `workflow.run_odds_converter` — probability (manual or live Kalshi ticker) → decimal/American
+    odds, breakeven win rate, and vig when a live market gives both sides of the price.
+  - `workflow.run_market_implied_odds` — full BTC/ETH year-end price ladder → median/mode bucket,
+    probability at any real bucket boundary. No expected value or in-bucket interpolation — the
+    open-ended top/bottom buckets would need an invented assumption, so every number traces to
+    one live, sourced price instead.
+  - `workflow.run_prediction_market_edge` — your probability estimate vs the market's price →
+    fractional (quarter-)Kelly recommended stake and verdict.
+- Scoped deliberately to Kalshi's Crypto category only, not politics/sports — stays horizontal
+  within crypto rather than drifting into an unrelated vertical. Polymarket was evaluated as a
+  second venue but found unreachable from the build/dev network entirely.
+
+---
+
 ## [2.8.0] — 2026-09-17
 
 ### MCP/API Changes
