@@ -6,6 +6,19 @@ Format: **Tool Changes · Verification Changes · MCP/API Changes · Breaking Ch
 
 ---
 
+## [2.7.0] — 2026-09-17
+
+### Tool Changes
+- New tool `workflow.run_wallet_flag_check` (28 tools total) — checks a Solana wallet against two
+  independent sources (GoPlus's 18 malicious-address categories, keyless; Webacy's address
+  analysis + dedicated sanctions check, keyed) and returns each source's own facts separately,
+  never merged into one invented score — the two use different, opaque methodologies.
+- First tool requiring a paid-signup vendor key. Every prior on-chain tool was fully keyless.
+  Vendor research ruled out ScamSniffer (public database confirmed EVM-only, zero Solana
+  addresses across 2530 entries) and RugCheck's documented wallet-risk endpoint (dead, 404).
+
+---
+
 ## [2.6.0] — 2026-09-17
 
 ### Tool Changes
