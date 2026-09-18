@@ -18,6 +18,7 @@ Access via **MCP** (Claude Desktop / Cursor / VS Code) or a plain HTTP POST to t
 |---|---|---|
 | MCP | `https://tradingcalc.io/api/mcp` | Bearer optional (free) |
 | For agents / setup | `https://tradingcalc.io/for-agents` | None |
+| Full API & MCP reference | `https://docs.tradingcalc.io/api` | None |
 | Verification proof | `https://tradingcalc.io/verify` | None |
 
 MCP transport: **Streamable HTTP** (MCP spec 2024-11-05)
@@ -129,81 +130,20 @@ Tool naming follows the `workflow.run_*` / `primitive.*` / `system.*` namespace 
 Old flat names (`pnl`, `liquidation`, etc.) are accepted for backward compatibility. All tools are
 free via MCP, no signup; 20 calls/day anonymously, 200/day with a free API key.
 
-### Trade Planning
-
-| Tool | Description |
+| Category | Tools |
 |---|---|
-| `workflow.run_pnl_planning` | Net PnL, fees and gross profit/loss for a futures trade |
-| `workflow.run_breakeven_planning` | Break-even price accounting for entry/exit fees |
-| `workflow.run_exit_target` | Exit price required to hit a target PnL or ROE |
-| `workflow.run_scenario_planning` | Multi-scenario P&L analysis across price targets |
-| `workflow.run_dca_entry` | DCA across N price levels → avg entry, breakeven, level contribution |
-| `workflow.run_scale_out` | Partial exits at multiple levels → P&L per exit, weighted avg, overall ROI |
+| Trade Planning | PnL, break-even, exit target, scenario, DCA entry, scale-out (6) |
+| Risk & Margin | Liquidation safety, position sizing, max leverage, risk/reward (4) |
+| Funding & Carry | Funding cost, funding arbitrage, compound funding, funding break-even, carry trade (5) |
+| Market Structure (Market Profile) | Open analysis, session structure, value migration, breakout acceptance (4) |
+| Primitives | Average entry, hedge ratio (2) |
+| Integrated Decision | Pre-trade check — sizing + liquidation + breakeven + funding + go/no-go in one call (1) |
+| On-chain (Solana + 5 EVM chains, per tool) | Token risk check, swap price impact, bonding curve, market cap comparison, wallet flag check (5) |
+| Prediction Markets (Kalshi crypto-price) | Odds converter, market-implied odds, prediction-market edge (3) |
+| System | `system.verify` — run 35 canonical test vectors, get a pass/fail report (1) |
 
-### Risk & Margin
-
-| Tool | Description |
-|---|---|
-| `workflow.run_liquidation_safety` | Liquidation price for long/short isolated margin |
-| `workflow.run_position_sizing` | Position size based on account size and max risk % |
-| `workflow.run_max_leverage` | Maximum safe leverage based on drawdown tolerance and volatility |
-| `workflow.run_risk_reward` | Full R:R analysis: sizing + liquidation + breakeven + P&L at stop and target |
-
-### Funding & Carry
-
-| Tool | Description |
-|---|---|
-| `workflow.run_funding_cost` | Cumulative funding cost over a holding period |
-| `workflow.run_funding_arbitrage` | Annualized yield from long/short basis trades across two exchanges |
-| `workflow.run_compound_funding` | Capital growth projection from reinvesting funding income |
-| `workflow.run_funding_breakeven` | Price move needed to cover funding cost + fees over holding period |
-| `workflow.run_carry_trade` | Delta-neutral carry setup: net yield, ROI, breakeven days, verdict |
-
-### Market Structure (Market Profile)
-
-| Tool | Description |
-|---|---|
-| `workflow.run_open_analysis` | Open location + type (OD/OTD/ORR/OAIR), VAH/VAL/VPOC/IB, scenario framing |
-| `workflow.run_session_structure` | Day-type classifier: trend / balance / neutral_trend / normal / normal_var |
-| `workflow.run_value_migration` | Value-area migration across sessions, directional conviction vs balance |
-| `workflow.run_breakout_acceptance` | Breakout acceptance vs rejection beyond the value area (optional delta) |
-
-### Primitives
-
-| Tool | Description |
-|---|---|
-| `primitive.average_entry` | Average entry price after DCA into a position |
-| `primitive.hedge_ratio` | Short perp size and funding cost to hedge a spot position |
-
-### Integrated Decision
-
-| Tool | Description |
-|---|---|
-| `workflow.run_pre_trade_check` | Full pre-trade decision: position size, liquidation, breakeven, funding cost, go/no-go signal. Accepts live exchange + symbol. |
-
-### On-chain (chain-agnostic — Solana + 5 EVM chains where the vendor supports it)
-
-| Tool | Chains | Description |
-|---|---|---|
-| `workflow.run_token_risk_check` | Solana | Rug-pull mechanism check: mint/freeze authority, LP-lock %, mutable metadata, named scam-pattern flags. Holder concentration and dump-impact are returned separately as informational market context, not scored. |
-| `workflow.run_swap_price_impact` | Solana | Live price-impact quote for a swap, routed through Jupiter across every pool it knows about — not a single-pool estimate. |
-| `workflow.run_bonding_curve` | Solana | Pump.fun-style bonding curve calculator: exact tokens received, price impact, graduation progress. Pure constant-product math from pump.fun's official reserve constants — no live lookup needed. |
-| `workflow.run_market_cap_comparison` | Solana, Ethereum, Base, BSC, Arbitrum, Polygon (mix and match) | Projects what an investment is worth if one token's market cap matched a second token's, using live market caps. Narrative-agnostic — works for any token pair on any supported chain. |
-| `workflow.run_wallet_flag_check` | Solana, Ethereum, Base, BSC, Arbitrum, Polygon | Checks a wallet against independent sources (GoPlus, Webacy, and on EVM chains ScamSniffer) and returns each one's own facts separately — never merged into one invented score. |
-
-### Prediction Markets (Kalshi crypto-price category, keyless)
-
-| Tool | Description |
-|---|---|
-| `workflow.run_odds_converter` | Probability (manual or a live Kalshi ticker) → decimal/American odds, breakeven win rate, and vig when a live market gives both sides of the price. |
-| `workflow.run_market_implied_odds` | Full BTC/ETH year-end price ladder → median/mode bucket, probability at any real bucket boundary. No expected value or interpolation — the open-ended top/bottom buckets would need an invented assumption. |
-| `workflow.run_prediction_market_edge` | Your probability estimate vs the market's price → fractional (quarter-)Kelly recommended stake and verdict. |
-
-### System
-
-| Tool | Description |
-|---|---|
-| `system.verify` | Run 35 canonical test vectors against all calculators. Returns pass/fail report. |
+Full tool-by-tool reference (every input/output schema, request/response examples, per-tool
+descriptions): **[docs.tradingcalc.io/api](https://docs.tradingcalc.io/api)**
 
 Formulas normalized across 16 exchanges: **Binance, OKX, Bybit, Aster, Hyperliquid, MEXC, KuCoin, Gate, Deribit, Kraken, HTX, WOO, Phemex, Blofin, Backpack, dYdX**.
 
@@ -303,5 +243,6 @@ const report = await tc.system.verify();
 ## Links
 
 - For agents: [tradingcalc.io/for-agents](https://tradingcalc.io/for-agents)
+- Full docs (API & MCP reference, methodology, architecture, changelog): [docs.tradingcalc.io](https://docs.tradingcalc.io)
 - Verification proof: [tradingcalc.io/verify](https://tradingcalc.io/verify)
 - Web calculators: [tradingcalc.io](https://tradingcalc.io)
