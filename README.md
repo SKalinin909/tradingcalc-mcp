@@ -50,6 +50,16 @@ Add to `claude_desktop_config.json`:
 }
 ```
 
+### Agent Skill
+
+For coding agents that support the [skills.sh](https://skills.sh) ecosystem (Claude Code, Cursor,
+GitHub Copilot, and others) — installs a `SKILL.md` that teaches the agent when to reach for these
+tools instead of estimating trade math itself:
+
+```bash
+npx skills add SKalinin909/tradingcalc-mcp
+```
+
 ### Direct HTTP
 
 ```bash
