@@ -6,6 +6,24 @@ Format: **Tool Changes · Verification Changes · MCP/API Changes · Breaking Ch
 
 ---
 
+## [2.9.2] — 2026-09-19
+
+### MCP/API Changes
+- Metadata-only fix: `server.json`/`package.json` description and README still said "31 tools"
+  after `system.pubkey` shipped in 2.9.1, undercounting the live tool list by one. No code change.
+
+## [2.9.1] — 2026-09-19
+
+### Tool Changes
+- One new tool (32 total): `system.pubkey` (also `GET /api/mcp/pubkey`) returns the ECDSA P-256
+  public key (PEM + JWK) and the canonical signing string format.
+
+### Verification Changes
+- Signed responses: every `tools/call` result now carries a second `content` block signed with
+  ECDSA P-256, plus `X-TradingCalc-Signature/Kid/Signed-At` headers, so a response can be verified
+  offline as having come from tradingcalc.io unaltered — no callback required. Complements
+  `system.verify`, which proves the formulas are correct rather than a specific response's origin.
+
 ## [2.9.0] — 2026-09-17
 
 ### Tool Changes
