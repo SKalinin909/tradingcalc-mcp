@@ -6,6 +6,32 @@ Format: **Tool Changes · Verification Changes · MCP/API Changes · Breaking Ch
 
 ---
 
+## [2.12.0] — 2026-09-20
+
+### Tool Changes
+- Six new tools (38 total), a new domain — Options, scoped to Deribit's BTC/ETH options, which are
+  coin-settled (strike/spot in USD, but premium/payoff/settlement in the underlying coin —
+  confirmed live against a real Deribit instrument before building against it). Deliberately does
+  not compete with the crowded IV-surface/open-interest/max-pain scraper-terminal lane (a whole
+  cottage industry of MCP servers already covers that); the gap is deterministic payoff and pricing
+  math, the same "not an AI estimate" pitch already made for perps.
+  - `workflow.run_options_payoff` — single-leg long/short call/put → P&L, breakeven price, max
+    loss/profit. Coin settlement means a call's upside is capped at (1−premium) per unit, while a
+    put's is technically unbounded as price falls toward zero — the mirror of a USD-settled option.
+  - `workflow.run_black_scholes` — theoretical price + Greeks from manual inputs (spot, strike,
+    days to expiry, volatility, risk-free rate).
+  - `workflow.run_black_scholes_live` — same, but pulls a real Deribit instrument's own live
+    spot/strike/expiry/IV and reports how far its actual quoted mark price sits from what
+    Black-Scholes implies at that IV — a live cross-check, not an estimate.
+  - `workflow.run_straddle_strangle` — two-leg call+put combination (straddle when strikes match,
+    strangle when they differ) → combined P&L, both breakeven prices, max loss/profit.
+  - `workflow.run_covered_call_protective_put` — coin held + one option leg → annualized yield
+    (covered call) or insurance cost (protective put), position value at a scenario price, and the
+    true floor/cap accounting for the coin-denominated premium's effect on both.
+  - `workflow.run_implied_volatility` — solves for the volatility Black-Scholes needs to reproduce
+    an observed option price (Newton-Raphson with a bisection fallback), refusing to solve a price
+    outside its no-arbitrage bounds rather than return a plausible-looking wrong number.
+
 ## [2.9.2] — 2026-09-19
 
 ### MCP/API Changes

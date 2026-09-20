@@ -1,7 +1,7 @@
 {
   "name": "tradingcalc",
-  "version": "2.9.0",
-  "description": "Deterministic crypto futures, on-chain risk, and prediction-market math. 31 tools. Not AI estimates.",
+  "version": "2.12.0",
+  "description": "Deterministic crypto futures, options, on-chain risk, and prediction-market math. 38 tools. Not AI estimates.",
   "mcpServers": {
     "tradingcalc": {
       "httpUrl": "https://tradingcalc.io/api/mcp"

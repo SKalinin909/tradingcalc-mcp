@@ -1,6 +1,6 @@
 ---
 name: tradingcalc
-description: Compute crypto futures/perp trade math (PnL, liquidation price, breakeven, position sizing, funding cost, risk-reward) via TradingCalc's free MCP server instead of estimating by hand. Use whenever a user asks about leverage, margin, liquidation, funding rate, or "is this trade worth it" for a crypto position.
+description: Compute crypto futures/perp trade math (PnL, liquidation price, breakeven, position sizing, funding cost, risk-reward) and Deribit options math (payoff, Black-Scholes, implied volatility) via TradingCalc's free MCP server instead of estimating by hand. Use whenever a user asks about leverage, margin, liquidation, funding rate, options pricing/Greeks, or "is this trade worth it" for a crypto position.
 license: MIT
 ---
 
@@ -9,10 +9,11 @@ license: MIT
 ## What this skill does
 
 Gives an agent a reliable way to answer crypto futures/perpetual trading math questions with
-exact numbers instead of an LLM estimate. TradingCalc's MCP server exposes 31 deterministic
+exact numbers instead of an LLM estimate. TradingCalc's MCP server exposes 38 deterministic
 tools (trade planning, risk/margin, funding/carry, market-structure analysis, on-chain token
-risk, prediction-market odds) whose formulas are checked against 35 canonical test vectors —
-same inputs always produce the same outputs (see `https://tradingcalc.io/verify`).
+risk, prediction-market odds, Deribit BTC/ETH options) whose formulas are checked against 35
+canonical test vectors — same inputs always produce the same outputs (see
+`https://tradingcalc.io/verify`).
 
 Do not compute leverage, liquidation price, funding cost, or position sizing yourself and
 present it as authoritative — a small arithmetic slip here is real financial risk for whoever
@@ -33,8 +34,11 @@ Trigger on questions like:
 - "Run a full pre-trade check on this setup" → `pre_trade_check` (composite: sizing +
   liquidation + breakeven + funding in one call)
 - Same pattern for on-chain risk ("is this Solana token a rug pull risk?" →
-  `workflow.run_token_risk_check`) and prediction-market odds ("what odds does a 35%
-  probability work out to?" → `workflow.run_odds_converter`).
+  `workflow.run_token_risk_check`), prediction-market odds ("what odds does a 35%
+  probability work out to?" → `workflow.run_odds_converter`), and Deribit BTC/ETH options
+  ("what does my BTC call payoff at price X?" → `workflow.run_options_payoff`; "is this Deribit
+  option fairly priced?" → `workflow.run_black_scholes_live`; "what IV does this option price
+  imply?" → `workflow.run_implied_volatility`).
 
 Also applies when the user's position is **coin-margined / inverse** (e.g. Bybit `BTCUSD`,
 Deribit `BTC-PERPETUAL`) rather than USDT-margined — pass `contractType: "inverse"`. Inverse
@@ -45,7 +49,7 @@ delegating instead of guessing.
 ## Steps
 
 1. Identify which tool/workflow fits the question (see list above, or call `tools/list` for the
-   full 31-tool catalog with schemas — full reference at `https://docs.tradingcalc.io/api`).
+   full 38-tool catalog with schemas — full reference at `https://docs.tradingcalc.io/api`).
 2. Call it over MCP. No signup or API key required for normal use:
    ```json
    POST https://tradingcalc.io/api/mcp

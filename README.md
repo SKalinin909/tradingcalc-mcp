@@ -8,7 +8,7 @@ Ask Claude or Cursor trade questions and get exact numbers back, not AI guesses.
 > "Size my position: $10k account, 1% risk, long BTC at $83k, stop at $81k."
 > "Is this carry trade worth it? 0.01% funding long, 0.05% short, $50k, 30 days."
 
-32 deterministic tools across trade planning, risk & margin, funding/carry, market-structure (Market Profile) analysis, chain-agnostic on-chain tools — Solana (token safety, swap price impact, bonding curve) plus Solana + 5 EVM chains for market cap comparison and wallet flag check — and prediction-market odds from Kalshi's public crypto-price category. Formulas verified against 35 canonical test vectors: same inputs always produce the same outputs. Every response is also signed with ECDSA P-256, so you can verify offline that it actually came from us. Free, no signup.
+38 deterministic tools across trade planning, risk & margin, funding/carry, market-structure (Market Profile) analysis, chain-agnostic on-chain tools — Solana (token safety, swap price impact, bonding curve) plus Solana + 5 EVM chains for market cap comparison and wallet flag check — prediction-market odds from Kalshi's public crypto-price category, and Deribit BTC/ETH options math (payoff/breakeven, Black-Scholes price/Greeks, straddle/strangle, covered call/protective put, implied volatility). Formulas verified against 35 canonical test vectors: same inputs always produce the same outputs. Every response is also signed with ECDSA P-256, so you can verify offline that it actually came from us. Free, no signup.
 
 Access via **MCP** (Claude Desktop / Cursor / VS Code) or a plain HTTP POST to the MCP endpoint. Free, no signup.
 
@@ -132,9 +132,18 @@ After connecting, just ask naturally: the AI picks the right tool automatically:
 **Prediction market edge**
 > "I think this event is 60% likely but the market prices it at 40%. Should I bet, and how much with a $10k bankroll?"
 
+**Options payoff**
+> "What does my BTC call payoff at $90,000? Strike $85,000, premium 0.02 BTC, long 1 contract."
+
+**Black-Scholes / IV check**
+> "Is Deribit's BTC-27FEB27-90000-C fairly priced right now?"
+
+**Covered call yield**
+> "I hold BTC bought at $80,000. What annualized yield do I get selling a $85,000-strike call for 0.02 BTC, 30 days out?"
+
 ---
 
-## Tools (31)
+## Tools (38)
 
 Tool naming follows the `workflow.run_*` / `primitive.*` / `system.*` namespace convention.
 Old flat names (`pnl`, `liquidation`, etc.) are accepted for backward compatibility. All tools are
@@ -150,6 +159,7 @@ free via MCP, no signup; 20 calls/day anonymously, 200/day with a free API key.
 | Integrated Decision | Pre-trade check — sizing + liquidation + breakeven + funding + go/no-go in one call (1) |
 | On-chain (Solana + 5 EVM chains, per tool) | Token risk check, swap price impact, bonding curve, market cap comparison, wallet flag check (5) |
 | Prediction Markets (Kalshi crypto-price) | Odds converter, market-implied odds, prediction-market edge (3) |
+| Options (Deribit BTC/ETH, coin-settled) | Options payoff & breakeven, Black-Scholes price/Greeks (manual + live), straddle/strangle, covered call/protective put, implied volatility solver (6) |
 | System | `system.verify` — run 35 canonical test vectors, get a pass/fail report; `system.pubkey` — get the public key to verify signed responses offline (2) |
 
 Full tool-by-tool reference (every input/output schema, request/response examples, per-tool
