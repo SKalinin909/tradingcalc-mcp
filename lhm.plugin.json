@@ -1,0 +1,1947 @@
+{
+  "author": "TradingCalc",
+  "cloudEndpoint": "https://tradingcalc.io/api/mcp",
+  "description": "40 deterministic crypto futures tools: trade planning (pnl, breakeven, exit_target, scenario, dca_entry, scale_out), risk (liquidation, position_sizing, max_leverage, risk_reward), funding & carry (funding_cost, funding_arb, compound_funding, funding_breakeven, carry_trade), market structure (open_analysis, session_structure, value_migration, breakout_acceptance), primitives (average_entry, hedge_ratio), integrated decision (pre_trade_check), chain-agnostic on-chain (token_risk_check, swap_price_impact, bonding_curve on Solana; market_cap_comparison and wallet_flag_check on Solana + 5 EVM chains), prediction markets across Kalshi, Polymarket and ADI Predictstreet's crypto categories (odds_converter, market_implied_odds, prediction_market_edge, window_fair_value, spread_reader), and Deribit BTC/ETH options (options_payoff, black_scholes, black_scholes_live, straddle_strangle, covered_call_protective_put, implied_volatility). Formulas normalized across 16 exchanges, linear and inverse contracts. Every response signed with ECDSA P-256. Not AI estimates, exact numbers your trading bot can trust.",
+  "homepage": "https://tradingcalc.io",
+  "identifier": "skalinin909-tradingcalc-mcp",
+  "name": "tradingcalc-mcp",
+  "prompts": [],
+  "resources": [],
+  "tags": [
+    "mcp",
+    "crypto",
+    "trading",
+    "futures",
+    "calculator",
+    "pnl",
+    "liquidation",
+    "breakeven",
+    "position-sizing",
+    "funding-rate",
+    "pre-trade-check",
+    "risk-management",
+    "hedge",
+    "binance",
+    "bybit",
+    "okx",
+    "hyperliquid",
+    "kucoin",
+    "mexc",
+    "prediction-markets",
+    "kalshi",
+    "polymarket",
+    "options",
+    "deribit",
+    "black-scholes",
+    "implied-volatility"
+  ],
+  "tools": [
+    {
+      "name": "workflow.run_pnl_planning",
+      "description": "Calculate net PnL, ROE, fees and gross profit/loss for a futures trade. Use when user asks \"what's my profit/loss on this trade?\" Returns: grossPnl, fees, netPnl, netPnlUsdt, roe (%).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "side": {
+            "type": "string",
+            "enum": [
+              "long",
+              "short"
+            ],
+            "description": "Trade direction"
+          },
+          "entryPrice": {
+            "type": "number",
+            "description": "Entry price (positive)"
+          },
+          "exitPrice": {
+            "type": "number",
+            "description": "Exit price (positive)"
+          },
+          "size": {
+            "type": "number",
+            "description": "Position size: base asset qty for linear, USD contracts for inverse"
+          },
+          "feeOpenPct": {
+            "type": "number",
+            "description": "Opening fee as fraction, e.g. 0.0002 = 0.02%"
+          },
+          "feeClosePct": {
+            "type": "number",
+            "description": "Closing fee as fraction"
+          },
+          "contractType": {
+            "type": "string",
+            "enum": [
+              "linear",
+              "inverse"
+            ],
+            "description": "linear = USDT-margined (default), inverse = coin-margined. For inverse, pnl/fees are returned in the base coin, not USDT."
+          }
+        },
+        "required": [
+          "side",
+          "entryPrice",
+          "exitPrice",
+          "size"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_liquidation_safety",
+      "description": "Calculate the liquidation price for an isolated-margin futures position. Use when user asks \"where will I get liquidated?\" or \"how close is my liq price?\". Returns: liquidationPrice, distancePct (how far from entry).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "side": {
+            "type": "string",
+            "enum": [
+              "long",
+              "short"
+            ]
+          },
+          "entryPrice": {
+            "type": "number",
+            "description": "Entry price (positive)"
+          },
+          "leverage": {
+            "type": "number",
+            "description": "Leverage multiplier, e.g. 10 for 10x"
+          },
+          "mmr": {
+            "type": "number",
+            "description": "Maintenance margin rate, default 0.005 (0.5%)"
+          },
+          "contractType": {
+            "type": "string",
+            "enum": [
+              "linear",
+              "inverse"
+            ],
+            "description": "linear = USDT-margined (default), inverse = coin-margined (e.g. Deribit/Bybit/MEXC BTC-settled perps)."
+          }
+        },
+        "required": [
+          "side",
+          "entryPrice",
+          "leverage"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_breakeven_planning",
+      "description": "Calculate the break-even exit price that covers all trading fees: this alone, nothing else. Use when user asks only \"what price do I need to just break even?\" and nothing more. If the user also gave a stop/target or wants a full trade-safety check, use workflow.run_risk_reward or workflow.run_pre_trade_check instead; both already include this breakeven figure plus more. Returns: breakevenPrice, totalFees.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "side": {
+            "type": "string",
+            "enum": [
+              "long",
+              "short"
+            ]
+          },
+          "entryPrice": {
+            "type": "number",
+            "description": "Entry price (positive)"
+          },
+          "sizeBase": {
+            "type": "number",
+            "description": "Position size: base asset qty for linear, USD contracts for inverse"
+          },
+          "feeOpenPct": {
+            "type": "number",
+            "description": "Opening fee fraction, default 0.0002"
+          },
+          "feeClosePct": {
+            "type": "number",
+            "description": "Closing fee fraction, default 0.0005"
+          },
+          "contractType": {
+            "type": "string",
+            "enum": [
+              "linear",
+              "inverse"
+            ],
+            "description": "linear = USDT-margined (default), inverse = coin-margined. For inverse, totalFees is returned in the base coin."
+          }
+        },
+        "required": [
+          "side",
+          "entryPrice",
+          "sizeBase"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_position_sizing",
+      "description": "Calculate the correct position size given a maximum risk in USDT and a stop-loss price. Use when user asks \"how many coins should I buy?\" or \"size my position so I risk exactly $X\". Returns: positionSize (base), positionUsdt, marginRequired.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "side": {
+            "type": "string",
+            "enum": [
+              "long",
+              "short"
+            ]
+          },
+          "entryPrice": {
+            "type": "number",
+            "description": "Entry price"
+          },
+          "stopLoss": {
+            "type": "number",
+            "description": "Stop-loss price"
+          },
+          "riskUsdt": {
+            "type": "number",
+            "description": "Maximum acceptable loss in USDT"
+          },
+          "leverage": {
+            "type": "number",
+            "description": "Leverage, default 1"
+          },
+          "feeOpenPct": {
+            "type": "number",
+            "description": "Opening fee fraction, default 0.0002"
+          },
+          "feeClosePct": {
+            "type": "number",
+            "description": "Closing fee fraction, default 0.0005"
+          },
+          "contractType": {
+            "type": "string",
+            "enum": [
+              "linear",
+              "inverse"
+            ],
+            "description": "linear = USDT-margined (default), inverse = coin-margined. For inverse, sizeQuote is USD contracts and margin is returned in the base coin."
+          }
+        },
+        "required": [
+          "side",
+          "entryPrice",
+          "stopLoss",
+          "riskUsdt"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_funding_cost",
+      "description": "Calculate the total funding cost (or income) for holding a perpetual futures position. Use when user asks \"how much funding will I pay holding X days?\" or \"is funding eating my profit?\". Returns: totalFundingUsdt (negative = you pay, positive = you receive), perIntervalUsdt.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "side": {
+            "type": "string",
+            "enum": [
+              "long",
+              "short"
+            ]
+          },
+          "sizeBase": {
+            "type": "number",
+            "description": "Position size in base asset"
+          },
+          "entryPrice": {
+            "type": "number",
+            "description": "Entry price"
+          },
+          "fundingRate": {
+            "type": "number",
+            "description": "Funding rate per 8h period as fraction, e.g. 0.0001"
+          },
+          "days": {
+            "type": "number",
+            "description": "Number of days to hold"
+          },
+          "contractType": {
+            "type": "string",
+            "enum": [
+              "linear",
+              "inverse"
+            ],
+            "description": "linear = USDT-margined (default), inverse = coin-margined. For inverse, sizeBase is USD contracts and cost figures come out in the base coin."
+          }
+        },
+        "required": [
+          "side",
+          "sizeBase",
+          "entryPrice",
+          "fundingRate",
+          "days"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "primitive.average_entry",
+      "description": "Calculate the weighted average entry price from multiple buy/sell fills (DCA): the bare number only, no breakeven or per-fill breakdown. Use when user asks only \"what's my average entry?\" and wants just that figure. For breakeven and a per-level summary too, use workflow.run_dca_entry instead. Returns: averagePrice, totalSize, totalCost.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "symbol": {
+            "type": "string",
+            "description": "Trading pair symbol, e.g. BTCUSDT"
+          },
+          "exchangeCode": {
+            "type": "string",
+            "description": "Exchange identifier (optional)"
+          },
+          "input": {
+            "type": "object",
+            "properties": {
+              "fills": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "price": {
+                      "type": "number",
+                      "description": "Fill price"
+                    },
+                    "quantity": {
+                      "type": "number",
+                      "description": "Fill quantity"
+                    }
+                  },
+                  "required": [
+                    "price",
+                    "quantity"
+                  ]
+                },
+                "minItems": 1
+              }
+            },
+            "required": [
+              "fills"
+            ]
+          },
+          "contractType": {
+            "type": "string",
+            "enum": [
+              "linear",
+              "inverse"
+            ],
+            "description": "linear = USDT-margined, average is the arithmetic mean (default). inverse = coin-margined, average is the harmonic mean (fill quantity is USD notional)."
+          }
+        },
+        "required": [
+          "symbol",
+          "input"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_exit_target",
+      "description": "Calculate the exact exit price needed to hit a target PnL or ROE percentage. Use when user asks \"at what price do I take profit to make $500?\" or \"where should I set TP for 20% ROE?\". Returns: targetExitPrice.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "side": {
+            "type": "string",
+            "enum": [
+              "long",
+              "short"
+            ]
+          },
+          "entryPrice": {
+            "type": "number",
+            "description": "Entry price"
+          },
+          "leverage": {
+            "type": "number",
+            "description": "Leverage multiplier"
+          },
+          "sizeBase": {
+            "type": "number",
+            "description": "Position size in base asset"
+          },
+          "targetMode": {
+            "type": "string",
+            "enum": [
+              "pnl",
+              "roe"
+            ],
+            "description": "\"pnl\" = target in USDT, \"roe\" = target in %"
+          },
+          "targetValue": {
+            "type": "number",
+            "description": "Target value (USDT/coin for pnl mode, or %)"
+          },
+          "feeOpenPct": {
+            "type": "number",
+            "description": "Opening fee fraction, default 0.0002"
+          },
+          "feeClosePct": {
+            "type": "number",
+            "description": "Closing fee fraction, default 0.0005"
+          },
+          "contractType": {
+            "type": "string",
+            "enum": [
+              "linear",
+              "inverse"
+            ],
+            "description": "linear = USDT-margined (default), inverse = coin-margined. For inverse, pnl-mode targetValue and outputs are in the base coin."
+          }
+        },
+        "required": [
+          "side",
+          "entryPrice",
+          "leverage",
+          "sizeBase",
+          "targetMode",
+          "targetValue"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_scenario_planning",
+      "description": "Run a scenario analysis: compute PnL for multiple price-change percentages at once. Use when user asks \"show me my P&L if BTC moves -10%, -5%, +5%, +10%\". Returns: array of { deltaPct, exitPrice, netPnl, roe }.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "side": {
+            "type": "string",
+            "enum": [
+              "long",
+              "short"
+            ]
+          },
+          "entryPrice": {
+            "type": "number",
+            "description": "Entry price"
+          },
+          "size": {
+            "type": "number",
+            "description": "Position size in base asset"
+          },
+          "deltasPct": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "description": "List of price change percentages, e.g. [-10, -5, 0, 5, 10]"
+          },
+          "feeOpenPct": {
+            "type": "number",
+            "description": "Opening fee fraction"
+          },
+          "feeClosePct": {
+            "type": "number",
+            "description": "Closing fee fraction"
+          },
+          "contractType": {
+            "type": "string",
+            "enum": [
+              "linear",
+              "inverse"
+            ],
+            "description": "linear = USDT-margined (default), inverse = coin-margined. For inverse, size is USD contracts and pnl/fees come out in the base coin."
+          }
+        },
+        "required": [
+          "side",
+          "entryPrice",
+          "size",
+          "deltasPct"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_max_leverage",
+      "description": "Calculate the maximum safe leverage based on account size, max acceptable drawdown, and asset daily volatility. Use when user asks \"what's the max leverage I should use on BTC?\" or \"how much leverage is safe given 3% daily volatility?\". Returns: maxLeverage, marginAtRisk.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "accountSize": {
+            "type": "number",
+            "description": "Total account size in USDT"
+          },
+          "maxDrawdownPct": {
+            "type": "number",
+            "description": "Maximum acceptable drawdown as percentage, e.g. 10 for 10%"
+          },
+          "volatilityPct": {
+            "type": "number",
+            "description": "Expected daily price volatility as percentage, e.g. 3 for 3%"
+          },
+          "mmr": {
+            "type": "number",
+            "description": "Maintenance margin rate, default 0.005 (0.5%)"
+          }
+        },
+        "required": [
+          "accountSize",
+          "maxDrawdownPct",
+          "volatilityPct"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "primitive.hedge_ratio",
+      "description": "Calculate the short perpetual futures position size needed to hedge a spot holding. Use when user asks \"how much should I short to hedge my BTC?\" or \"what margin do I need for a 100% hedge?\". Returns: hedgeNotional, requiredMargin, estimatedFundingCost.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "spotSize": {
+            "type": "number",
+            "description": "Spot position value in USDT"
+          },
+          "hedgeRatio": {
+            "type": "number",
+            "description": "Percentage of spot to hedge, e.g. 100 for full hedge, 50 for half. Default 100."
+          },
+          "leverage": {
+            "type": "number",
+            "description": "Leverage on the perp short. Default 1."
+          },
+          "fundingRatePct": {
+            "type": "number",
+            "description": "Current 8h funding rate as percentage, e.g. 0.01. Used for cost estimate."
+          }
+        },
+        "required": [
+          "spotSize"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_funding_arbitrage",
+      "description": "Calculate funding rate arbitrage profit: annualized yield, net profit, and breakeven days for a long/short basis trade across two exchanges: the bare numbers only, no plain-English verdict. For the same math plus a profitable/marginal/loss verdict, use workflow.run_carry_trade instead. Use when user asks \"is this funding arb worth it?\" or \"how many days to break even on transfer fees?\". Returns: netProfitUsdt, annualizedYieldPct, breakevenDays.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "positionSize": {
+            "type": "number",
+            "description": "Position size in USDT"
+          },
+          "longFundingRate": {
+            "type": "number",
+            "description": "Funding rate on long side (% per interval, positive = you pay)"
+          },
+          "shortFundingRate": {
+            "type": "number",
+            "description": "Funding rate on short side (% per interval, positive = you receive)"
+          },
+          "transferFeePct": {
+            "type": "number",
+            "description": "One-time transfer/setup fee as percentage, e.g. 0.1 for 0.1%"
+          },
+          "durationDays": {
+            "type": "number",
+            "description": "Holding period in days"
+          },
+          "intervalHours": {
+            "type": "number",
+            "enum": [
+              8,
+              1
+            ],
+            "description": "Funding interval: 8 (standard) or 1 (Hyperliquid)"
+          }
+        },
+        "required": [
+          "positionSize",
+          "longFundingRate",
+          "shortFundingRate",
+          "durationDays"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_compound_funding",
+      "description": "Project capital growth from reinvesting perpetual futures funding income (compounding carry). Use when user asks \"how much will I make compounding 0.01% funding for 90 days?\" or \"what's my APY on this carry position?\". Returns: finalCapital, totalEarned, apy, growthTable.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "initialCapital": {
+            "type": "number",
+            "description": "Starting capital in USDT"
+          },
+          "fundingRatePct": {
+            "type": "number",
+            "description": "Funding rate per interval as percentage, e.g. 0.01 for 0.01%"
+          },
+          "intervalHours": {
+            "type": "number",
+            "enum": [
+              8,
+              1
+            ],
+            "description": "Funding interval: 8 (standard) or 1 (Hyperliquid)"
+          },
+          "durationDays": {
+            "type": "number",
+            "description": "Number of days to project"
+          },
+          "reinvestPct": {
+            "type": "number",
+            "description": "Percentage of earnings reinvested each interval. 100 = full compounding, 0 = no reinvestment. Default 100."
+          }
+        },
+        "required": [
+          "initialCapital",
+          "fundingRatePct",
+          "durationDays"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_pre_trade_check",
+      "description": "Full pre-trade decision card: orchestrates position sizing, breakeven, liquidation, and funding cost in one call: the preferred tool whenever a full setup check is wanted, not just one metric. Use when user describes a full trade setup and asks \"should I take this trade?\" or \"run the numbers on this setup\". Provide exchange+symbol to fetch live funding rate automatically. If the user specifically gave an entry/stop/target and wants an R:R-graded verdict, use workflow.run_risk_reward instead. Returns: positionSize, breakeven, liquidationPrice, fundingCost, overnightBreakevenShift, verdict.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "exchange": {
+            "type": "string",
+            "description": "Exchange code, e.g. \"binance\" or \"bybit\". Used to fetch live funding rate if funding_rate is omitted."
+          },
+          "symbol": {
+            "type": "string",
+            "description": "Perpetual symbol, e.g. \"BTCUSDT\"."
+          },
+          "side": {
+            "type": "string",
+            "enum": [
+              "long",
+              "short"
+            ]
+          },
+          "entry_price": {
+            "type": "number",
+            "description": "Entry price (positive)"
+          },
+          "stop_loss": {
+            "type": "number",
+            "description": "Stop-loss price (positive)"
+          },
+          "account_balance": {
+            "type": "number",
+            "description": "Total account balance in USDT"
+          },
+          "risk_pct": {
+            "type": "number",
+            "description": "Risk as % of balance, e.g. 1.0 = 1%"
+          },
+          "leverage": {
+            "type": "number",
+            "description": "Leverage multiplier"
+          },
+          "funding_rate": {
+            "type": "number",
+            "description": "Funding rate per 8h as decimal, e.g. 0.0001. If omitted, fetched live from exchange."
+          },
+          "hold_hours": {
+            "type": "number",
+            "description": "Expected hold time in hours for overnight shift calc. Default 8."
+          },
+          "fee_open_pct": {
+            "type": "number",
+            "description": "Opening fee fraction, default 0.0002"
+          },
+          "fee_close_pct": {
+            "type": "number",
+            "description": "Closing fee fraction, default 0.0005"
+          },
+          "mmr": {
+            "type": "number",
+            "description": "Maintenance margin rate, default 0.005"
+          },
+          "contractType": {
+            "type": "string",
+            "enum": [
+              "linear",
+              "inverse"
+            ],
+            "description": "linear = USDT-margined (default), inverse = coin-margined (e.g. Bybit BTCUSD). All returned figures (notional, margin, risk_amount, funding_cost_*) stay USD-denominated either way; recommended_size is USD notional (contracts) for inverse."
+          }
+        },
+        "required": [
+          "side",
+          "entry_price",
+          "stop_loss",
+          "account_balance",
+          "risk_pct",
+          "leverage"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_risk_reward",
+      "description": "Full risk:reward analysis: the single best tool when user describes a trade with entry, stop, AND target (all three). Calculates R:R ratio, position size, liquidation price, breakeven, and P&L at both stop and target. Returns a verdict: strong (3:1+) / good (2:1+) / marginal / poor, specifically graded on the R:R ratio. If the user instead wants a full setup check tied to a live exchange/symbol (including funding cost), use workflow.run_pre_trade_check instead; its verdict covers overall setup safety, not just R:R. Use when user asks \"is this trade worth taking?\" or \"what's my risk reward on this setup?\".",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "side": {
+            "type": "string",
+            "enum": [
+              "long",
+              "short"
+            ]
+          },
+          "entry_price": {
+            "type": "number",
+            "description": "Entry price"
+          },
+          "stop_loss": {
+            "type": "number",
+            "description": "Stop-loss price"
+          },
+          "take_profit": {
+            "type": "number",
+            "description": "Take-profit price"
+          },
+          "account_balance": {
+            "type": "number",
+            "description": "Account balance in USDT"
+          },
+          "risk_pct": {
+            "type": "number",
+            "description": "Max risk as % of account"
+          },
+          "leverage": {
+            "type": "number",
+            "description": "Leverage multiplier"
+          },
+          "fee_open_pct": {
+            "type": "number",
+            "description": "Open fee rate (default 0.0002)"
+          },
+          "fee_close_pct": {
+            "type": "number",
+            "description": "Close fee rate (default 0.0005)"
+          },
+          "mmr": {
+            "type": "number",
+            "description": "Maintenance margin rate (default 0.005)"
+          },
+          "contractType": {
+            "type": "string",
+            "enum": [
+              "linear",
+              "inverse"
+            ],
+            "description": "linear = USDT-margined (default), inverse = coin-margined (e.g. Bybit BTCUSD). position_size/notional are USD notional (contracts) for inverse; pnl_at_stop/pnl_at_target come back denominated in the base coin."
+          }
+        },
+        "required": [
+          "side",
+          "entry_price",
+          "stop_loss",
+          "take_profit",
+          "account_balance",
+          "risk_pct",
+          "leverage"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_dca_entry",
+      "description": "DCA entry planner: weighted average entry price, breakeven, and per-level contribution from multiple fill prices and sizes. Prefer this over primitive.average_entry whenever breakeven or the per-level breakdown is also wanted, not just the bare average. Use when user bought at several prices and asks \"what's my average entry?\" or \"where is my DCA breakeven?\". Returns: averageEntry, breakeven, per-level summary.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "side": {
+            "type": "string",
+            "enum": [
+              "long",
+              "short"
+            ]
+          },
+          "entries": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "price": {
+                  "type": "number"
+                },
+                "size": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "price",
+                "size"
+              ]
+            },
+            "minItems": 2,
+            "maxItems": 20
+          },
+          "fee_open_pct": {
+            "type": "number",
+            "description": "Open fee rate (default 0.0002)"
+          },
+          "fee_close_pct": {
+            "type": "number",
+            "description": "Close fee rate (default 0.0005)"
+          },
+          "contractType": {
+            "type": "string",
+            "enum": [
+              "linear",
+              "inverse"
+            ],
+            "description": "linear = USDT-margined (default), inverse = coin-margined. Each fill's size is USD notional (contracts) for inverse; averageEntry is then the harmonic mean of fill prices, not the arithmetic mean."
+          }
+        },
+        "required": [
+          "side",
+          "entries"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_scale_out",
+      "description": "Scale-out planner: P&L, ROI, and cumulative P&L for each partial exit level. Use when user wants to take profit at multiple targets: \"close 30% at $90k, 30% at $95k, 40% at $100k, what's my total P&L?\". Returns: per-level pnl, weightedAvgExitPrice, totalRoi.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "side": {
+            "type": "string",
+            "enum": [
+              "long",
+              "short"
+            ]
+          },
+          "entry_price": {
+            "type": "number",
+            "description": "Entry price"
+          },
+          "total_size": {
+            "type": "number",
+            "description": "Total position size in base currency"
+          },
+          "exits": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "price": {
+                  "type": "number"
+                },
+                "pct": {
+                  "type": "number",
+                  "description": "% of total_size to exit here"
+                }
+              },
+              "required": [
+                "price",
+                "pct"
+              ]
+            },
+            "minItems": 2,
+            "maxItems": 10
+          },
+          "fee_open_pct": {
+            "type": "number",
+            "description": "Open fee rate (default 0.0002)"
+          },
+          "fee_close_pct": {
+            "type": "number",
+            "description": "Close fee rate (default 0.0005)"
+          },
+          "contractType": {
+            "type": "string",
+            "enum": [
+              "linear",
+              "inverse"
+            ],
+            "description": "linear = USDT-margined (default), inverse = coin-margined. total_size is USD notional (contracts) for inverse, and per-level pnl comes back denominated in the base coin."
+          }
+        },
+        "required": [
+          "side",
+          "entry_price",
+          "total_size",
+          "exits"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_carry_trade",
+      "description": "Delta-neutral carry trade (funding arbitrage) analysis, with a profitable/marginal/loss verdict on top of the same math primitive.funding_arb uses. Prefer this over primitive.funding_arb whenever a plain-English verdict is wanted, not just the raw numbers. Use when user asks \"is this carry trade worth it?\": long on exchange A, short on exchange B, collect the funding rate spread. Returns: netYieldPct, grossProfit, netProfit, breakevenDays, verdict (profitable/marginal/loss).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "notional": {
+            "type": "number",
+            "description": "Position notional in USDT"
+          },
+          "funding_rate_long": {
+            "type": "number",
+            "description": "Funding rate on long exchange per interval (decimal)"
+          },
+          "funding_rate_short": {
+            "type": "number",
+            "description": "Funding rate on short exchange per interval (decimal)"
+          },
+          "transfer_fee_pct": {
+            "type": "number",
+            "description": "One-way transfer fee % (default 0.1)"
+          },
+          "hold_days": {
+            "type": "number",
+            "description": "Hold duration in days"
+          },
+          "interval_hours": {
+            "type": "number",
+            "enum": [
+              1,
+              8
+            ],
+            "description": "Funding interval: 1 or 8 hours (default 8)"
+          }
+        },
+        "required": [
+          "notional",
+          "funding_rate_long",
+          "funding_rate_short",
+          "hold_days"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_funding_breakeven",
+      "description": "Price move needed to cover funding cost + fees over a holding period. Use when user asks \"how much does BTC need to move for me to profit after funding?\" or \"is funding killing my edge on this trade?\". Returns: breakevenWithFunding, breakevenWithoutFunding, requiredMovePct.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "side": {
+            "type": "string",
+            "enum": [
+              "long",
+              "short"
+            ]
+          },
+          "entry_price": {
+            "type": "number",
+            "description": "Entry price"
+          },
+          "size": {
+            "type": "number",
+            "description": "Position size in base currency"
+          },
+          "funding_rate": {
+            "type": "number",
+            "description": "Funding rate per 8h period (decimal, e.g. 0.0001)"
+          },
+          "hold_hours": {
+            "type": "number",
+            "description": "Hold duration in hours"
+          },
+          "fee_open_pct": {
+            "type": "number",
+            "description": "Open fee rate (default 0.0002)"
+          },
+          "fee_close_pct": {
+            "type": "number",
+            "description": "Close fee rate (default 0.0005)"
+          },
+          "contractType": {
+            "type": "string",
+            "enum": [
+              "linear",
+              "inverse"
+            ],
+            "description": "linear = USDT-margined (default), inverse = coin-margined. size is USD notional (contracts) for inverse; notional/funding_cost/fee_total/total_carry_cost come back denominated in the base coin."
+          }
+        },
+        "required": [
+          "side",
+          "entry_price",
+          "size",
+          "funding_rate",
+          "hold_hours"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_bonding_curve",
+      "description": "Pump.fun-style bonding curve calculator: exact tokens received for a buy, price impact, and graduation progress. Pure constant-product math (Uniswap V2 style) using pump.fun's official virtual-reserve constants: no live lookup needed, works for any token still on the curve (not yet graduated to a real AMM pool). Use when user asks \"how many tokens do I get buying X SOL on this curve?\" or \"will this buy graduate the token?\". Returns: tokensOut, priceImpactPct, progressPctBefore/After, willGraduate, partialFill (true if the buy exceeds remaining curve capacity).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "solRaisedSoFar": {
+            "type": "number",
+            "description": "SOL already raised on the curve so far (0 for a brand-new token)"
+          },
+          "solToSpend": {
+            "type": "number",
+            "description": "SOL amount for this buy"
+          }
+        },
+        "required": [
+          "solRaisedSoFar",
+          "solToSpend"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_options_payoff",
+      "description": "Payoff, P&L, and breakeven price for a single-leg Deribit BTC/ETH option (long or short call/put) at a given scenario price at expiry. Deribit BTC/ETH options are coin-settled: premium, P&L, and the max profit/loss caps come back denominated in the base coin (BTC/ETH), not USD; a scenarioPnlUsd convenience field converts the coin P&L back to USD at the scenario price. Coin settlement means a long call's upside is capped (max profit = 1 − premium per unit, not unlimited) while a long put's upside is technically unbounded as price falls toward zero, the mirror image of a USD-settled option's payoff shape, not a bug. Use when user asks \"what does my BTC call/put pay off at price X?\" or \"where's my breakeven on this option?\". Returns: intrinsicPerUnitCoin, scenarioPnlCoin, scenarioPnlUsd, breakevenPrice, maxLossCoin/maxProfitCoin (null = unbounded), isProfitable.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "string",
+            "enum": [
+              "BTC",
+              "ETH"
+            ],
+            "description": "Underlying coin. Default BTC."
+          },
+          "optionType": {
+            "type": "string",
+            "enum": [
+              "call",
+              "put"
+            ]
+          },
+          "position": {
+            "type": "string",
+            "enum": [
+              "long",
+              "short"
+            ]
+          },
+          "strike": {
+            "type": "number",
+            "description": "Strike price in USD"
+          },
+          "premiumCoin": {
+            "type": "number",
+            "description": "Premium paid/received per contract, in the base coin (matches Deribit's own quoted price, e.g. 0.02 BTC); must be < 1 for a call"
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Number of contracts (Deribit BTC/ETH options have contract_size 1.0, so this is coin-denominated size)"
+          },
+          "scenarioPrice": {
+            "type": "number",
+            "description": "Underlying price in USD to evaluate the payoff at"
+          }
+        },
+        "required": [
+          "optionType",
+          "position",
+          "strike",
+          "premiumCoin",
+          "quantity",
+          "scenarioPrice"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_black_scholes",
+      "description": "Theoretical European option price and Greeks (delta, gamma, theta, vega, rho) from Black-Scholes, given manual spot/strike/days-to-expiry/volatility/risk-free-rate inputs: no live data fetch. Prefer workflow.run_black_scholes_live instead when checking a real Deribit BTC/ETH instrument, since that variant also reports how far the instrument's actual quoted price sits from what this formula implies. Prices are USD-denominated (the universal convention); callPriceCoin/putPriceCoin additionally divide by spot to match Deribit's own coin-settled quoting convention. Use when user asks \"what should this option be worth at X% IV?\" or wants raw Greeks for a hypothetical. Returns: callPriceUsd/putPriceUsd, callPriceCoin/putPriceCoin, deltaCall/deltaPut, gamma, vegaPerPct (per 1 vol point), thetaCallPerDay/thetaPutPerDay, rhoCallPerPct/rhoPutPerPct (per 1 rate point).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "spot": {
+            "type": "number",
+            "description": "Underlying spot price, USD"
+          },
+          "strike": {
+            "type": "number",
+            "description": "Strike price, USD"
+          },
+          "daysToExpiry": {
+            "type": "number",
+            "description": "Calendar days until expiry (can be fractional)"
+          },
+          "volatilityPct": {
+            "type": "number",
+            "description": "Annualized implied volatility in percentage points, e.g. 60 for 60%"
+          },
+          "riskFreeRatePct": {
+            "type": "number",
+            "description": "Risk-free rate in percentage points. Default 0: standard crypto-options convention."
+          }
+        },
+        "required": [
+          "spot",
+          "strike",
+          "daysToExpiry",
+          "volatilityPct"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_straddle_strangle",
+      "description": "Payoff, P&L, and both breakeven prices for a long or short straddle/strangle (a call + a put on the same Deribit BTC/ETH underlying, both legs the same direction) at a scenario price. A straddle is callStrike === putStrike; any callStrike > putStrike makes it a strangle, same formula either way. Coin-settled like workflow.run_options_payoff: a long position's max loss is the flat total premium paid (between the strikes, both legs worthless); max profit is technically unbounded, dominated by the put leg's payoff as price falls toward zero. Use when user asks about a straddle or strangle, e.g. \"what does a BTC straddle pay off if price barely moves?\" or \"where are my breakevens on this strangle?\". Returns: combinedIntrinsicCoin, scenarioPnlCoin, scenarioPnlUsd, upperBreakevenPrice, lowerBreakevenPrice, maxLossCoin/maxProfitCoin (null = unbounded), isStraddle, isProfitable.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "string",
+            "enum": [
+              "BTC",
+              "ETH"
+            ],
+            "description": "Underlying coin. Default BTC."
+          },
+          "position": {
+            "type": "string",
+            "enum": [
+              "long",
+              "short"
+            ]
+          },
+          "callStrike": {
+            "type": "number",
+            "description": "Call leg strike, USD. Equal to putStrike for a straddle, higher for a strangle."
+          },
+          "putStrike": {
+            "type": "number",
+            "description": "Put leg strike, USD. Must be <= callStrike."
+          },
+          "callPremiumCoin": {
+            "type": "number",
+            "description": "Call leg premium per contract, in the base coin (e.g. 0.02 BTC)"
+          },
+          "putPremiumCoin": {
+            "type": "number",
+            "description": "Put leg premium per contract, in the base coin"
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Number of straddle/strangle units (both legs sized equally)"
+          },
+          "scenarioPrice": {
+            "type": "number",
+            "description": "Underlying price in USD to evaluate the payoff at"
+          }
+        },
+        "required": [
+          "position",
+          "callStrike",
+          "putStrike",
+          "callPremiumCoin",
+          "putPremiumCoin",
+          "quantity",
+          "scenarioPrice"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_covered_call_protective_put",
+      "description": "Covered call (long the coin + short a call against it, for yield) or protective put (long the coin + long a put, for downside insurance) on a Deribit BTC/ETH position. Returns the standard annualized-yield metric (premium ÷ 1 coin, annualized by 365/daysToExpiry) up front: that number doesn't depend on any price scenario. Also returns the USD value of the combined position at a given scenario price: covered call caps upside at strike + premium×scenarioPrice (the premium's own coin-denominated value still scales with price, unlike a textbook USD-settled cap); protective put floors value at strike×(1−premium), which is the true minimum across every possible settlement price, not just an approximation. Use when user asks \"what annualized yield do I get selling covered calls on my BTC?\" or \"how much does insuring my BTC with a put cost me?\". Returns: staticYieldPct, annualizedYieldPct, valueAtScenarioUsd, breakevenPrice (covered_call only), floorValueUsd (protective_put only), vsHoldingUsd (vs. just holding the coin).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "strategy": {
+            "type": "string",
+            "enum": [
+              "covered_call",
+              "protective_put"
+            ]
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "BTC",
+              "ETH"
+            ],
+            "description": "Underlying coin. Default BTC."
+          },
+          "spotEntry": {
+            "type": "number",
+            "description": "Price you acquired/value the underlying coin at, USD; used for the covered-call breakeven vs. cost basis"
+          },
+          "strike": {
+            "type": "number",
+            "description": "Option strike, USD"
+          },
+          "premiumCoin": {
+            "type": "number",
+            "description": "Premium received (covered_call) or paid (protective_put) per contract, in the base coin"
+          },
+          "daysToExpiry": {
+            "type": "number",
+            "description": "Calendar days until expiry; used to annualize the yield/cost"
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Coin units held / contracts (1:1 covered)"
+          },
+          "scenarioPrice": {
+            "type": "number",
+            "description": "Underlying price in USD to evaluate the combined position's value at"
+          }
+        },
+        "required": [
+          "strategy",
+          "spotEntry",
+          "strike",
+          "premiumCoin",
+          "daysToExpiry",
+          "quantity",
+          "scenarioPrice"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_implied_volatility",
+      "description": "Solves for the volatility that makes Black-Scholes reproduce an observed option price (Newton-Raphson with a bisection fallback for cases where vega is too flat to converge, e.g. deep ITM/OTM or very short-dated). Checks the price against its no-arbitrage bounds first and refuses to solve (converged: false + error) rather than return a garbage number when the price is impossible for the given spot/strike/rate. Use when user asks \"what IV does this option price imply?\" or gives a market price and wants the volatility, not the reverse. Returns: impliedVolatilityPct, iterations, method (newton-raphson/bisection), converged, priceAtSolution.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "optionType": {
+            "type": "string",
+            "enum": [
+              "call",
+              "put"
+            ]
+          },
+          "spot": {
+            "type": "number",
+            "description": "Underlying spot price, USD"
+          },
+          "strike": {
+            "type": "number",
+            "description": "Strike price, USD"
+          },
+          "daysToExpiry": {
+            "type": "number",
+            "description": "Calendar days until expiry (can be fractional)"
+          },
+          "riskFreeRatePct": {
+            "type": "number",
+            "description": "Risk-free rate in percentage points. Default 0: standard crypto-options convention."
+          },
+          "targetPriceUsd": {
+            "type": "number",
+            "description": "The observed option price, USD, to solve the implied volatility from"
+          }
+        },
+        "required": [
+          "optionType",
+          "spot",
+          "strike",
+          "daysToExpiry",
+          "targetPriceUsd"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_window_fair_value",
+      "description": "Theoretical fair value for a time-windowed crypto up/down contract (the shape ADI Predictstreet and Kalshi-style daily crypto markets use: pays out based on whether the settlement price finishes at/above or below a reference price pinned at window open, by a fixed close time): a cash-or-nothing digital option, priced with the standard N(d2) formula. Use this when there's no live market price to read (e.g. a venue's contract has real terms but zero trading volume) instead of a live-market odds tool. Volatility is a required manual input; there is no live implied-vol market on these contracts to pull it from. Use when user asks \"what should this up/down contract be worth?\" or \"what's the fair probability BTC finishes above $X in N minutes?\". Returns: d1, d2, probAbovePct, probBelowPct, fairPriceAboveCents, fairPriceBelowCents (cents convention, directly comparable to how these venues quote a contract).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "currentPrice": {
+            "type": "number",
+            "description": "Current spot price of the coin, in USD."
+          },
+          "referencePrice": {
+            "type": "number",
+            "description": "The reference/pinned price the contract resolves against (the window's open price, or a stated strike)."
+          },
+          "minutesToClose": {
+            "type": "number",
+            "description": "Minutes remaining until the window closes/settles."
+          },
+          "volatilityPct": {
+            "type": "number",
+            "description": "Annualized volatility, in percentage points (e.g. 50 for 50%). Required; no live source for this on these contracts."
+          },
+          "riskFreeRatePct": {
+            "type": "number",
+            "description": "Risk-free rate in percentage points. Default 0: negligible for these short windows."
+          }
+        },
+        "required": [
+          "currentPrice",
+          "referencePrice",
+          "minutesToClose",
+          "volatilityPct"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_open_analysis",
+      "description": "Market Profile open analysis: where and how price opened vs the prior session value area. Use for \"how did BTC open today?\" / \"what does the open imply for the session?\". Returns: open_location, open_type (OD/OTD/ORR/OAIR) with description/implication, confidence, key_levels (VAH/VAL/VPOC/IB), scenario_framing (bullish/bearish/neutral), invalidation level.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "instrument": {
+            "type": "string",
+            "description": "Symbol, e.g. BTCUSDT"
+          },
+          "venue": {
+            "type": "string",
+            "enum": [
+              "binance",
+              "bybit"
+            ],
+            "description": "Exchange to fetch candles from when candles[] not supplied"
+          },
+          "session_date": {
+            "type": "string",
+            "description": "Session date YYYY-MM-DD (UTC)"
+          },
+          "timeframe": {
+            "type": "string",
+            "enum": [
+              "1m",
+              "5m",
+              "15m",
+              "30m"
+            ],
+            "description": "Candle timeframe (default 15m)"
+          },
+          "value_area_rule": {
+            "type": "number",
+            "description": "Value-area fraction 0.5–0.9 (default 0.70)"
+          },
+          "candles": {
+            "type": "array",
+            "description": "Optional OHLCV for the session; omit to fetch from venue (reproducible + 0 COGS when supplied)",
+            "items": {
+              "type": "object"
+            }
+          },
+          "prev_candles": {
+            "type": "array",
+            "description": "Optional OHLCV for the previous session",
+            "items": {
+              "type": "object"
+            }
+          }
+        },
+        "required": [
+          "instrument",
+          "venue",
+          "session_date"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_session_structure",
+      "description": "Market Profile day-type classifier: trend / balance / neutral_trend / normal / normal_var, from TPO, initial balance, range extension and value migration. Use for \"is this a trend day or a balance day?\". Returns: structure (the day-type label), description, bias, key_signals, key_levels (VAH/VAL/VPOC/IB/session high-low), scenario_framing, invalidation level.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "instrument": {
+            "type": "string",
+            "description": "Symbol, e.g. BTCUSDT"
+          },
+          "venue": {
+            "type": "string",
+            "enum": [
+              "binance",
+              "bybit"
+            ],
+            "description": "Exchange to fetch candles from when candles[] not supplied"
+          },
+          "session_date": {
+            "type": "string",
+            "description": "Session date YYYY-MM-DD (UTC)"
+          },
+          "timeframe": {
+            "type": "string",
+            "enum": [
+              "1m",
+              "5m",
+              "15m",
+              "30m"
+            ],
+            "description": "Candle timeframe (default 15m)"
+          },
+          "value_area_rule": {
+            "type": "number",
+            "description": "Value-area fraction 0.5–0.9 (default 0.70)"
+          },
+          "candles": {
+            "type": "array",
+            "description": "Optional OHLCV for the session; omit to fetch from venue (reproducible + 0 COGS when supplied)",
+            "items": {
+              "type": "object"
+            }
+          },
+          "prev_candles": {
+            "type": "array",
+            "description": "Optional OHLCV for the previous session",
+            "items": {
+              "type": "object"
+            }
+          }
+        },
+        "required": [
+          "instrument",
+          "venue",
+          "session_date"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_value_migration",
+      "description": "Market Profile value-area migration across sessions: is value migrating up, down, or overlapping (directional conviction vs balance)? Use for \"is value moving higher day over day?\". Returns: state, direction, migration_pct, key_levels (current vs. prior session VAH/VAL/VPOC), scenario_framing, invalidation level.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "instrument": {
+            "type": "string",
+            "description": "Symbol, e.g. BTCUSDT"
+          },
+          "venue": {
+            "type": "string",
+            "enum": [
+              "binance",
+              "bybit"
+            ],
+            "description": "Exchange to fetch candles from when candles[] not supplied"
+          },
+          "session_date": {
+            "type": "string",
+            "description": "Session date YYYY-MM-DD (UTC)"
+          },
+          "timeframe": {
+            "type": "string",
+            "enum": [
+              "1m",
+              "5m",
+              "15m",
+              "30m"
+            ],
+            "description": "Candle timeframe (default 15m)"
+          },
+          "value_area_rule": {
+            "type": "number",
+            "description": "Value-area fraction 0.5–0.9 (default 0.70)"
+          },
+          "candles": {
+            "type": "array",
+            "description": "Optional OHLCV for the session; omit to fetch from venue (reproducible + 0 COGS when supplied)",
+            "items": {
+              "type": "object"
+            }
+          },
+          "prev_candles": {
+            "type": "array",
+            "description": "Optional OHLCV for the previous session",
+            "items": {
+              "type": "object"
+            }
+          },
+          "lookback_sessions": {
+            "type": "number",
+            "description": "Sessions to compare, 1–5 (default 1)"
+          }
+        },
+        "required": [
+          "instrument",
+          "venue",
+          "session_date"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_breakout_acceptance",
+      "description": "Market Profile breakout acceptance: did price accept (hold) beyond the value area / range, or reject back inside (fakeout)? Optional buy/sell delta. Use for \"did the break above VAH get accepted?\". Returns: state, accepted (boolean), direction, confidence, key_levels (VAH/VAL/VPOC), scenario_framing, invalidation level.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "instrument": {
+            "type": "string",
+            "description": "Symbol, e.g. BTCUSDT"
+          },
+          "venue": {
+            "type": "string",
+            "enum": [
+              "binance",
+              "bybit"
+            ],
+            "description": "Exchange to fetch candles from when candles[] not supplied"
+          },
+          "session_date": {
+            "type": "string",
+            "description": "Session date YYYY-MM-DD (UTC)"
+          },
+          "timeframe": {
+            "type": "string",
+            "enum": [
+              "1m",
+              "5m",
+              "15m",
+              "30m"
+            ],
+            "description": "Candle timeframe (default 15m)"
+          },
+          "value_area_rule": {
+            "type": "number",
+            "description": "Value-area fraction 0.5–0.9 (default 0.70)"
+          },
+          "candles": {
+            "type": "array",
+            "description": "Optional OHLCV for the session; omit to fetch from venue (reproducible + 0 COGS when supplied)",
+            "items": {
+              "type": "object"
+            }
+          },
+          "prev_candles": {
+            "type": "array",
+            "description": "Optional OHLCV for the previous session",
+            "items": {
+              "type": "object"
+            }
+          },
+          "include_delta": {
+            "type": "boolean",
+            "description": "Include buy/sell delta analysis (default true)"
+          }
+        },
+        "required": [
+          "instrument",
+          "venue",
+          "session_date"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_token_risk_check",
+      "description": "Token rug-pull MECHANISM check for a Solana token (mint address): can the deployer still mint supply, freeze wallets, pull liquidity, swap metadata, or has RugCheck flagged a known scam pattern (e.g. copycat token)? Fetches live facts from RugCheck (GoPlus as fallback) and returns a transparently-weighted composite score. Deliberately does NOT score holder concentration or \"whale dump\" impact: those are properties of any liquid market (a legit protocol's top holders are routinely treasury/vesting/exchange wallets), not rug signals; they are returned separately as informational market_context. Use when user asks \"is this token a rug pull?\" or \"is [token] safe to buy?\". This is a sourced, timestamped read of public facts, not a safety guarantee. Returns: score (0-100), verdict (clean/caution/high_risk/red_flags), verdict_summary, components breakdown, facts, market_context, sources.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "mint": {
+            "type": "string",
+            "description": "Solana token mint address (base58)"
+          }
+        },
+        "required": [
+          "mint"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_swap_price_impact",
+      "description": "Live price-impact quote for a Solana token swap: routed through Jupiter (the same aggregator real swaps use) across every pool it knows about, not a single-pool estimate. Use when user asks \"how much slippage will I eat swapping X tokens?\" or \"what will I actually get if I sell N tokens?\". Returns: outputAmount, priceImpactPct, effectivePrice, marketPriceUsd, liquidityUsd, routable (false + error if the size can't be routed at all).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "mint": {
+            "type": "string",
+            "description": "Solana mint address of the token being sold (base58)"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Amount of the token to swap, in human units (not raw base units)"
+          },
+          "outputAsset": {
+            "type": "string",
+            "enum": [
+              "USDC",
+              "SOL"
+            ],
+            "description": "Asset to receive. Default USDC."
+          }
+        },
+        "required": [
+          "mint",
+          "amount"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_market_cap_comparison",
+      "description": "Compares two tokens' live market caps (Solana or any of 5 EVM chains; the two tokens can be on different chains) and projects what an investment would be worth if the first token's market cap matched the second's. Narrative-agnostic (\"if X reaches Y's market cap\"): works for any token pair, not tied to one hype cycle or one chain. A snapshot ratio, not a forecast: assumes fixed supply on both sides. Use when user asks \"what if this token reaches [other token]'s market cap?\". Returns: multiplier, projectedValueUsd, projectedPriceUsd, profitUsd, comparable (false + error if either market cap can't be resolved).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "tokenChain": {
+            "type": "string",
+            "enum": [
+              "solana",
+              "ethereum",
+              "base",
+              "bsc",
+              "arbitrum",
+              "polygon"
+            ],
+            "description": "Chain of the token you hold. Default solana."
+          },
+          "tokenMint": {
+            "type": "string",
+            "description": "Address of the token you hold or are evaluating (base58 for Solana, 0x... for EVM chains)"
+          },
+          "compareToChain": {
+            "type": "string",
+            "enum": [
+              "solana",
+              "ethereum",
+              "base",
+              "bsc",
+              "arbitrum",
+              "polygon"
+            ],
+            "description": "Chain of the comparison token. Default solana. Can differ from tokenChain."
+          },
+          "compareToMint": {
+            "type": "string",
+            "description": "Address of the token whose market cap to compare against"
+          },
+          "investmentUsd": {
+            "type": "number",
+            "description": "Investment amount in USD"
+          }
+        },
+        "required": [
+          "tokenMint",
+          "compareToMint",
+          "investmentUsd"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_wallet_flag_check",
+      "description": "Checks a wallet address (Solana or any of 5 EVM chains) against independent flag databases: GoPlus (malicious-address categories, all chains), Webacy (address analysis + sanctions check, all chains), and ScamSniffer (public phishing/drainer blacklist, EVM chains only), and returns each source's own facts separately, never merged into one invented score. Use when user asks \"is this wallet address flagged?\" or \"is it safe to send to this address?\". A clean result means \"nothing found in these databases,\" not a certified-safe verdict. Returns: goplus (flags[], categoriesChecked), webacyGeneral (overallRisk, dprk/hack/ofacSanctioned, exchangeLabel), webacySanctions (status), scamSniffer (flagged; not applicable on Solana). Each source has an `available` flag: false + error if that source failed independently.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "chain": {
+            "type": "string",
+            "enum": [
+              "solana",
+              "ethereum",
+              "base",
+              "bsc",
+              "arbitrum",
+              "polygon"
+            ],
+            "description": "Chain of the wallet address. Default solana."
+          },
+          "walletAddress": {
+            "type": "string",
+            "description": "Wallet address (base58 for Solana, 0x... for EVM chains)"
+          }
+        },
+        "required": [
+          "walletAddress"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_odds_converter",
+      "description": "Converts a probability into decimal odds, American odds, and breakeven win rate: either from a manually supplied probability, or fetched live from Kalshi, Polymarket, or ADI Predictstreet (three independent crypto-price prediction market venues, all public keyless market data). When a Kalshi or Polymarket source is supplied, also returns the vig (the exchange's built-in edge), computed from the market's own YES+NO prices, not estimated; ADI Predictstreet's crypto contracts currently have no live trading volume on any venue, so this returns available:false with an explanation rather than a fake price (use workflow.run_window_fair_value for a theoretical price on those instead). Use when user asks \"what odds does a 35% probability work out to?\" or \"what's the vig on this Kalshi/Polymarket market?\". Provide exactly one of probability/kalshiTicker/polymarketSlug/adiSymbol. Returns: probability, decimalOdds, americanOdds, breakevenWinRatePct, vigPct (null unless a live two-sided source was used), source (manual/kalshi/polymarket/adi), identifier, label.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "probability": {
+            "type": "number",
+            "description": "Probability as a decimal 0-1 (e.g. 0.35). Use this OR one of the live sources below, not both."
+          },
+          "kalshiTicker": {
+            "type": "string",
+            "description": "A Kalshi market ticker (e.g. KXBTCY-27JAN0100-T149999.99) to fetch a live price from."
+          },
+          "polymarketSlug": {
+            "type": "string",
+            "description": "A Polymarket market slug, from the market URL (e.g. will-bitcoin-reach-100k-in-september-2026), to fetch a live price from."
+          },
+          "adiSymbol": {
+            "type": "string",
+            "description": "An ADI Predictstreet market symbol (e.g. BTC1D-20260920T0000). Currently always returns available:false; these contracts have no live trading volume yet."
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_spread_reader",
+      "description": "Reads the same real-world bet's live price from 2-4 prediction-market venues at once (Kalshi, Polymarket, ADI Predictstreet) and reports the spread between the cheapest and most expensive. The caller supplies each venue's own identifier for what they've confirmed is the same underlying bet; this tool never auto-matches events across venues, only reads and compares prices for identifiers you provide. Use when user asks \"is this bet priced differently on Kalshi vs Polymarket?\" or \"which venue has the best price on this?\". Returns: quotes[] (venue, identifier, label, probabilityPct, available, error), availableCount, cheapestVenue, mostExpensiveVenue, spreadPct (percentage points, null if fewer than 2 quotes resolved).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "quotes": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 4,
+            "items": {
+              "type": "object",
+              "properties": {
+                "venue": {
+                  "type": "string",
+                  "enum": [
+                    "kalshi",
+                    "polymarket",
+                    "adi"
+                  ]
+                },
+                "identifier": {
+                  "type": "string",
+                  "description": "Kalshi ticker, Polymarket slug, or ADI Predictstreet symbol, matching the venue field."
+                }
+              },
+              "required": [
+                "venue",
+                "identifier"
+              ]
+            },
+            "description": "One entry per venue you want to compare: 2 to 4 total. Each must genuinely be the same real-world bet; this tool does not verify that for you."
+          }
+        },
+        "required": [
+          "quotes"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_market_implied_odds",
+      "description": "Reads Kalshi's full live BTC or ETH year-end price ladder (a set of mutually-exclusive prediction markets covering the whole price range) and reports what the market itself implies: the median (50th-percentile) price bucket, the single most-likely (mode) bucket, and the probability of ending the year at or above any real bucket boundary. Deliberately does not compute an expected value or interpolate inside a bucket: the top/bottom buckets are open-ended, so any point estimate there would need an invented assumption; every number this tool returns traces back to one live, sourced price. Use when user asks \"what does the market think BTC will be worth by year end?\" or \"what are the odds ETH ends the year above $X?\". Returns: buckets[] (label, floor, cap, probabilityPct), medianBucketLabel, modeBucketLabel, vigPct, probabilityAtOrAbovePct + snappedThresholdUsd (only when thresholdUsd is supplied).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "coin": {
+            "type": "string",
+            "enum": [
+              "BTC",
+              "ETH"
+            ],
+            "description": "Which coin's year-end ladder to read. Default BTC."
+          },
+          "thresholdUsd": {
+            "type": "number",
+            "description": "Optional price threshold: returns the probability of ending the year at or above the nearest real bucket boundary at or below this value."
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_black_scholes_live",
+      "description": "Black-Scholes theoretical price and Greeks for a REAL, live Deribit BTC/ETH option instrument: pulls that instrument's own spot, strike, days to expiry, and implied volatility from Deribit, then reports how far Deribit's actual quoted mark price sits from what Black-Scholes implies at that IV (priceDiscrepancyPct). This is the trust-check tool: \"is this exchange's quoted price consistent with its own volatility assumption?\", not an estimate, a live formula cross-check. Use when user gives a specific instrument name (e.g. \"BTC-27FEB27-90000-C\") and asks \"is this option fairly priced?\" or \"what are the Greeks on this contract?\". Returns everything workflow.run_black_scholes does, plus instrumentName, currency, optionType, deribitMarkPriceCoin, deribitMarkIvPct, bsPriceCoin, priceDiscrepancyPct, available (false + error if the instrument name doesn't resolve).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "instrumentName": {
+            "type": "string",
+            "description": "Exact Deribit instrument name, e.g. BTC-27FEB27-90000-C. Get one from Deribit's options chain; this tool does not browse the chain, it prices one named instrument."
+          },
+          "riskFreeRatePct": {
+            "type": "number",
+            "description": "Risk-free rate in percentage points. Default 0: standard crypto-options convention."
+          }
+        },
+        "required": [
+          "instrumentName"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_prediction_market_edge",
+      "description": "Compares your own probability estimate for an event against a prediction market's price (manual entry or a live Kalshi ticker) and sizes a bet using fractional Kelly criterion bet sizing (default: quarter-Kelly, a standard conservative haircut on full Kelly, stated explicitly as a convention). Returns zero recommended stake whenever your probability doesn't exceed the market's price: no edge, no bet. Use when user asks \"does this bet have edge?\" or \"how much should I stake given my probability estimate vs the market's?\". Returns: edgePct, evPerDollarStaked, fullKellyFraction, cappedKellyFraction, recommendedStakeUsd, verdict (skip_this_one/think_twice/worth_the_risk/take_it).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "yourProbabilityPct": {
+            "type": "number",
+            "description": "Your own probability estimate, 0.01-99.99"
+          },
+          "marketProbabilityPct": {
+            "type": "number",
+            "description": "The market's probability (price), 0.01-99.99. Use this OR kalshiTicker, not both."
+          },
+          "kalshiTicker": {
+            "type": "string",
+            "description": "A Kalshi market ticker to fetch the market probability from live instead of supplying it manually."
+          },
+          "bankrollUsd": {
+            "type": "number",
+            "description": "Bankroll available for this bet, in USD"
+          },
+          "kellyFractionCap": {
+            "type": "number",
+            "description": "Fraction of full Kelly to actually stake, 0.01-1. Default 0.25 (quarter-Kelly)."
+          }
+        },
+        "required": [
+          "yourProbabilityPct",
+          "bankrollUsd"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "system.verify",
+      "description": "Run the full regression suite: 35 canonical test vectors (linear and inverse/coin-margined) across all 12 calculators, and return a pass/fail report with counts and timestamp. Call this before using results in production workflows to confirm the computation layer is operating correctly.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "system.pubkey",
+      "description": "Return the ECDSA P-256 public key (PEM + JWK) and canonical signing format used to sign tool responses, so results can be verified offline without calling back to TradingCalc. Every tools/call result includes a signed second content block when signing is configured; also available at GET /api/mcp/pubkey.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    }
+  ],
+  "version": "1.9.0"
+}
