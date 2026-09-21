@@ -174,7 +174,7 @@ Formulas normalized across 16 exchanges: **Binance, OKX, Bybit, Aster, Hyperliqu
 | Anonymous | 20 | Free |
 | Free API key | 200 | Free |
 
-The Service is free. Need a higher-limit key → email [hi@tradingcalc.io](mailto:hi@tradingcalc.io).
+The Service is free. Need a higher-limit key → email [s@tradingcalc.io](mailto:s@tradingcalc.io).
 
 Pass key as: `Authorization: Bearer <your-api-key>`
 
