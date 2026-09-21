@@ -1,7 +1,7 @@
 {
   "name": "tradingcalc-mcp",
   "version": "2.12.0",
-  "description": "38 deterministic crypto futures tools: trade planning (pnl, breakeven, exit_target, scenario, dca_entry, scale_out), risk (liquidation, position_sizing, max_leverage, risk_reward), funding & carry (funding_cost, funding_arb, compound_funding, funding_breakeven, carry_trade), market structure (open_analysis, session_structure, value_migration, breakout_acceptance), primitives (average_entry, hedge_ratio), integrated decision (pre_trade_check), chain-agnostic on-chain (token_risk_check, swap_price_impact, bonding_curve on Solana; market_cap_comparison and wallet_flag_check on Solana + 5 EVM chains), prediction markets on Kalshi's crypto-price category (odds_converter, market_implied_odds, prediction_market_edge), and Deribit BTC/ETH options (options_payoff, black_scholes, black_scholes_live, straddle_strangle, covered_call_protective_put, implied_volatility). Formulas normalized across 16 exchanges, linear and inverse contracts. Every response signed with ECDSA P-256. Not AI estimates, exact numbers your trading bot can trust.",
+  "description": "40 deterministic crypto futures tools: trade planning (pnl, breakeven, exit_target, scenario, dca_entry, scale_out), risk (liquidation, position_sizing, max_leverage, risk_reward), funding & carry (funding_cost, funding_arb, compound_funding, funding_breakeven, carry_trade), market structure (open_analysis, session_structure, value_migration, breakout_acceptance), primitives (average_entry, hedge_ratio), integrated decision (pre_trade_check), chain-agnostic on-chain (token_risk_check, swap_price_impact, bonding_curve on Solana; market_cap_comparison and wallet_flag_check on Solana + 5 EVM chains), prediction markets across Kalshi, Polymarket and ADI Predictstreet's crypto categories (odds_converter, market_implied_odds, prediction_market_edge, window_fair_value, spread_reader), and Deribit BTC/ETH options (options_payoff, black_scholes, black_scholes_live, straddle_strangle, covered_call_protective_put, implied_volatility). Formulas normalized across 16 exchanges, linear and inverse contracts. Every response signed with ECDSA P-256. Not AI estimates, exact numbers your trading bot can trust.",
   "mcpName": "tradingcalc-mcp",
   "files": [
     "README.md",
@@ -32,6 +32,7 @@
     "mexc",
     "prediction-markets",
     "kalshi",
+    "polymarket",
     "options",
     "deribit",
     "black-scholes",

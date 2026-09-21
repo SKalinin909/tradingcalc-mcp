@@ -8,7 +8,7 @@ Ask Claude or Cursor trade questions and get exact numbers back, not AI guesses.
 > "Size my position: $10k account, 1% risk, long BTC at $83k, stop at $81k."
 > "Is this carry trade worth it? 0.01% funding long, 0.05% short, $50k, 30 days."
 
-38 deterministic tools across trade planning, risk & margin, funding/carry, market-structure (Market Profile) analysis, chain-agnostic on-chain tools — Solana (token safety, swap price impact, bonding curve) plus Solana + 5 EVM chains for market cap comparison and wallet flag check — prediction-market odds from Kalshi's public crypto-price category, and Deribit BTC/ETH options math (payoff/breakeven, Black-Scholes price/Greeks, straddle/strangle, covered call/protective put, implied volatility). Formulas verified against 35 canonical test vectors: same inputs always produce the same outputs. Every response is also signed with ECDSA P-256, so you can verify offline that it actually came from us. Free, no signup.
+40 deterministic tools across trade planning, risk & margin, funding/carry, market-structure (Market Profile) analysis, chain-agnostic on-chain tools — Solana (token safety, swap price impact, bonding curve) plus Solana + 5 EVM chains for market cap comparison and wallet flag check — prediction-market odds and fair value across Kalshi, Polymarket and ADI Predictstreet's crypto categories, and Deribit BTC/ETH options math (payoff/breakeven, Black-Scholes price/Greeks, straddle/strangle, covered call/protective put, implied volatility). Formulas verified against 35 canonical test vectors: same inputs always produce the same outputs. Every response is also signed with ECDSA P-256, so you can verify offline that it actually came from us. Free, no signup.
 
 Access via **MCP** (Claude Desktop / Cursor / VS Code) or a plain HTTP POST to the MCP endpoint. Free, no signup.
 
@@ -143,7 +143,7 @@ After connecting, just ask naturally: the AI picks the right tool automatically:
 
 ---
 
-## Tools (38)
+## Tools (40)
 
 Tool naming follows the `workflow.run_*` / `primitive.*` / `system.*` namespace convention.
 Old flat names (`pnl`, `liquidation`, etc.) are accepted for backward compatibility. All tools are
@@ -158,7 +158,7 @@ free via MCP, no signup; 20 calls/day anonymously, 200/day with a free API key.
 | Primitives | Average entry, hedge ratio (2) |
 | Integrated Decision | Pre-trade check — sizing + liquidation + breakeven + funding + go/no-go in one call (1) |
 | On-chain (Solana + 5 EVM chains, per tool) | Token risk check, swap price impact, bonding curve, market cap comparison, wallet flag check (5) |
-| Prediction Markets (Kalshi crypto-price) | Odds converter, market-implied odds, prediction-market edge (3) |
+| Prediction Markets (Kalshi, Polymarket, ADI Predictstreet crypto categories) | Odds converter, market-implied odds, prediction-market edge, window fair value, cross-venue spread reader (5) |
 | Options (Deribit BTC/ETH, coin-settled) | Options payoff & breakeven, Black-Scholes price/Greeks (manual + live), straddle/strangle, covered call/protective put, implied volatility solver (6) |
 | System | `system.verify` — run 35 canonical test vectors, get a pass/fail report; `system.pubkey` — get the public key to verify signed responses offline (2) |
 

@@ -6,10 +6,25 @@ Format: **Tool Changes · Verification Changes · MCP/API Changes · Breaking Ch
 
 ---
 
-## [2.12.0] — 2026-09-20
+## [2.12.0] — 2026-09-21
 
 ### Tool Changes
-- Six new tools (38 total), a new domain — Options, scoped to Deribit's BTC/ETH options, which are
+- `workflow.run_spread_reader` (40 tools total) — reads the same bet's live price from 2-4 venues
+  (Kalshi, Polymarket, ADI Predictstreet) at once and reports the spread between cheapest and most
+  expensive. Never auto-matches "the same event" across venues (no shared identifier scheme exists
+  between them); the caller supplies each venue's own identifier for a bet they've already confirmed
+  is the same one.
+- `workflow.run_odds_converter` gained live sources beyond Kalshi: Polymarket (both its grouped
+  price-ladder events and its fixed-date binaries expose a live two-sided price directly) and ADI
+  Predictstreet (correctly returns `available: false` when a real contract has zero trading volume,
+  rather than showing a placeholder price).
+- `workflow.run_window_fair_value` (39 tools total) — theoretical fair value for a time-windowed
+  crypto up/down contract (ADI Predictstreet, Polymarket fixed-date binaries, Kalshi-style dailies)
+  when there's no live price to read. Priced as a cash-or-nothing digital option via `N(d2)`, reusing
+  the Options domain's own Black-Scholes machinery. Volatility is a required manual input, no live IV
+  market exists for these contracts.
+
+- Six new tools, a new domain — Options, scoped to Deribit's BTC/ETH options, which are
   coin-settled (strike/spot in USD, but premium/payoff/settlement in the underlying coin —
   confirmed live against a real Deribit instrument before building against it). Deliberately does
   not compete with the crowded IV-surface/open-interest/max-pain scraper-terminal lane (a whole
