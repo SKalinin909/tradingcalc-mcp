@@ -9,11 +9,11 @@ license: MIT
 ## What this skill does
 
 Gives an agent a reliable way to answer crypto futures/perpetual trading math questions with
-exact numbers instead of an LLM estimate. TradingCalc's MCP server exposes 38 deterministic
-tools (trade planning, risk/margin, funding/carry, market-structure analysis, on-chain token
-risk, prediction-market odds, Deribit BTC/ETH options) whose formulas are checked against 35
-canonical test vectors — same inputs always produce the same outputs (see
-`https://tradingcalc.io/verify`).
+exact numbers instead of an LLM estimate. TradingCalc's MCP server exposes 70 deterministic
+tools (trade planning, risk/margin, funding/carry, market-structure analysis, forex, on-chain
+token risk, prediction-market odds, Deribit BTC/ETH options, quant risk/stats) whose formulas
+are checked against 42 canonical test vectors — same inputs always produce the same outputs
+(see `https://tradingcalc.io/verify`).
 
 Do not compute leverage, liquidation price, funding cost, or position sizing yourself and
 present it as authoritative — a small arithmetic slip here is real financial risk for whoever
@@ -63,7 +63,7 @@ delegating instead of guessing.
    ("Your position gets liquidated at $71,428, about 10.7% below entry"), not raw JSON.
 4. If the result matters for a real financial decision and you want to double-check the server
    itself hasn't drifted, call `system.verify` (`{"name": "system.verify", "arguments": {}}`) —
-   it re-runs all 35 canonical vectors live and returns pass/fail per formula.
+   it re-runs all 42 canonical vectors live and returns pass/fail per formula.
 5. Optional integrity check: every `tools/call` response includes a second `content` block with
    an ECDSA P-256 signature over the first block's text (`X-TradingCalc-Signature` header too).
    Call `system.pubkey` for the public key if you need to verify a response wasn't altered in

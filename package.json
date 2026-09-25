@@ -1,7 +1,7 @@
 {
   "name": "tradingcalc-mcp",
-  "version": "2.12.0",
-  "description": "40 deterministic crypto futures tools: trade planning (pnl, breakeven, exit_target, scenario, dca_entry, scale_out), risk (liquidation, position_sizing, max_leverage, risk_reward), funding & carry (funding_cost, funding_arb, compound_funding, funding_breakeven, carry_trade), market structure (open_analysis, session_structure, value_migration, breakout_acceptance), primitives (average_entry, hedge_ratio), integrated decision (pre_trade_check), chain-agnostic on-chain (token_risk_check, swap_price_impact, bonding_curve on Solana; market_cap_comparison and wallet_flag_check on Solana + 5 EVM chains), prediction markets across Kalshi, Polymarket and ADI Predictstreet's crypto categories (odds_converter, market_implied_odds, prediction_market_edge, window_fair_value, spread_reader), and Deribit BTC/ETH options (options_payoff, black_scholes, black_scholes_live, straddle_strangle, covered_call_protective_put, implied_volatility). Formulas normalized across 16 exchanges, linear and inverse contracts. Every response signed with ECDSA P-256. Not AI estimates, exact numbers your trading bot can trust.",
+  "version": "2.13.0",
+  "description": "70 deterministic tools across crypto futures, forex, options, on-chain safety, prediction markets, and quant risk/stats: trade planning (pnl, breakeven, exit_target, scenario, dca_entry, scale_out), risk (liquidation, position_sizing, max_leverage, risk_reward), funding & carry (funding_cost, funding_arb, compound_funding, funding_breakeven, carry_trade), market structure (open_analysis, session_structure, value_migration, breakout_acceptance), primitives (average_entry, hedge_ratio), integrated decision (pre_trade_check, portfolio_risk), forex (pip value, margin level, breakeven, pnl, risk/reward, scenario, average entry, position size, margin required, currency converter, swap/rollover cost, correlation - manual + live-FX-rate variants), chain-agnostic on-chain (token_risk_check, swap_price_impact, bonding_curve on Solana; market_cap_comparison and wallet_flag_check on Solana + 5 EVM chains), prediction markets across Kalshi, Polymarket, Limitless, Myriad and ADI Predictstreet's crypto categories (odds_converter, market_implied_odds, prediction_market_edge, window_fair_value, spread_reader), Deribit BTC/ETH options (options_payoff, black_scholes, black_scholes_live, straddle_strangle, covered_call_protective_put, implied_volatility), and risk/stats (var_cvar, sharpe_stats, hurst_exponent, cointegration, portfolio_tearsheet, garch, risk_parity, dsr, kelly_frontier, unsmoothing, evt_tail_risk, orderbook_impact). Formulas normalized across 17 exchanges, linear and inverse contracts. Every response signed with ECDSA P-256. Not AI estimates, exact numbers your trading bot can trust.",
   "mcpName": "tradingcalc-mcp",
   "files": [
     "README.md",
@@ -36,7 +36,13 @@
     "options",
     "deribit",
     "black-scholes",
-    "implied-volatility"
+    "implied-volatility",
+    "forex",
+    "value-at-risk",
+    "sharpe-ratio",
+    "garch",
+    "risk-parity",
+    "quant"
   ],
   "homepage": "https://tradingcalc.io",
   "repository": {

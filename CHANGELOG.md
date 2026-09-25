@@ -6,6 +6,70 @@ Format: **Tool Changes · Verification Changes · MCP/API Changes · Breaking Ch
 
 ---
 
+## [2.13.0] — 2026-09-26
+
+Catch-up release consolidating everything shipped on the main site since 2.12.0. Tool count
+40 → 70, test vectors 35 → 42, exchanges 16 → 17.
+
+### Tool Changes
+- **Market Structure suite (4 tools)** — `workflow.run_open_analysis`, `_session_structure`,
+  `_value_migration`, `_breakout_acceptance`: Market Profile (TPO) analysis for Binance/Bybit perp
+  futures — open-type classification, value-area migration session over session, and breakout
+  acceptance vs. rejection at a prior session's value boundary.
+- **Forex, phases 2-3 (10 new tools)** — account-currency conversion via live FX rate
+  (TrueFX direct/reciprocal pairs, frankfurter.app fallback for everything else): 3 brand-new
+  calculators (`workflow.run_forex_margin_required[_live]`, `_currency_converter[_live]`,
+  `_position_size_live`) plus live variants of the existing pip-value/swap-cost/correlation tools
+  (`_pip_value_live`, `_swap_cost[_live]`, `_correlation[_live]`). Correlation/hedge ratio uses
+  Pearson correlation and Hull's minimum-variance hedge ratio on daily % returns (not raw price
+  levels). Swap/rollover cost follows the same "manual input, no free live feed exists" precedent
+  as the rest of this domain.
+- **Risk/Stats — new domain (12 tools)** — quant portfolio statistics, deterministic and
+  cross-checked against Python reference implementations (numpy/scipy/statsmodels/arch) rather
+  than hand-traced against the same TypeScript logic:
+  - `workflow.run_var_cvar` — parametric Value at Risk / Conditional VaR, plus a skew/kurtosis-aware
+    Modified (Cornish-Fisher) VaR.
+  - `workflow.run_sharpe_stats` — Sharpe ratio with the Lo (2002) serial-correlation-aware
+    annualization correction and the Probabilistic Sharpe Ratio (Bailey & López de Prado).
+  - `workflow.run_hurst_exponent` — rescaled-range (R/S) analysis for mean-reversion vs. trending
+    persistence.
+  - `workflow.run_cointegration` — Engle-Granger two-step cointegration test for a pair of price
+    series, the standard pairs-trading signal.
+  - `workflow.run_portfolio_tearsheet` — annualized return/volatility, Sharpe (plain/Lo/Adjusted),
+    Sortino, the drawdown-ratio cluster (Ulcer/Martin, Pain, Burke, Omega-Sharpe, Upside Potential
+    Ratio), skew/kurtosis, PSR, win rate.
+  - `workflow.run_garch` — GARCH(1,1) volatility fit by maximum likelihood (Nelder-Mead), forecasts
+    next-period volatility.
+  - `workflow.run_risk_parity` — equal or custom risk-contribution portfolio weights for N assets.
+  - `workflow.run_dsr` — Deflated Sharpe Ratio: the threshold the best of N tried strategy variants
+    would clear by luck alone, corrected for correlated trials.
+  - `workflow.run_kelly_frontier` — MacLean-Ziemba-Blazenko fractional-Kelly growth-security
+    frontier.
+  - `workflow.run_unsmoothing` — Getmansky-Lo-Makarov MA(2) smoothing index and Blundell-Ward AR(1)
+    volatility inflation for appraisal/stale-marked return series.
+  - `workflow.run_evt_tail_risk` — Peaks-Over-Threshold Extreme Value Theory: fits a Generalized
+    Pareto Distribution to the loss tail, extrapolates VaR/ES without assuming a normal
+    distribution.
+  - `workflow.run_orderbook_impact` — walks a supplied order book for VWAP/price impact at a target
+    notional, or solves for max notional within an impact budget.
+- **Prediction Markets — 2 more venues** — Limitless (Base, mostly short-duration crypto up/down
+  contracts) and Myriad (Abstract L2), wired into `odds_converter`/`spread_reader` as full peers of
+  Kalshi/Polymarket/ADI Predictstreet.
+- `pnl.ts` gained a `maxLossBound` field for inverse+short positions: the coin-denominated loss
+  ceiling as exit price rises without limit.
+
+### Verification Changes
+- `system.verify` now runs 42 canonical test vectors (up from 35).
+
+### MCP/API Changes
+- Every `tools/call` response's signed-response mechanism now explicitly contrasted against
+  comparable Finance/Fintech MCP servers in `/docs/api`, `/for-agents`, `/mcp`, and `llms.txt`: none
+  of them do per-response cryptographic signing verifiable offline against a published key.
+- Contact address corrected from `hi@tradingcalc.io` to `s@tradingcalc.io` everywhere in this repo.
+
+### Breaking Changes
+None.
+
 ## [2.12.0] — 2026-09-21
 
 ### Tool Changes

@@ -8,7 +8,7 @@ Ask Claude or Cursor trade questions and get exact numbers back, not AI guesses.
 > "Size my position: $10k account, 1% risk, long BTC at $83k, stop at $81k."
 > "Is this carry trade worth it? 0.01% funding long, 0.05% short, $50k, 30 days."
 
-40 deterministic tools across trade planning, risk & margin, funding/carry, market-structure (Market Profile) analysis, chain-agnostic on-chain tools — Solana (token safety, swap price impact, bonding curve) plus Solana + 5 EVM chains for market cap comparison and wallet flag check — prediction-market odds and fair value across Kalshi, Polymarket and ADI Predictstreet's crypto categories, and Deribit BTC/ETH options math (payoff/breakeven, Black-Scholes price/Greeks, straddle/strangle, covered call/protective put, implied volatility). Formulas verified against 35 canonical test vectors: same inputs always produce the same outputs. Every response is also signed with ECDSA P-256, so you can verify offline that it actually came from us. Free, no signup.
+70 deterministic tools across trade planning, risk & margin, funding/carry, market-structure (Market Profile) analysis, forex (pip value, margin level, breakeven, PnL, risk/reward, scenario, average entry, position size, margin required, currency conversion, swap/rollover cost, correlation — with live-FX-rate variants), chain-agnostic on-chain tools — Solana (token safety, swap price impact, bonding curve) plus Solana + 5 EVM chains for market cap comparison and wallet flag check — prediction-market odds and fair value across Kalshi, Polymarket, Limitless, Myriad and ADI Predictstreet's crypto categories, Deribit BTC/ETH options math (payoff/breakeven, Black-Scholes price/Greeks, straddle/strangle, covered call/protective put, implied volatility), and quant risk/stats (VaR/CVaR, Sharpe with the Lo 2002 correction, GARCH(1,1) volatility, risk parity, Hurst exponent, cointegration, portfolio tearsheet, Deflated Sharpe Ratio, Kelly growth-security frontier, return unsmoothing, EVT tail risk, order-book impact). Formulas verified against 42 canonical test vectors: same inputs always produce the same outputs. Every response is also signed with ECDSA P-256, so you can verify offline that it actually came from us. Free, no signup.
 
 Access via **MCP** (Claude Desktop / Cursor / VS Code) or a plain HTTP POST to the MCP endpoint. Free, no signup.
 
@@ -143,7 +143,7 @@ After connecting, just ask naturally: the AI picks the right tool automatically:
 
 ---
 
-## Tools (40)
+## Tools (70)
 
 Tool naming follows the `workflow.run_*` / `primitive.*` / `system.*` namespace convention.
 Old flat names (`pnl`, `liquidation`, etc.) are accepted for backward compatibility. All tools are
@@ -156,16 +156,18 @@ free via MCP, no signup; 20 calls/day anonymously, 200/day with a free API key.
 | Funding & Carry | Funding cost, funding arbitrage, compound funding, funding break-even, carry trade (5) |
 | Market Structure (Market Profile) | Open analysis, session structure, value migration, breakout acceptance (4) |
 | Primitives | Average entry, hedge ratio (2) |
-| Integrated Decision | Pre-trade check — sizing + liquidation + breakeven + funding + go/no-go in one call (1) |
+| Integrated Decision | Pre-trade check (sizing + liquidation + breakeven + funding + go/no-go in one call), portfolio risk review (2) |
 | On-chain (Solana + 5 EVM chains, per tool) | Token risk check, swap price impact, bonding curve, market cap comparison, wallet flag check (5) |
-| Prediction Markets (Kalshi, Polymarket, ADI Predictstreet crypto categories) | Odds converter, market-implied odds, prediction-market edge, window fair value, cross-venue spread reader (5) |
+| Prediction Markets (Kalshi, Polymarket, Limitless, Myriad, ADI Predictstreet crypto categories) | Odds converter, market-implied odds, prediction-market edge, window fair value, cross-venue spread reader (5) |
 | Options (Deribit BTC/ETH, coin-settled) | Options payoff & breakeven, Black-Scholes price/Greeks (manual + live), straddle/strangle, covered call/protective put, implied volatility solver (6) |
-| System | `system.verify` — run 35 canonical test vectors, get a pass/fail report; `system.pubkey` — get the public key to verify signed responses offline (2) |
+| Forex (quote-currency + live account-currency conversion) | Pip value, margin level, breakeven, PnL, risk/reward, scenario, average entry, position size, margin required, currency converter, swap/rollover cost, correlation/hedge ratio — manual + live-FX-rate variants (17) |
+| Risk/Stats | VaR/CVaR (+ Modified VaR), Sharpe ratio (Lo 2002 + PSR), Hurst exponent, cointegration, portfolio tearsheet, GARCH(1,1), risk parity, Deflated Sharpe Ratio, Kelly growth-security frontier, return unsmoothing, EVT tail risk, order-book impact (12) |
+| System | `system.verify` — run 42 canonical test vectors, get a pass/fail report; `system.pubkey` — get the public key to verify signed responses offline (2) |
 
 Full tool-by-tool reference (every input/output schema, request/response examples, per-tool
 descriptions): **[docs.tradingcalc.io/api](https://docs.tradingcalc.io/api)**
 
-Formulas normalized across 16 exchanges: **Binance, OKX, Bybit, Aster, Hyperliquid, MEXC, KuCoin, Gate, Deribit, Kraken, HTX, WOO, Phemex, Blofin, Backpack, dYdX**.
+Formulas normalized across 17 exchanges: **Binance, OKX, Bybit, Aster, Hyperliquid, MEXC, KuCoin, Gate, Deribit, Kraken, HTX, WOO, Phemex, Blofin, Backpack, dYdX, Polymarket Perps**.
 
 ## Rate Limits
 
@@ -180,7 +182,7 @@ Pass key as: `Authorization: Bearer <your-api-key>`
 
 ## Self-Verification
 
-Agents can verify all 35 canonical test vectors before trusting results:
+Agents can verify all 42 canonical test vectors before trusting results:
 
 ```json
 {
@@ -190,7 +192,7 @@ Agents can verify all 35 canonical test vectors before trusting results:
 }
 ```
 
-Response: `{ "status": "pass", "passed": 35, "failed": 0, "total": 35 }`
+Response: `{ "status": "pass", "passed": 42, "failed": 0, "total": 42 }`
 
 Live proof: [tradingcalc.io/verify](https://tradingcalc.io/verify)
 

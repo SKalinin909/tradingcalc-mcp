@@ -3,6 +3,8 @@
 .mcpregistry_registry_token
 .blogger-oauth-client.json
 .blogger-token.json
+.dataforseo-credentials.json
+.postingboard-credentials.json
 
 # Binaries
 mcp-publisher.exe

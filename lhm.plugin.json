@@ -1,7 +1,7 @@
 {
   "author": "TradingCalc",
   "cloudEndpoint": "https://tradingcalc.io/api/mcp",
-  "description": "40 deterministic crypto futures tools: trade planning (pnl, breakeven, exit_target, scenario, dca_entry, scale_out), risk (liquidation, position_sizing, max_leverage, risk_reward), funding & carry (funding_cost, funding_arb, compound_funding, funding_breakeven, carry_trade), market structure (open_analysis, session_structure, value_migration, breakout_acceptance), primitives (average_entry, hedge_ratio), integrated decision (pre_trade_check), chain-agnostic on-chain (token_risk_check, swap_price_impact, bonding_curve on Solana; market_cap_comparison and wallet_flag_check on Solana + 5 EVM chains), prediction markets across Kalshi, Polymarket and ADI Predictstreet's crypto categories (odds_converter, market_implied_odds, prediction_market_edge, window_fair_value, spread_reader), and Deribit BTC/ETH options (options_payoff, black_scholes, black_scholes_live, straddle_strangle, covered_call_protective_put, implied_volatility). Formulas normalized across 16 exchanges, linear and inverse contracts. Every response signed with ECDSA P-256. Not AI estimates, exact numbers your trading bot can trust.",
+  "description": "70 deterministic tools across crypto futures, forex, options, on-chain safety, prediction markets, and quant risk/stats: trade planning (pnl, breakeven, exit_target, scenario, dca_entry, scale_out), risk (liquidation, position_sizing, max_leverage, risk_reward), funding & carry (funding_cost, funding_arb, compound_funding, funding_breakeven, carry_trade), market structure (open_analysis, session_structure, value_migration, breakout_acceptance), primitives (average_entry, hedge_ratio), integrated decision (pre_trade_check, portfolio_risk), forex (pip value, margin level, breakeven, pnl, risk/reward, scenario, average entry, position size, margin required, currency converter, swap/rollover cost, correlation - manual + live-FX-rate variants), chain-agnostic on-chain (token_risk_check, swap_price_impact, bonding_curve on Solana; market_cap_comparison and wallet_flag_check on Solana + 5 EVM chains), prediction markets across Kalshi, Polymarket, Limitless, Myriad and ADI Predictstreet's crypto categories (odds_converter, market_implied_odds, prediction_market_edge, window_fair_value, spread_reader), Deribit BTC/ETH options (options_payoff, black_scholes, black_scholes_live, straddle_strangle, covered_call_protective_put, implied_volatility), and risk/stats (var_cvar, sharpe_stats, hurst_exponent, cointegration, portfolio_tearsheet, garch, risk_parity, dsr, kelly_frontier, unsmoothing, evt_tail_risk, orderbook_impact). Formulas normalized across 17 exchanges, linear and inverse contracts. Every response signed with ECDSA P-256. Not AI estimates, exact numbers your trading bot can trust.",
   "homepage": "https://tradingcalc.io",
   "identifier": "skalinin909-tradingcalc-mcp",
   "name": "tradingcalc-mcp",
@@ -33,12 +33,18 @@
     "options",
     "deribit",
     "black-scholes",
-    "implied-volatility"
+    "implied-volatility",
+    "forex",
+    "value-at-risk",
+    "sharpe-ratio",
+    "garch",
+    "risk-parity",
+    "quant"
   ],
   "tools": [
     {
       "name": "workflow.run_pnl_planning",
-      "description": "Calculate net PnL, ROE, fees and gross profit/loss for a futures trade. Use when user asks \"what's my profit/loss on this trade?\" Returns: grossPnl, fees, netPnl, netPnlUsdt, roe (%).",
+      "description": "Calculate net PnL, ROE, fees and gross profit/loss for a futures trade. Use when user asks \"what's my profit/loss on this trade?\" Returns: grossPnl, fees, netPnl, netPnlUsdt, roe (%), maxLossBound (only non-null for an inverse/coin-margined short: the finite ceiling on net coin-denominated loss as price rises without limit, (size/entryPrice)×(1+feeOpenPct) - includes the opening fee, since it survives the exit-price-to-infinity limit while the closing fee vanishes - null for every other side/contractType combination, which either has no such bound or a trivial one).",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -794,6 +800,94 @@
       }
     },
     {
+      "name": "workflow.run_portfolio_risk",
+      "description": "Aggregates risk across multiple open positions in one call: total notional, total P&L, total margin in use, margin usage as a % of account balance (if given), and which single position sits closest to liquidation. Each position is computed through the same canonical PnL/liquidation math as the single-position tools, then rolled up. Linear (USDT-margined) positions sum into one USD total; inverse (coin-margined) positions are grouped by settlement coin instead, since a BTC-margined P&L cannot be summed with an ETH-margined one without a live conversion rate. Returns a verdict: healthy / watch / reduce / critical, driven by the closest liquidation distance and margin usage. Use when user asks \"how exposed am I across all my positions?\" or \"which of my positions is closest to liquidation?\". Position size follows the product-wide convention: base-asset quantity for linear, USD notional (contracts) for inverse.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "positions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 50,
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "description": "Optional label to identify this position in the response (defaults to \"Position N\")"
+                },
+                "side": {
+                  "type": "string",
+                  "enum": [
+                    "long",
+                    "short"
+                  ]
+                },
+                "entry_price": {
+                  "type": "number",
+                  "description": "Entry price"
+                },
+                "mark_price": {
+                  "type": "number",
+                  "description": "Current mark/last price"
+                },
+                "size": {
+                  "type": "number",
+                  "description": "Position size: base-asset quantity for linear, USD notional (contracts) for inverse"
+                },
+                "leverage": {
+                  "type": "number",
+                  "description": "Leverage multiplier"
+                },
+                "fee_open_pct": {
+                  "type": "number",
+                  "description": "Open fee rate (default 0.0002)"
+                },
+                "fee_close_pct": {
+                  "type": "number",
+                  "description": "Close fee rate (default 0.0005)"
+                },
+                "mmr": {
+                  "type": "number",
+                  "description": "Maintenance margin rate (default 0.005)"
+                },
+                "contractType": {
+                  "type": "string",
+                  "enum": [
+                    "linear",
+                    "inverse"
+                  ],
+                  "description": "linear = USDT-margined (default), inverse = coin-margined (e.g. Bybit BTCUSD)"
+                },
+                "coin": {
+                  "type": "string",
+                  "description": "Settlement coin, required when contractType is inverse (e.g. \"BTC\", \"ETH\")"
+                }
+              },
+              "required": [
+                "side",
+                "entry_price",
+                "mark_price",
+                "size",
+                "leverage"
+              ]
+            }
+          },
+          "account_balance": {
+            "type": "number",
+            "description": "Optional account balance in USD, used to compute margin_usage_pct: linear margin plus every inverse position's own margin marked to market at its mark_price, all as one USD total"
+          }
+        },
+        "required": [
+          "positions"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
       "name": "workflow.run_dca_entry",
       "description": "DCA entry planner: weighted average entry price, breakeven, and per-level contribution from multiple fill prices and sizes. Prefer this over primitive.average_entry whenever breakeven or the per-level breakdown is also wanted, not just the bare average. Use when user bought at several prices and asks \"what's my average entry?\" or \"where is my DCA breakeven?\". Returns: averageEntry, breakeven, per-level summary.",
       "inputSchema": {
@@ -1362,8 +1456,801 @@
       }
     },
     {
+      "name": "workflow.run_forex_pip_value",
+      "description": "Value of 1 pip for a given forex pair and position size, in that pair's own quote currency (e.g. EUR/USD's pip value comes back in USD, USD/JPY's in JPY): no live FX rate needed, since a pair's pip value is naturally denominated in its own quote currency. Pip size is 0.0001 for non-JPY pairs, 0.01 for JPY-quoted pairs, a universal market convention verified against real broker documentation, not broker-specific. Prefer workflow.run_forex_pip_value_live instead when the account currency differs from the pair's quote currency. Use when user asks \"what's 1 pip worth on X lots of EUR/USD?\". Returns: pipSize, pipValueQuote, base, quote.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "pair": {
+            "type": "string",
+            "description": "Currency pair in BASE/QUOTE format, e.g. \"EUR/USD\""
+          },
+          "units": {
+            "type": "number",
+            "description": "Position size in base-currency units (1 standard lot = 100,000, mini = 10,000, micro = 1,000, nano = 100)"
+          }
+        },
+        "required": [
+          "pair",
+          "units"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_forex_margin_level",
+      "description": "Free margin and margin level % from account equity and used margin: equity/usedMargin*100, the same stop-out proximity metric every forex platform shows. Returns null (not Infinity) when usedMargin is 0, meaning no open position. Use when user asks \"how close am I to a margin call?\" or \"what's my free margin?\". Returns: freeMargin, marginLevelPct.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "equity": {
+            "type": "number",
+            "description": "Account equity (balance + floating P&L)"
+          },
+          "usedMargin": {
+            "type": "number",
+            "description": "Margin currently locked by open positions. 0 if none."
+          }
+        },
+        "required": [
+          "equity",
+          "usedMargin"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_forex_breakeven",
+      "description": "Breakeven price for a forex position accounting for spread and round-trip commission, in pips and in price. Commission is quoted per standard lot (100,000 units) and expressed in the pair's own quote currency; because both commission and pip value scale with lot size, the commission-in-pips figure is independent of position size by construction. Use when user asks \"where's my true breakeven after spread and commission?\". Returns: pipSize, commissionPips, totalCostPips, breakevenPrice.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "pair": {
+            "type": "string",
+            "description": "Currency pair in BASE/QUOTE format, e.g. \"EUR/USD\""
+          },
+          "side": {
+            "type": "string",
+            "enum": [
+              "long",
+              "short"
+            ]
+          },
+          "entryPrice": {
+            "type": "number"
+          },
+          "spreadPips": {
+            "type": "number",
+            "description": "Spread at entry, in pips"
+          },
+          "commissionPerLotRoundTrip": {
+            "type": "number",
+            "description": "Round-trip commission per standard lot, in the pair's own quote currency. Default 0 (pure-spread broker model)."
+          }
+        },
+        "required": [
+          "pair",
+          "side",
+          "entryPrice",
+          "spreadPips"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_forex_pnl",
+      "description": "Profit or loss for a closed or hypothetical forex trade, in pips and in the pair's own quote currency, long or short. Use when user asks \"what did I make/lose on this trade?\" or \"what would X pips be worth on Y lots?\". Returns: pips (signed, positive favors the position taken), pnlQuote.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "pair": {
+            "type": "string",
+            "description": "Currency pair in BASE/QUOTE format, e.g. \"EUR/USD\""
+          },
+          "side": {
+            "type": "string",
+            "enum": [
+              "long",
+              "short"
+            ]
+          },
+          "entryPrice": {
+            "type": "number"
+          },
+          "exitPrice": {
+            "type": "number"
+          },
+          "units": {
+            "type": "number",
+            "description": "Position size in base-currency units"
+          }
+        },
+        "required": [
+          "pair",
+          "side",
+          "entryPrice",
+          "exitPrice",
+          "units"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_forex_risk_reward",
+      "description": "Risk and reward distance in pips from entry/stop/target, and the resulting ratio (reward/risk): a raw number, not a verdict. ratio is null when the stop sits exactly at entry (no risk distance), and also when validSetup is false (stop/target on the wrong side of entry for the given side, e.g. a long with its stop above entry) - check validSetup before trusting the ratio. Use when user asks \"what's my risk/reward on this setup?\". Returns: riskPips, rewardPips, validSetup, ratio.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "pair": {
+            "type": "string",
+            "description": "Currency pair in BASE/QUOTE format, e.g. \"EUR/USD\""
+          },
+          "side": {
+            "type": "string",
+            "enum": [
+              "long",
+              "short"
+            ]
+          },
+          "entryPrice": {
+            "type": "number"
+          },
+          "stopPrice": {
+            "type": "number"
+          },
+          "targetPrice": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "pair",
+          "side",
+          "entryPrice",
+          "stopPrice",
+          "targetPrice"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_forex_scenario",
+      "description": "PnL across a range of hypothetical price moves (in pips, signed by actual price direction, not pre-adjusted for side), for a single forex position size, long or short. Use when user asks \"what if price moves X pips in either direction?\". Returns: scenarios[] (deltaPips, exitPrice, pnlQuote).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "pair": {
+            "type": "string",
+            "description": "Currency pair in BASE/QUOTE format, e.g. \"EUR/USD\""
+          },
+          "side": {
+            "type": "string",
+            "enum": [
+              "long",
+              "short"
+            ]
+          },
+          "entryPrice": {
+            "type": "number"
+          },
+          "units": {
+            "type": "number",
+            "description": "Position size in base-currency units"
+          },
+          "deltasPips": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "description": "Hypothetical price moves in pips, e.g. [-50, 0, 50]"
+          }
+        },
+        "required": [
+          "pair",
+          "side",
+          "entryPrice",
+          "units",
+          "deltasPips"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_forex_average_entry",
+      "description": "Size-weighted average entry price across multiple forex fills: plain arithmetic mean, since forex has no coin-margined analog requiring the harmonic mean the crypto average_entry tool uses for inverse contracts. Use when user asks \"what's my average entry after these fills?\". Returns: totalUnits, totalCost, avgEntry.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "pair": {
+            "type": "string",
+            "description": "Currency pair in BASE/QUOTE format, e.g. \"EUR/USD\""
+          },
+          "fills": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "price": {
+                  "type": "number"
+                },
+                "units": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "price",
+                "units"
+              ]
+            },
+            "description": "Fills to average, each with a price and a size in base-currency units"
+          }
+        },
+        "required": [
+          "pair",
+          "fills"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_forex_margin_required",
+      "description": "Notional and margin required for a forex position, in the pair's own quote currency: no live FX rate needed. Never built for Phase 1 of this domain since a margin figure has no natural currency-neutral form the way pip value does. Prefer workflow.run_forex_margin_required_live instead when the account currency differs from the pair's quote currency. Use when user asks \"how much margin do I need for X lots of EUR/USD at 50:1?\". Returns: notionalQuote, marginQuote, base, quote.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "pair": {
+            "type": "string",
+            "description": "Currency pair in BASE/QUOTE format, e.g. \"EUR/USD\""
+          },
+          "units": {
+            "type": "number",
+            "description": "Position size in base-currency units"
+          },
+          "price": {
+            "type": "number",
+            "description": "Entry or current price"
+          },
+          "leverage": {
+            "type": "number",
+            "description": "Leverage multiplier, e.g. 50 for 50:1"
+          }
+        },
+        "required": [
+          "pair",
+          "units",
+          "price",
+          "leverage"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_forex_currency_converter",
+      "description": "Converts an amount between currencies using a manually supplied rate: no live data fetch. Prefer workflow.run_forex_currency_converter_live instead to have the rate fetched automatically. Use when user already knows the exact rate they want applied. Returns: converted.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "description": "Amount in the source currency"
+          },
+          "rate": {
+            "type": "number",
+            "description": "Exchange rate to apply (1 unit of source currency = rate units of target currency)"
+          }
+        },
+        "required": [
+          "amount",
+          "rate"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_forex_swap_cost",
+      "description": "Total swap/rollover cost (or credit) for holding a forex position overnight, in the pair's own quote currency: no live FX rate needed. Swap rates are broker-set with no free live feed available, so swapPerLotPerNight is always a manual input (quoted per standard lot, matching how commission is quoted in workflow.run_forex_breakeven), not fetched. Negative = cost (you pay), positive = credit (you receive). Prefer workflow.run_forex_swap_cost_live instead when the account currency differs from the pair's quote currency. Use when user asks \"how much will holding this position overnight cost me?\". Returns: lots, totalSwapQuote, base, quote.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "pair": {
+            "type": "string",
+            "description": "Currency pair in BASE/QUOTE format, e.g. \"EUR/USD\""
+          },
+          "units": {
+            "type": "number",
+            "description": "Position size in base-currency units"
+          },
+          "swapPerLotPerNight": {
+            "type": "number",
+            "description": "Swap rate per standard lot (100,000 units) per night, in the pair's quote currency. Negative = cost, positive = credit. Broker-set: get this from the user's broker platform, there is no live source for it."
+          },
+          "nights": {
+            "type": "integer",
+            "description": "Number of nights the position is held"
+          }
+        },
+        "required": [
+          "pair",
+          "units",
+          "swapPerLotPerNight",
+          "nights"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_forex_correlation",
+      "description": "Correlation coefficient and minimum-variance hedge ratio between two price series of matching length, computed on daily % returns (not raw price levels, which would give spuriously high correlation between two unrelated but both-trending series). hedgeRatio follows Hull's standard futures-hedging formula: cov(returns1,returns2)/var(returns2), \"how many units of series 2 per unit of series 1 minimizes the combined position's variance.\" No live data fetch: supply the two price series directly. Prefer workflow.run_forex_correlation_live instead to have both series fetched automatically for two named pairs. Use when user already has two price series and wants their statistical relationship. Returns: n, correlation (-1 to 1), hedgeRatio.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "rates1": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 5,
+            "description": "First price series, chronological order, one price per date"
+          },
+          "rates2": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 5,
+            "description": "Second price series, chronological order, same length and same dates as rates1"
+          }
+        },
+        "required": [
+          "rates1",
+          "rates2"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_var_cvar",
+      "description": "Parametric Value at Risk (VaR) and Conditional VaR / Expected Shortfall (CVaR), the variance-covariance method (assumes normally distributed returns), plus Modified VaR (Cornish-Fisher skew/kurtosis correction, Boudt/Peterson/Croux) when a return series is supplied. Supply either a return series or a mean/stdev pair directly, at a confidence level. Output is at the same periodicity as the input (no automatic annualization) - a daily return series gives a daily VaR/CVaR. Use when user asks \"what's my VaR at 95%/99%?\", \"what's my expected shortfall on this position?\", or \"does my Sharpe/VaR estimate need a fat-tails correction?\". Returns: var, cvar (both positive loss magnitudes; cvar >= var always), z, mean, stdev, skewness, excess_kurtosis (both null unless 3+ returns were supplied), var_modified (skew/kurtosis-adjusted VaR; null when skewness is, OR when this series' skew/kurtosis are too extreme for the Cornish-Fisher expansion to be a valid quantile - skewness/excess_kurtosis are still returned in that case).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "returns": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 2,
+            "description": "Return series (e.g. daily % returns as decimals). Provide this OR mean+stdev, not both."
+          },
+          "mean": {
+            "type": "number",
+            "description": "Mean return, if not supplying returns[] directly"
+          },
+          "stdev": {
+            "type": "number",
+            "description": "Standard deviation of returns, if not supplying returns[] directly"
+          },
+          "confidence": {
+            "type": "number",
+            "description": "Confidence level, 0-1 exclusive (default 0.95)"
+          }
+        }
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_sharpe_stats",
+      "description": "Sharpe ratio with the Lo (2002) serial-correlation-aware annualization correction (the naive sqrt(periods_per_year) scaling overstates or understates the true annualized Sharpe when returns are autocorrelated), plus the Probabilistic Sharpe Ratio (Bailey & Lopez de Prado): the probability the true Sharpe exceeds a benchmark, adjusted for the sample's skewness/kurtosis and length, not just its point estimate. Use when user asks \"what's my real annualized Sharpe, not the naive one?\" or \"how confident can I be this Sharpe ratio is actually good?\". Returns: sharpe_period, sharpe_annualized_naive, sharpe_annualized_lo, autocorrelation_lag1, psr, skewness, kurtosis.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "returns": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "description": "Return series, one value per period"
+          },
+          "periods_per_year": {
+            "type": "number",
+            "description": "Periods per year for annualization (default 365, crypto convention - trades every day)"
+          },
+          "benchmark_sharpe": {
+            "type": "number",
+            "description": "Benchmark Sharpe ratio for the PSR test, same periodicity as returns (default 0)"
+          }
+        },
+        "required": [
+          "returns"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_hurst_exponent",
+      "description": "Hurst exponent via rescaled-range (R/S) analysis: is this return/price series trending/persistent (H>0.5, a move tends to be followed by a move in the same direction), mean-reverting/anti-persistent (H<0.5), or consistent with a random walk (H~0.5)? Use when user asks \"is this asset trending or mean-reverting?\" or \"does this series show long-range dependence?\". Takes a return series, not raw price levels. Returns: hurst, interpretation (trending/mean_reverting/random_walk), window_sizes, rs_values.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "values": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 32,
+            "description": "Return series (not raw price levels)"
+          },
+          "min_window": {
+            "type": "number",
+            "description": "Smallest R/S analysis window size (default 8)"
+          }
+        },
+        "required": [
+          "values"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_cointegration",
+      "description": "Engle-Granger two-step cointegration test for a pair of price series: do they share a long-run equilibrium relationship (their spread is stationary/mean-reverting)? The standard pairs-trading signal test. Returns the cointegrating regression's hedge ratio (beta) and an ADF t-statistic on the residuals, compared against 1%/5%/10% critical values. Use when user asks \"are these two assets cointegrated?\" or \"is this a valid pairs trade?\". Returns: alpha, beta (hedge ratio), t_stat, critical_values, cointegrated (booleans at each significance level).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "y": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 20,
+            "description": "First price series (the dependent variable in the cointegrating regression)"
+          },
+          "x": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 20,
+            "description": "Second price series, same length and dates as y"
+          }
+        },
+        "required": [
+          "y",
+          "x"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_portfolio_tearsheet",
+      "description": "Core risk/return tearsheet from a single return series: annualized return (compounded, not linear) and volatility, Sharpe (plain + Lo 2002-corrected + Pezier-White skew/kurtosis-adjusted), Sortino, max drawdown, Calmar ratio, the drawdown-ratio cluster (Ulcer Index/Martin ratio, Pain Index/Pain ratio, Burke ratio + modified), Omega-Sharpe ratio, Upside Potential Ratio, skewness, kurtosis, Probabilistic Sharpe Ratio, win rate, best/worst single-period return. Use when user asks for a full risk summary/report on a strategy or portfolio's returns, not just one metric. Returns all of the above in one call.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "returns": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "description": "Return series, one value per period"
+          },
+          "periods_per_year": {
+            "type": "number",
+            "description": "Periods per year for annualization (default 365)"
+          },
+          "mar": {
+            "type": "number",
+            "description": "Minimum acceptable return for the Sortino ratio, same periodicity as returns (default 0)"
+          },
+          "benchmark_sharpe": {
+            "type": "number",
+            "description": "Benchmark Sharpe ratio for the PSR figure, same periodicity as returns (default 0)"
+          }
+        },
+        "required": [
+          "returns"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_garch",
+      "description": "GARCH(1,1) volatility model, fit by maximum likelihood on a return series: estimates omega/alpha/beta (the variance-persistence parameters) and forecasts next-period volatility. Use when user asks \"what's my GARCH volatility forecast?\" or \"how persistent is volatility in this return series?\". This is a backward-looking statistical fit, not a market prediction guarantee. Returns: mu, omega, alpha, beta, persistence (alpha+beta), unconditional_vol, forecast_vol, loglikelihood.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "returns": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 50,
+            "description": "Return series, one value per period, at least 50 values (GARCH needs real sample depth to identify persistence)"
+          }
+        },
+        "required": [
+          "returns"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_risk_parity",
+      "description": "Risk-parity (equal or custom risk contribution) portfolio weights for N assets: given a covariance matrix (or N return series to compute one from), finds long-only weights where each asset contributes its target share of total portfolio risk. Use when user asks \"what weights give each asset equal risk contribution?\" or \"how do I risk-parity-weight this portfolio?\". A portfolio-construction calculation, not a buy/sell recommendation. Returns: weights, risk_contributions (should match risk_budgets exactly at convergence), portfolio_volatility.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "returns": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            },
+            "description": "One return series per asset (2+ assets, all series the same length). Provide this OR covariance, not both."
+          },
+          "covariance": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            },
+            "description": "Direct NxN covariance matrix, if not supplying returns[][] directly."
+          },
+          "risk_budgets": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "description": "Target risk share per asset, one per asset (need not sum to 1, normalized internally). Default: equal (1/N each)."
+          }
+        }
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_dsr",
+      "description": "Deflated Sharpe Ratio (Bailey & Lopez de Prado): given how many strategy variants you tried (and how correlated they are), what Sharpe ratio would the *best of N* clear by luck alone, and does your actual strategy still clear that higher bar? Use when user asks \"is my backtested Sharpe ratio real, or did I get lucky trying many variants?\" or \"how many independent trials does this really represent?\". Provide either trial_sharpes[] (the N trials' own observed Sharpe ratios, most rigorous) or n_trials (+ optional avg_correlation to correct for correlated trials via Kish's design effect). Returns: expected_max_sharpe (the luck-alone threshold), dsr (probability your strategy's true Sharpe exceeds it, 0-1), n_trials_effective.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "returns": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "description": "The candidate strategy's own return series"
+          },
+          "trial_sharpes": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 2,
+            "description": "Observed Sharpe ratios of all N trials tried, if tracked. Takes priority over n_trials if both are given."
+          },
+          "n_trials": {
+            "type": "number",
+            "description": "Number of strategy variants tried, if trial_sharpes were not tracked individually"
+          },
+          "avg_correlation": {
+            "type": "number",
+            "description": "Average pairwise correlation between trials, 0-1 (default 0 = independent). Only used with n_trials; lowers the effective trial count via Kish's design effect."
+          }
+        },
+        "required": [
+          "returns"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_kelly_frontier",
+      "description": "Kelly growth-security frontier (MacLean, Ziemba & Blazenko 1992): for a strategy compounding at a fraction lambda of full Kelly, the probability wealth ever falls to a fraction alpha of its starting value is P = alpha^(2/lambda-1). Provide either lambda_fraction (to compute that probability) or max_probability (to solve for the largest lambda that keeps the ruin probability at or below it). Use when user asks \"if I bet half-Kelly, what's my chance of ever losing half my bankroll?\" or \"what fraction of Kelly keeps my chance of a 50% drawdown under 5%?\". Valid lambda range is (0, 2]; beyond 2 the probability is certain (1), not the raw formula value. Returns: probability, lambda_fraction (echoed or solved).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "alpha": {
+            "type": "number",
+            "description": "Fraction of starting capital, 0-1 exclusive (e.g. 0.5 = \"ever falls to half my starting bankroll\")"
+          },
+          "lambda_fraction": {
+            "type": "number",
+            "description": "Fraction of full Kelly being bet (1 = full Kelly, 0.5 = half Kelly). Provide this OR max_probability, not both."
+          },
+          "max_probability": {
+            "type": "number",
+            "description": "Target ceiling on the ruin probability, 0-1 exclusive. Provide this to solve for the safe lambda_fraction instead of supplying it directly."
+          }
+        },
+        "required": [
+          "alpha"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_unsmoothing",
+      "description": "Return \"unsmoothing\" for infrequently-marked/illiquid or appraisal-based series: Getmansky-Lo-Makarov (2004) MA(2) smoothing index plus Blundell-Ward (1987) AR(1) volatility inflation, two complementary models answering \"this return series looks smoother than it really is; what's the true volatility?\". Use when user asks \"how much is appraisal smoothing understating my real volatility?\" or \"what's my de-smoothed Sharpe ratio?\". Returns: glm_theta (MA(2) weights), glm_smoothing_index (xi, 1=no smoothing, down to 1/3 for max MA(2) smoothing), glm_true_volatility_multiplier, glm_converged (false if the fit may be unreliable - treat that result with caution), bw_alpha (AR(1) coefficient = lag-1 autocorrelation, can be negative), bw_smoothing_detected (false when alpha<=0: no evidence of smoothing, bw_volatility_multiplier is then pinned to 1 with no correction applied rather than a misleading below-1 value), bw_volatility_multiplier, and each model's own true_stdev estimate.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "returns": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 20,
+            "description": "The observed (possibly smoothed) return series, at least 20 values"
+          }
+        },
+        "required": [
+          "returns"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_evt_tail_risk",
+      "description": "Extreme Value Theory tail risk (Peaks-Over-Threshold): fits a Generalized Pareto Distribution to the losses beyond a high threshold via Grimshaw's (1993) profile-likelihood MLE, then extrapolates VaR/Expected Shortfall at the requested confidence, without assuming a normal distribution. Use when user asks \"what's my tail VaR without assuming normality?\" or \"how fat is my loss tail, really?\". Complements workflow.run_var_cvar (parametric, normal-distribution VaR/CVaR) for exactly the fat-tailed-return case that assumption understates. threshold_percentile (default 90) sets which percentile of the loss distribution (losses = -returns) becomes the threshold u; confidence must be deep enough into the fitted tail (1-confidence < the threshold's own exceedance rate) or the call throws. Returns: threshold, n_exceedances, exceedance_rate, xi (GPD shape: 0=exponential tail, >0=heavy/fat tail, <0=bounded tail; values <= -1 are excluded from the fit domain as a known non-regular/unbounded-likelihood case, Smith 1985), beta (GPD scale), xi_asymptotically_normal (false when xi<=-0.5: the fit is still valid but the usual MLE confidence-interval theory doesn't apply, per that same Smith 1985 result), var, es (null when xi>=1, where Expected Shortfall is mathematically undefined).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "returns": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 100,
+            "description": "Return series, one value per period, at least 100 values (POT needs real sample depth in the tail)"
+          },
+          "threshold_percentile": {
+            "type": "number",
+            "description": "Percentile (0-100 exclusive) of the loss distribution used as the POT threshold u. Default 90."
+          },
+          "confidence": {
+            "type": "number",
+            "description": "VaR/ES confidence level, 0-1 exclusive. Default 0.99. Must satisfy 1-confidence < the threshold's own exceedance rate."
+          }
+        },
+        "required": [
+          "returns"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_orderbook_impact",
+      "description": "Order-book \"walk the book\" impact/capacity: given order-book levels (price, size in base-asset units) and EITHER a target notional or an impact budget in bps, computes VWAP and price impact for that size, or (via bisection) the largest notional that stays inside the impact budget. Use when user asks \"what's my price impact if I trade $X\" or \"how much can I trade before impact exceeds Y bps\". side=\"buy\" walks the asks, side=\"sell\" walks the bids; impact is measured from the book's own mid ((best_bid+best_ask)/2) and is always a positive \"cost in bps\" number regardless of side. Returns: mid_price, spread_bps, vwap, impact_bps - both null when EITHER the loaded book doesn't cover the requested notional (book_sufficient=false flags this specific case) OR the notional involved is ~0 (book_sufficient stays true then; happens for a near-zero notional_usd, or in capacity mode when even an infinitesimal trade already exceeds impact_budget_bps, in which case max_notional itself resolves to 0) - and in capacity mode, max_notional plus capacity_is_lower_bound (true if the ENTIRE supplied book was consumed within budget, meaning true market capacity may exceed what was supplied - this tool only sees the levels given to it).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "bids": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "description": "Bid levels as [price, size_base] pairs, any order"
+          },
+          "asks": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "description": "Ask levels as [price, size_base] pairs, any order"
+          },
+          "side": {
+            "type": "string",
+            "enum": [
+              "buy",
+              "sell"
+            ],
+            "description": "\"buy\" walks the asks, \"sell\" walks the bids"
+          },
+          "notional_usd": {
+            "type": "number",
+            "description": "Target notional to walk the book for. Provide this OR impact_budget_bps, not both."
+          },
+          "impact_budget_bps": {
+            "type": "number",
+            "description": "Max acceptable impact in bps; solves for the largest notional within it. Provide this OR notional_usd, not both."
+          }
+        },
+        "required": [
+          "bids",
+          "asks",
+          "side"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
       "name": "workflow.run_open_analysis",
-      "description": "Market Profile open analysis: where and how price opened vs the prior session value area. Use for \"how did BTC open today?\" / \"what does the open imply for the session?\". Returns: open_location, open_type (OD/OTD/ORR/OAIR) with description/implication, confidence, key_levels (VAH/VAL/VPOC/IB), scenario_framing (bullish/bearish/neutral), invalidation level.",
+      "description": "Market Profile open analysis: where and how price opened vs the prior session value area. Use for \"how did BTC open today?\" / \"what does the open imply for the session?\". Returns: open_location, open_type (OD/OTD/ORR/OAIR) with description/implication, confidence, key_levels (VAH/VAL/VPOC/IB), tails (session-high/low rejection tails and single prints), scenario_framing (bullish/bearish/neutral), invalidation level.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -1425,7 +2312,7 @@
     },
     {
       "name": "workflow.run_session_structure",
-      "description": "Market Profile day-type classifier: trend / balance / neutral_trend / normal / normal_var, from TPO, initial balance, range extension and value migration. Use for \"is this a trend day or a balance day?\". Returns: structure (the day-type label), description, bias, key_signals, key_levels (VAH/VAL/VPOC/IB/session high-low), scenario_framing, invalidation level.",
+      "description": "Market Profile day-type classifier: trend / balance / neutral_trend / normal / normal_var, from TPO, initial balance, range extension and value migration. Use for \"is this a trend day or a balance day?\". Returns: structure (the day-type label), description, bias, key_signals, key_levels (VAH/VAL/VPOC/IB/session high-low), tails (session-high/low rejection tails and single prints), scenario_framing, invalidation level.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -1487,7 +2374,7 @@
     },
     {
       "name": "workflow.run_value_migration",
-      "description": "Market Profile value-area migration across sessions: is value migrating up, down, or overlapping (directional conviction vs balance)? Use for \"is value moving higher day over day?\". Returns: state, direction, migration_pct, key_levels (current vs. prior session VAH/VAL/VPOC), scenario_framing, invalidation level.",
+      "description": "Market Profile value-area migration across sessions: is value migrating up, down, or overlapping (directional conviction vs balance)? Use for \"is value moving higher day over day?\". Returns: state, direction, migration_pct, key_levels (current vs. prior session VAH/VAL/VPOC), tails (session-high/low rejection tails and single prints), scenario_framing, invalidation level.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -1758,7 +2645,7 @@
     },
     {
       "name": "workflow.run_odds_converter",
-      "description": "Converts a probability into decimal odds, American odds, and breakeven win rate: either from a manually supplied probability, or fetched live from Kalshi, Polymarket, or ADI Predictstreet (three independent crypto-price prediction market venues, all public keyless market data). When a Kalshi or Polymarket source is supplied, also returns the vig (the exchange's built-in edge), computed from the market's own YES+NO prices, not estimated; ADI Predictstreet's crypto contracts currently have no live trading volume on any venue, so this returns available:false with an explanation rather than a fake price (use workflow.run_window_fair_value for a theoretical price on those instead). Use when user asks \"what odds does a 35% probability work out to?\" or \"what's the vig on this Kalshi/Polymarket market?\". Provide exactly one of probability/kalshiTicker/polymarketSlug/adiSymbol. Returns: probability, decimalOdds, americanOdds, breakevenWinRatePct, vigPct (null unless a live two-sided source was used), source (manual/kalshi/polymarket/adi), identifier, label.",
+      "description": "Converts a probability into decimal odds, American odds, and breakeven win rate: either from a manually supplied probability, or fetched live from Kalshi, Polymarket, ADI Predictstreet, Limitless, or Myriad (five independent crypto-price prediction market venues, all public keyless market data). When a Kalshi, Polymarket, Limitless, or Myriad source is supplied, also returns the vig (the exchange's built-in edge), computed from the market's own YES+NO prices, not estimated; ADI Predictstreet's crypto contracts currently have no live trading volume on any venue, so this returns available:false with an explanation rather than a fake price (use workflow.run_window_fair_value for a theoretical price on those instead). Use when user asks \"what odds does a 35% probability work out to?\" or \"what's the vig on this Kalshi/Polymarket/Limitless/Myriad market?\". Provide exactly one of probability/kalshiTicker/polymarketSlug/adiSymbol/limitlessSlug/myriadSlug. Returns: probability, decimalOdds, americanOdds, breakevenWinRatePct, vigPct (null unless a live two-sided source was used), source (manual/kalshi/polymarket/adi/limitless/myriad), identifier, label.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -1777,6 +2664,14 @@
           "adiSymbol": {
             "type": "string",
             "description": "An ADI Predictstreet market symbol (e.g. BTC1D-20260920T0000). Currently always returns available:false; these contracts have no live trading volume yet."
+          },
+          "limitlessSlug": {
+            "type": "string",
+            "description": "A Limitless Exchange market slug, from the market URL (e.g. btc-up-or-down-5-min-1790249100), to fetch a live price from. On-chain (Base), mostly short-duration (5min/15min/daily) crypto up/down contracts."
+          },
+          "myriadSlug": {
+            "type": "string",
+            "description": "A Myriad Markets market slug, from the market URL (e.g. eth-at-three-digits-when-bitcoin-goes-below-50k), to fetch a live price from. On-chain (Abstract L2); not every market has a Yes/No outcome, some are multi-outcome ladders."
           }
         },
         "required": []
@@ -1788,14 +2683,14 @@
     },
     {
       "name": "workflow.run_spread_reader",
-      "description": "Reads the same real-world bet's live price from 2-4 prediction-market venues at once (Kalshi, Polymarket, ADI Predictstreet) and reports the spread between the cheapest and most expensive. The caller supplies each venue's own identifier for what they've confirmed is the same underlying bet; this tool never auto-matches events across venues, only reads and compares prices for identifiers you provide. Use when user asks \"is this bet priced differently on Kalshi vs Polymarket?\" or \"which venue has the best price on this?\". Returns: quotes[] (venue, identifier, label, probabilityPct, available, error), availableCount, cheapestVenue, mostExpensiveVenue, spreadPct (percentage points, null if fewer than 2 quotes resolved).",
+      "description": "Reads the same real-world bet's live price from 2-5 prediction-market venues at once (Kalshi, Polymarket, ADI Predictstreet, Limitless, Myriad) and reports the spread between the cheapest and most expensive. The caller supplies each venue's own identifier for what they've confirmed is the same underlying bet; this tool never auto-matches events across venues, only reads and compares prices for identifiers you provide. Use when user asks \"is this bet priced differently on Kalshi vs Polymarket?\" or \"which venue has the best price on this?\". Returns: quotes[] (venue, identifier, label, probabilityPct, available, error), availableCount, cheapestVenue, mostExpensiveVenue, spreadPct (percentage points, null if fewer than 2 quotes resolved).",
       "inputSchema": {
         "type": "object",
         "properties": {
           "quotes": {
             "type": "array",
             "minItems": 2,
-            "maxItems": 4,
+            "maxItems": 5,
             "items": {
               "type": "object",
               "properties": {
@@ -1804,12 +2699,14 @@
                   "enum": [
                     "kalshi",
                     "polymarket",
-                    "adi"
+                    "adi",
+                    "limitless",
+                    "myriad"
                   ]
                 },
                 "identifier": {
                   "type": "string",
-                  "description": "Kalshi ticker, Polymarket slug, or ADI Predictstreet symbol, matching the venue field."
+                  "description": "Kalshi ticker, Polymarket slug, ADI Predictstreet symbol, Limitless slug, or Myriad slug, matching the venue field."
                 }
               },
               "required": [
@@ -1817,7 +2714,7 @@
                 "identifier"
               ]
             },
-            "description": "One entry per venue you want to compare: 2 to 4 total. Each must genuinely be the same real-world bet; this tool does not verify that for you."
+            "description": "One entry per venue you want to compare: 2 to 5 total. Each must genuinely be the same real-world bet; this tool does not verify that for you."
           }
         },
         "required": [
@@ -1880,8 +2777,215 @@
       }
     },
     {
+      "name": "workflow.run_forex_pip_value_live",
+      "description": "Value of 1 pip for a forex pair and position size, converted to a given account currency via a live FX rate: TrueFX for its 10 quoted majors (genuinely live tick data), frankfurter.app daily ECB reference rate as the fallback for every other currency (30 total). Use when user asks \"what's 1 pip worth in my account currency?\" and the account currency differs from the pair's own quote currency (if it matches, workflow.run_forex_pip_value alone is enough, no live fetch needed). Returns everything workflow.run_forex_pip_value does, plus accountCurrency, pipValueAccount, fxRate, fxSource (truefx/frankfurter/identity), available (false + error if no rate could be found for that currency).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "pair": {
+            "type": "string",
+            "description": "Currency pair in BASE/QUOTE format, e.g. \"EUR/USD\""
+          },
+          "units": {
+            "type": "number",
+            "description": "Position size in base-currency units"
+          },
+          "accountCurrency": {
+            "type": "string",
+            "description": "3-letter account currency code, e.g. \"GBP\""
+          }
+        },
+        "required": [
+          "pair",
+          "units",
+          "accountCurrency"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_forex_margin_required_live",
+      "description": "Notional and margin required for a forex position, converted to a given account currency via a live FX rate (same TrueFX/frankfurter.app source as workflow.run_forex_pip_value_live). Use when user asks \"how much margin do I need in my account currency?\" and the account currency differs from the pair's own quote currency. Returns everything workflow.run_forex_margin_required does, plus accountCurrency, notionalAccount, marginAccount, fxRate, fxSource, available (false + error if no rate could be found).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "pair": {
+            "type": "string",
+            "description": "Currency pair in BASE/QUOTE format, e.g. \"EUR/USD\""
+          },
+          "units": {
+            "type": "number",
+            "description": "Position size in base-currency units"
+          },
+          "price": {
+            "type": "number",
+            "description": "Entry or current price"
+          },
+          "leverage": {
+            "type": "number",
+            "description": "Leverage multiplier, e.g. 50 for 50:1"
+          },
+          "accountCurrency": {
+            "type": "string",
+            "description": "3-letter account currency code, e.g. \"GBP\""
+          }
+        },
+        "required": [
+          "pair",
+          "units",
+          "price",
+          "leverage",
+          "accountCurrency"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_forex_position_size_live",
+      "description": "Position size (units and standard lots) from a risk amount and stop distance, in a given account currency, via a live FX rate to convert pip value into that currency (same TrueFX/frankfurter.app source as the other forex _live tools). Never has a meaningful account-currency-agnostic form: sizing a position from a risk budget genuinely requires knowing what 1 pip is worth in the currency that budget is denominated in. Use when user asks \"how many lots should I trade to risk $X on this setup?\". Returns: stopDistancePips, units, lots, pipValuePerUnitAccount, fxRate, fxSource, available (false + error if entry equals stop, or if no rate could be found).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "pair": {
+            "type": "string",
+            "description": "Currency pair in BASE/QUOTE format, e.g. \"EUR/USD\""
+          },
+          "entryPrice": {
+            "type": "number"
+          },
+          "stopPrice": {
+            "type": "number"
+          },
+          "riskAmount": {
+            "type": "number",
+            "description": "Amount to risk, in accountCurrency"
+          },
+          "accountCurrency": {
+            "type": "string",
+            "description": "3-letter account currency code, e.g. \"USD\""
+          }
+        },
+        "required": [
+          "pair",
+          "entryPrice",
+          "stopPrice",
+          "riskAmount",
+          "accountCurrency"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_forex_currency_converter_live",
+      "description": "Converts an amount between currencies using a live FX rate: TrueFX for its 10 quoted majors (genuinely live tick data), frankfurter.app daily ECB reference rate as the fallback for every other currency pair (30 total). Use when user asks \"what's $X worth in EUR?\" or any currency conversion where the rate itself isn't already known. Returns: converted, rate, source (truefx/frankfurter/identity), asOf, available (false + error if no rate could be found for that pair).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "description": "Amount in the source currency"
+          },
+          "from": {
+            "type": "string",
+            "description": "3-letter source currency code, e.g. \"USD\""
+          },
+          "to": {
+            "type": "string",
+            "description": "3-letter target currency code, e.g. \"EUR\""
+          }
+        },
+        "required": [
+          "amount",
+          "from",
+          "to"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_forex_swap_cost_live",
+      "description": "Total swap/rollover cost (or credit) for holding a forex position overnight, converted to a given account currency via a live FX rate (same TrueFX/frankfurter.app source as the other forex _live tools). swapPerLotPerNight is still always a manual input: swap rates are broker-set, with no free live feed available for them. Use when user asks \"how much will holding this position overnight cost me in my account currency?\" and it differs from the pair's own quote currency. Returns everything workflow.run_forex_swap_cost does, plus accountCurrency, totalSwapAccount, fxRate, fxSource, available (false + error if no rate could be found).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "pair": {
+            "type": "string",
+            "description": "Currency pair in BASE/QUOTE format, e.g. \"EUR/USD\""
+          },
+          "units": {
+            "type": "number",
+            "description": "Position size in base-currency units"
+          },
+          "swapPerLotPerNight": {
+            "type": "number",
+            "description": "Swap rate per standard lot per night, in the pair's quote currency. Negative = cost, positive = credit."
+          },
+          "nights": {
+            "type": "integer",
+            "description": "Number of nights the position is held"
+          },
+          "accountCurrency": {
+            "type": "string",
+            "description": "3-letter account currency code, e.g. \"GBP\""
+          }
+        },
+        "required": [
+          "pair",
+          "units",
+          "swapPerLotPerNight",
+          "nights",
+          "accountCurrency"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "workflow.run_forex_correlation_live",
+      "description": "Correlation coefficient and minimum-variance hedge ratio between two forex pairs, fetched live: historical daily rates for both pairs over the given lookback window (frankfurter.app's daily ECB reference time series, business days only), aligned by matching date, computed on daily % returns. hedgeRatio follows Hull's standard futures-hedging formula: \"how many units of pair2 per unit of pair1 minimizes the combined position's variance.\" Use when user asks \"how correlated are EUR/USD and GBP/USD?\" or \"what hedge ratio should I use between these two pairs?\". Returns: n (overlapping trading days used), correlation (-1 to 1), hedgeRatio, available (false + error if either pair has no data, or too few dates overlap).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "pair1": {
+            "type": "string",
+            "description": "First currency pair in BASE/QUOTE format, e.g. \"EUR/USD\""
+          },
+          "pair2": {
+            "type": "string",
+            "description": "Second currency pair in BASE/QUOTE format, e.g. \"GBP/USD\""
+          },
+          "days": {
+            "type": "integer",
+            "description": "Calendar days to look back, 14-365. Default 30. Business-day-only data means fewer actual points than this number."
+          }
+        },
+        "required": [
+          "pair1",
+          "pair2"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
       "name": "workflow.run_prediction_market_edge",
-      "description": "Compares your own probability estimate for an event against a prediction market's price (manual entry or a live Kalshi ticker) and sizes a bet using fractional Kelly criterion bet sizing (default: quarter-Kelly, a standard conservative haircut on full Kelly, stated explicitly as a convention). Returns zero recommended stake whenever your probability doesn't exceed the market's price: no edge, no bet. Use when user asks \"does this bet have edge?\" or \"how much should I stake given my probability estimate vs the market's?\". Returns: edgePct, evPerDollarStaked, fullKellyFraction, cappedKellyFraction, recommendedStakeUsd, verdict (skip_this_one/think_twice/worth_the_risk/take_it).",
+      "description": "Compares your own probability estimate for an event against a prediction market's price (manual entry, or a live Kalshi ticker, Limitless slug, or Myriad slug) and sizes a bet using fractional Kelly criterion bet sizing (default: quarter-Kelly, a standard conservative haircut on full Kelly, stated explicitly as a convention). Returns zero recommended stake whenever your probability doesn't exceed the market's price: no edge, no bet. Use when user asks \"does this bet have edge?\" or \"how much should I stake given my probability estimate vs the market's?\". Provide exactly one of marketProbabilityPct/kalshiTicker/limitlessSlug/myriadSlug. Returns: edgePct, evPerDollarStaked, fullKellyFraction, cappedKellyFraction, recommendedStakeUsd, verdict (skip_this_one/think_twice/worth_the_risk/take_it).",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -1891,11 +2995,19 @@
           },
           "marketProbabilityPct": {
             "type": "number",
-            "description": "The market's probability (price), 0.01-99.99. Use this OR kalshiTicker, not both."
+            "description": "The market's probability (price), 0.01-99.99. Use this OR one of the live sources below, not both."
           },
           "kalshiTicker": {
             "type": "string",
             "description": "A Kalshi market ticker to fetch the market probability from live instead of supplying it manually."
+          },
+          "limitlessSlug": {
+            "type": "string",
+            "description": "A Limitless Exchange market slug to fetch the market probability from live instead of supplying it manually."
+          },
+          "myriadSlug": {
+            "type": "string",
+            "description": "A Myriad Markets market slug to fetch the market probability from live instead of supplying it manually. Not every market has a Yes/No outcome."
           },
           "bankrollUsd": {
             "type": "number",
@@ -1918,7 +3030,7 @@
     },
     {
       "name": "system.verify",
-      "description": "Run the full regression suite: 35 canonical test vectors (linear and inverse/coin-margined) across all 12 calculators, and return a pass/fail report with counts and timestamp. Call this before using results in production workflows to confirm the computation layer is operating correctly.",
+      "description": "Run the full regression suite: 42 canonical test vectors (linear and inverse/coin-margined) across all 12 calculators, and return a pass/fail report with counts and timestamp. Call this before using results in production workflows to confirm the computation layer is operating correctly.",
       "inputSchema": {
         "type": "object",
         "properties": {},
