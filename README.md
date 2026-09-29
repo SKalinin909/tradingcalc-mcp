@@ -8,7 +8,7 @@ Ask Claude or Cursor trade questions and get exact numbers back, not AI guesses.
 > "Size my position: $10k account, 1% risk, long BTC at $83k, stop at $81k."
 > "Is this carry trade worth it? 0.01% funding long, 0.05% short, $50k, 30 days."
 
-70 deterministic tools across trade planning, risk & margin, funding/carry, market-structure (Market Profile) analysis, forex (pip value, margin level, breakeven, PnL, risk/reward, scenario, average entry, position size, margin required, currency conversion, swap/rollover cost, correlation — with live-FX-rate variants), chain-agnostic on-chain tools — Solana (token safety, swap price impact, bonding curve) plus Solana + 5 EVM chains for market cap comparison and wallet flag check — prediction-market odds and fair value across Kalshi, Polymarket, Limitless, Myriad and ADI Predictstreet's crypto categories, Deribit BTC/ETH options math (payoff/breakeven, Black-Scholes price/Greeks, straddle/strangle, covered call/protective put, implied volatility), and quant risk/stats (VaR/CVaR, Sharpe with the Lo 2002 correction, GARCH(1,1) volatility, risk parity, Hurst exponent, cointegration, portfolio tearsheet, Deflated Sharpe Ratio, Kelly growth-security frontier, return unsmoothing, EVT tail risk, order-book impact). Formulas verified against 42 canonical test vectors: same inputs always produce the same outputs. Every response is also signed with ECDSA P-256, so you can verify offline that it actually came from us. Free, no signup.
+75 deterministic tools across trade planning, risk & margin, funding/carry, market-structure (Market Profile) analysis, forex (pip value, margin level, breakeven, PnL, risk/reward, scenario, average entry, position size, margin required, currency conversion, swap/rollover cost, correlation — with live-FX-rate variants), chain-agnostic on-chain tools — Solana (token safety, swap price impact, bonding curve) plus Solana + 5 EVM chains for market cap comparison and wallet flag check — prediction-market odds and fair value across Kalshi, Polymarket, Limitless, Myriad and ADI Predictstreet's crypto categories, Deribit BTC/ETH options math (payoff/breakeven, Black-Scholes price/Greeks, straddle/strangle, covered call/protective put, implied volatility), and quant risk/stats (VaR/CVaR, Sharpe with the Lo 2002 correction, GARCH(1,1) volatility, risk parity, Hurst exponent, cointegration, portfolio tearsheet, Deflated Sharpe Ratio, Kelly growth-security frontier, return unsmoothing, EVT tail risk, order-book impact). Formulas verified against 42 canonical test vectors: same inputs always produce the same outputs. Every response is also signed with ECDSA P-256, so you can verify offline that it actually came from us. Free, no signup.
 
 Access via **MCP** (Claude Desktop / Cursor / VS Code) or a plain HTTP POST to the MCP endpoint. Free, no signup.
 
@@ -147,7 +147,7 @@ After connecting, just ask naturally: the AI picks the right tool automatically:
 
 Tool naming follows the `workflow.run_*` / `primitive.*` / `system.*` namespace convention.
 Old flat names (`pnl`, `liquidation`, etc.) are accepted for backward compatibility. All tools are
-free via MCP, no signup; 20 calls/day anonymously, 200/day with a free API key.
+free via MCP, no signup; 100 calls/day anonymously, 200/day with a free API key.
 
 | Category | Tools |
 |---|---|
