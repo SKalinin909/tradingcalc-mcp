@@ -6,6 +6,19 @@ Format: **Tool Changes · Verification Changes · MCP/API Changes · Breaking Ch
 
 ---
 
+## [2.14.0] - 2026-09-30
+
+Listing copy and docs pass. No tool was added or removed (still 75).
+
+### MCP/API Changes
+- Title, description, `instructions` and README now lead with options, forex, and risk/stats, with prediction markets, on-chain, and crypto perpetual futures after them. Every previous example prompt is kept.
+- README: tool table counts match the real `tools/list` (75), anonymous limit corrected to 100 calls/day.
+
+### Verification Changes
+- Public daily anchor: once a day the verification state is signed and its hash is written to Solana; records at `GET https://tradingcalc.io/api/anchors`.
+
+---
+
 ## [2.13.0] — 2026-09-26
 
 Catch-up release consolidating everything shipped on the main site since 2.12.0. Tool count
