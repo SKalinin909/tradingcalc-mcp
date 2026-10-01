@@ -13,7 +13,7 @@ badge above).
 ```
  Your question               MCP tool call                    Result
 +------------------+      +---------------------------+      +---------------------------+
-| "Risk $200 on    | ---> | workflow.run_forex_       | ---> | 0.67 lots, plus an ECDSA  |
+| "Risk $200 on    |   ►  | workflow.run_forex_       |   ►  | 0.67 lots, plus an ECDSA  |
 |  EUR/USD with a  |      | position_size_live        |      | P-256 signature you can   |
 |  30 pip stop"    |      | (deterministic maths)     |      | verify offline            |
 +------------------+      +---------------------------+      +---------------------------+
