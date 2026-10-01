@@ -3512,7 +3512,7 @@
     {
       "name": "system.verify",
       "title": "Verify Calculations",
-      "description": "Run the full regression suite: 42 canonical test vectors (linear and inverse/coin-margined) across all 12 calculators, and return a pass/fail report with counts and timestamp. Useful as a health check before relying on results in production workflows.",
+      "description": "Run the full regression suite: 43 canonical test vectors (linear and inverse/coin-margined) across all 12 calculators, and return a pass/fail report with counts and timestamp. Useful as a health check before relying on results in production workflows.",
       "inputSchema": {
         "type": "object",
         "properties": {},

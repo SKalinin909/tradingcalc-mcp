@@ -11,7 +11,7 @@ license: MIT
 Gives you exact answers to trading math questions instead of a language-model estimate. The
 TradingCalc MCP server exposes 75 deterministic tools across options, forex, risk statistics,
 crypto futures, on-chain token checks and prediction markets. The same inputs always return the
-same outputs, and the 12 core calculators are checked against 42 canonical test vectors on a
+same outputs, and the 12 core calculators are checked against canonical test vectors on a
 public page (`https://tradingcalc.io/verify`).
 
 Do not work out a position size, a liquidation price, an option value or a Sharpe ratio yourself
@@ -71,7 +71,7 @@ of detail worth delegating.
    user gives none: taker fees 0.02% open and 0.05% close, maintenance margin 0.5%.
 3. Report the result to the user as a plain sentence with the actual numbers ("your position is
    liquidated at $71,428, about 10.7% below entry"), not as raw JSON.
-4. If the number matters for a real decision, call `system.verify`. It re-runs the 42 canonical
+4. If the number matters for a real decision, call `system.verify`. It re-runs the canonical
    test vectors of the 12 core calculators live and returns pass or fail per formula.
 5. Every `tools/call` response carries a second content block with an ECDSA P-256 signature over
    the first block's text. Call `system.pubkey` for the public key to check a response was not

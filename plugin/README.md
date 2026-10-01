@@ -46,7 +46,7 @@ Anonymous use is limited to 100 calls per day per IP. A free API key, issued on 
 
 ## Verification and reference
 
-- Live verification of the 12 core calculators against 42 test vectors: https://tradingcalc.io/verify
+- Live verification of the 12 core calculators against the canonical test vectors: https://tradingcalc.io/verify
 - Tool reference and request examples: https://docs.tradingcalc.io/api
 - Source and issues: https://github.com/SKalinin909/tradingcalc-mcp
 

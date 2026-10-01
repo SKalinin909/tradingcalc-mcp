@@ -1,17 +1,45 @@
 # TradingCalc MCP Server
 
+[![npm](https://img.shields.io/npm/v/tradingcalc-mcp?style=flat-square)](https://www.npmjs.com/package/tradingcalc-mcp)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
+[![Verified vectors](https://img.shields.io/endpoint?url=https%3A%2F%2Ftradingcalc.io%2Fapi%2Fverify%2Fbadge&style=flat-square)](https://tradingcalc.io/verify)
+[![Remote MCP](https://img.shields.io/badge/MCP-streamable%20HTTP-blue?style=flat-square)](https://docs.tradingcalc.io/api)
 [![MCP Badge](https://lobehub.com/badge/mcp/skalinin909-tradingcalc-mcp)](https://lobehub.com/mcp/skalinin909-tradingcalc-mcp)
 
-Ask Claude or Cursor trade questions and get exact numbers back, not AI guesses.
+An LLM guesses trading maths. This server computes it: the same inputs always return the same numbers, every
+result carries a signature you can check, and the core formulas are tested against public vectors (live count in the
+badge above).
+
+```
+ Your question               MCP tool call                    Result
++------------------+      +---------------------------+      +---------------------------+
+| "Risk $200 on    | ---> | workflow.run_forex_       | ---> | 0.67 lots, plus an ECDSA  |
+|  EUR/USD with a  |      | position_size_live        |      | P-256 signature you can   |
+|  30 pip stop"    |      | (deterministic maths)     |      | verify offline            |
++------------------+      +---------------------------+      +---------------------------+
+```
+
+Ask Claude, Cursor or any MCP client trade questions and get exact numbers back, not guesses:
 
 > "What should a BTC call at a $90k strike, 30 days out, with 55% implied volatility be worth?"
 > "How many lots of EUR/USD should I trade to risk $200 with a 30-pip stop?"
 > "What's my 95% Value at Risk on this monthly return series?"
 > "What's my PnL if I buy 0.5 BTC at $80k and sell at $95k with 5x leverage?"
 
-75 deterministic tools across Deribit BTC/ETH options math (payoff/breakeven, Black-Scholes price/Greeks, straddle/strangle, vertical spreads, covered call/protective put, implied volatility), forex (pip value, margin level, breakeven, PnL, risk/reward, scenario, average entry, position size, margin required, currency conversion, swap/rollover cost, correlation, with live-FX-rate variants), quant risk/stats (VaR/CVaR, Sharpe with the Lo 2002 correction, GARCH(1,1) volatility, risk parity, Hurst exponent, cointegration, portfolio tearsheet, Deflated Sharpe Ratio, Kelly growth-security frontier, return unsmoothing, EVT tail risk, order-book impact), prediction-market odds and fair value across Kalshi, Polymarket, Limitless, Myriad and ADI Predictstreet's crypto categories, chain-agnostic on-chain tools (Solana token safety, swap price impact, bonding curve, plus Solana + 5 EVM chains for market cap comparison, wallet flag check and impermanent loss), and crypto perpetual futures (trade planning, risk & margin, funding/carry, Market Profile market-structure analysis). Formulas verified against 42 canonical test vectors: same inputs always produce the same outputs. Every response is also signed with ECDSA P-256, so you can verify offline that it actually came from us. Once a day the verification state is also written to Solana ([latest record](https://tradingcalc.io/verification#public-anchor)). Free, no signup.
+## What it covers (75 tools)
 
-Access via **MCP** (Claude Desktop / Cursor / VS Code) or a plain HTTP POST to the MCP endpoint. Free, no signup.
+| Domain | Examples |
+|---|---|
+| Options | Black-Scholes price and Greeks (manual, or checked live against a Deribit BTC/ETH option), payoff and breakeven, straddle and strangle, vertical spreads, covered call and protective put, implied volatility |
+| Forex | Position size from a risk amount, pip value, margin, swap cost, currency conversion, pair correlation, with live-rate variants for the account currency |
+| Risk and statistics | VaR and CVaR, Sharpe with the Lo 2002 correction, Deflated Sharpe, Kelly frontier, GARCH(1,1), risk parity, Hurst exponent, cointegration, portfolio tearsheet, EVT tail risk |
+| Prediction markets | Odds and vig, market-implied odds, edge sizing, spread and arbitrage checks across Kalshi, Polymarket, Limitless and Myriad |
+| On-chain | Solana token and wallet checks, swap price impact, pump.fun bonding curve, impermanent loss |
+| Crypto futures | PnL, liquidation price, breakeven, funding cost, position size, risk/reward, linear and coin-margined contracts |
+
+Access via **MCP** (Claude Desktop, Cursor, VS Code and other clients) or a plain HTTP POST to the MCP endpoint. No
+signup. The server is remote, so nothing to install beyond a one-line client config; only the Claude Desktop bridge
+below needs Node.js 18 or newer.
 
 ## Endpoints
 
@@ -181,7 +209,7 @@ free via MCP, no signup; 100 calls/day anonymously, 200/day with a free API key.
 | Market Structure (Market Profile) | Open analysis, session structure, value migration, breakout acceptance (4) |
 | Primitives | Average entry, hedge ratio (2) |
 | Integrated Decision | Pre-trade check (sizing + liquidation + breakeven + funding + go/no-go in one call), portfolio risk review (2) |
-| System | `system.verify` - run 42 canonical test vectors, get a pass/fail report; `system.pubkey` - get the public key to verify signed responses offline (2) |
+| System | `system.verify` - run the canonical test vectors, get a pass/fail report; `system.pubkey` - get the public key to verify signed responses offline (2) |
 
 Full tool-by-tool reference (every input/output schema, request/response examples, per-tool
 descriptions): **[docs.tradingcalc.io/api](https://docs.tradingcalc.io/api)**
@@ -201,7 +229,7 @@ Pass key as: `Authorization: Bearer <your-api-key>`
 
 ## Self-Verification
 
-Agents can verify all 42 canonical test vectors before trusting results:
+Agents can verify all the canonical test vectors before trusting results:
 
 ```json
 {
@@ -211,7 +239,7 @@ Agents can verify all 42 canonical test vectors before trusting results:
 }
 ```
 
-Response: `{ "status": "pass", "passed": 42, "failed": 0, "total": 42 }`
+Response: `{ "status": "pass", "passed": 43, "failed": 0, "total": 43 }`
 
 Live proof: [tradingcalc.io/verify](https://tradingcalc.io/verify)
 
