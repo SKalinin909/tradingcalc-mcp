@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "tradingcalc": {
+      "url": "https://tradingcalc.io/api/mcp"
+    }
+  }
+}

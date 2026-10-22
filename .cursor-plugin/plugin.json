@@ -1,0 +1,14 @@
+{
+  "name": "tradingcalc",
+  "version": "1.0.0",
+  "description": "Exact trading math for Cursor agents: Black-Scholes and options payoff, forex position size and pip value, VaR and Sharpe, prediction-market odds, on-chain token checks, crypto futures PnL and liquidation. Deterministic tools, every result signed.",
+  "author": {
+    "name": "TradingCalc",
+    "email": "s@tradingcalc.io"
+  },
+  "homepage": "https://tradingcalc.io",
+  "repository": "https://github.com/SKalinin909/tradingcalc-mcp",
+  "license": "MIT",
+  "keywords": ["trading", "options", "black-scholes", "forex", "risk", "var", "sharpe", "crypto", "futures", "calculator", "mcp"],
+  "logo": "assets/logo.png"
+}
