@@ -9,7 +9,7 @@ license: MIT
 ## What this skill does
 
 Gives you exact answers to trading math questions instead of a language-model estimate. The
-TradingCalc MCP server exposes 75 deterministic tools across options, forex, risk statistics,
+TradingCalc MCP server exposes 77 deterministic tools across options, forex, risk statistics,
 crypto futures, on-chain token checks and prediction markets. The same inputs always return the
 same outputs, and the 12 core calculators are checked against canonical test vectors on a
 public page (`https://tradingcalc.io/verify`).

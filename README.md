@@ -26,7 +26,7 @@ Ask Claude, Cursor or any MCP client trade questions and get exact numbers back,
 > "What's my 95% Value at Risk on this monthly return series?"
 > "What's my PnL if I buy 0.5 BTC at $80k and sell at $95k with 5x leverage?"
 
-## What it covers (75 tools)
+## What it covers (77 tools)
 
 | Domain | Examples |
 |---|---|
@@ -35,6 +35,7 @@ Ask Claude, Cursor or any MCP client trade questions and get exact numbers back,
 | Risk and statistics | VaR and CVaR, Sharpe with the Lo 2002 correction, Deflated Sharpe, Kelly frontier, GARCH(1,1), risk parity, Hurst exponent, cointegration, portfolio tearsheet, EVT tail risk |
 | Prediction markets | Odds and vig, market-implied odds, edge sizing, spread and arbitrage checks across Kalshi, Polymarket, Limitless and Myriad |
 | On-chain | Solana token and wallet checks, swap price impact, pump.fun bonding curve, impermanent loss |
+| Crypto spot | Profit or loss on a coin bought and sold outright, after both fees |
 | Crypto futures | PnL, liquidation price, breakeven, funding cost, position size, risk/reward, linear and coin-margined contracts |
 
 Access via **MCP** (Claude Desktop, Cursor, VS Code and other clients) or a plain HTTP POST to the MCP endpoint. No
@@ -201,7 +202,7 @@ After connecting, just ask naturally: the AI picks the right tool automatically:
 
 ---
 
-## Tools (75)
+## Tools (77)
 
 Tool naming follows the `workflow.run_*` / `primitive.*` / `system.*` namespace convention.
 Old flat names (`pnl`, `liquidation`, etc.) are accepted for backward compatibility. All tools are
@@ -219,6 +220,8 @@ free via MCP, no signup; 100 calls/day anonymously, 200/day with a free API key.
 | Funding & Carry | Funding cost, funding arbitrage, compound funding, funding break-even, carry trade (5) |
 | Market Structure (Market Profile) | Open analysis, session structure, value migration, breakout acceptance (4) |
 | Primitives | Average entry, hedge ratio (2) |
+| Crypto spot | Crypto profit: profit or loss on a spot trade after both fees (1) |
+| Cross-exchange | Price consensus: how far one perpetual futures price sits from 7 reference exchanges (1) |
 | Integrated Decision | Pre-trade check (sizing + liquidation + breakeven + funding + go/no-go in one call), portfolio risk review (2) |
 | System | `system.verify` - run the canonical test vectors, get a pass/fail report; `system.pubkey` - get the public key to verify signed responses offline (2) |
 

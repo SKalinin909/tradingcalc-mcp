@@ -1,8 +1,8 @@
 {
   "name": "tradingcalc",
   "displayName": "TradingCalc",
-  "version": "1.0.3",
-  "description": "Exact trading math for Claude: Black-Scholes and options payoff, forex position size and pip value, VaR and Sharpe, plus crypto futures PnL and liquidation. 75 deterministic tools, not AI estimates.",
+  "version": "1.0.4",
+  "description": "Exact trading math for Claude: Black-Scholes and options payoff, forex position size and pip value, VaR and Sharpe, plus crypto futures PnL and liquidation. 77 deterministic tools, not AI estimates.",
   "author": {
     "name": "TradingCalc",
     "url": "https://tradingcalc.io"

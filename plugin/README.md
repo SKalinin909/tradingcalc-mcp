@@ -1,6 +1,6 @@
 # TradingCalc plugin for Claude
 
-Exact trading math for Claude, from a remote MCP server with 75 deterministic tools. Instead of
+Exact trading math for Claude, from a remote MCP server with 77 deterministic tools. Instead of
 estimating a number, Claude calls a calculator and reports the result: the same inputs always give the
 same outputs.
 

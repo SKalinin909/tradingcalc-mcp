@@ -6,6 +6,21 @@ Format: **Tool Changes · Verification Changes · MCP/API Changes · Breaking Ch
 
 ---
 
+## [2.15.0] - 2026-10-22
+
+Catch-up release for the tools and description fixes shipped on the main site since 2.14.0. Tool count 75 to 77.
+
+### Tool Changes
+- **`workflow.run_crypto_profit`**: profit or loss on a spot crypto trade after both fees (no leverage, no funding).
+- **`workflow.run_price_consensus`**: how far one perpetual futures price sits from a reference set of 7 exchanges.
+- **`workflow.run_swap_price_impact`**: new `side` input (`sell` or `buy`), so a buy-side swap is no longer declined.
+- **`workflow.run_odds_converter`, `workflow.run_spread_reader`**: descriptions and parameter texts now state where one ends and the other begins, so a model picks the right one.
+
+### MCP/API Changes
+- Listing copy, README, skill and plugin text state 77 tools; the LobeHub manifest is regenerated from the live `tools/list`.
+
+---
+
 ## [2.14.0] - 2026-09-30
 
 Listing copy and docs pass. No tool was added or removed (still 75).

@@ -1,7 +1,7 @@
 {
   "author": "TradingCalc",
   "cloudEndpoint": "https://tradingcalc.io/api/mcp",
-  "description": "75 deterministic tools across options, forex, quant risk/stats, prediction markets, on-chain safety, and crypto futures: Deribit BTC/ETH options (options_payoff, black_scholes, black_scholes_live, straddle_strangle, covered_call_protective_put, implied_volatility), forex (pip value, margin level, breakeven, pnl, risk/reward, scenario, average entry, position size, margin required, currency converter, swap/rollover cost, correlation - manual + live-FX-rate variants), risk/stats (var_cvar, sharpe_stats, hurst_exponent, cointegration, portfolio_tearsheet, garch, risk_parity, dsr, kelly_frontier, unsmoothing, evt_tail_risk, orderbook_impact), prediction markets across Kalshi, Polymarket, Limitless, Myriad and ADI Predictstreet's crypto categories (odds_converter, market_implied_odds, prediction_market_edge, window_fair_value, spread_reader), chain-agnostic on-chain (token_risk_check, swap_price_impact, bonding_curve on Solana; market_cap_comparison and wallet_flag_check on Solana + 5 EVM chains), trade planning (pnl, breakeven, exit_target, scenario, dca_entry, scale_out), risk (liquidation, position_sizing, max_leverage, risk_reward), funding & carry (funding_cost, funding_arb, compound_funding, funding_breakeven, carry_trade), market structure (open_analysis, session_structure, value_migration, breakout_acceptance), primitives (average_entry, hedge_ratio), and integrated decision (pre_trade_check, portfolio_risk). Formulas normalized across 17 exchanges, linear and inverse contracts. Every response signed with ECDSA P-256. Not AI estimates, exact numbers your trading bot can trust.",
+  "description": "77 deterministic tools across options, forex, quant risk/stats, prediction markets, on-chain safety, and crypto futures: Deribit BTC/ETH options (options_payoff, black_scholes, black_scholes_live, straddle_strangle, covered_call_protective_put, implied_volatility), forex (pip value, margin level, breakeven, pnl, risk/reward, scenario, average entry, position size, margin required, currency converter, swap/rollover cost, correlation - manual + live-FX-rate variants), risk/stats (var_cvar, sharpe_stats, hurst_exponent, cointegration, portfolio_tearsheet, garch, risk_parity, dsr, kelly_frontier, unsmoothing, evt_tail_risk, orderbook_impact), prediction markets across Kalshi, Polymarket, Limitless, Myriad and ADI Predictstreet's crypto categories (odds_converter, market_implied_odds, prediction_market_edge, window_fair_value, spread_reader), chain-agnostic on-chain (token_risk_check, swap_price_impact, bonding_curve on Solana; market_cap_comparison and wallet_flag_check on Solana + 5 EVM chains), trade planning (pnl, breakeven, exit_target, scenario, dca_entry, scale_out), risk (liquidation, position_sizing, max_leverage, risk_reward), funding & carry (funding_cost, funding_arb, compound_funding, funding_breakeven, carry_trade), market structure (open_analysis, session_structure, value_migration, breakout_acceptance), crypto spot (crypto_profit), cross-exchange price agreement (price_consensus), primitives (average_entry, hedge_ratio), and integrated decision (pre_trade_check, portfolio_risk). Formulas normalized across 17 exchanges, linear and inverse contracts. Every response signed with ECDSA P-256. Not AI estimates, exact numbers your trading bot can trust.",
   "homepage": "https://tradingcalc.io",
   "identifier": "skalinin909-tradingcalc-mcp",
   "name": "tradingcalc-mcp",
@@ -94,9 +94,10 @@
         ]
       },
       "annotations": {
-        "title": "PnL Planning",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "PnL Planning"
       }
     },
     {
@@ -111,7 +112,8 @@
             "enum": [
               "long",
               "short"
-            ]
+            ],
+            "description": "Trade direction: \"long\" or \"short\""
           },
           "entryPrice": {
             "type": "number",
@@ -141,9 +143,10 @@
         ]
       },
       "annotations": {
-        "title": "Liquidation Safety",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Liquidation Safety"
       }
     },
     {
@@ -158,7 +161,8 @@
             "enum": [
               "long",
               "short"
-            ]
+            ],
+            "description": "Trade direction: \"long\" or \"short\""
           },
           "entryPrice": {
             "type": "number",
@@ -192,9 +196,10 @@
         ]
       },
       "annotations": {
-        "title": "Breakeven Planning",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Breakeven Planning"
       }
     },
     {
@@ -209,7 +214,8 @@
             "enum": [
               "long",
               "short"
-            ]
+            ],
+            "description": "Trade direction: \"long\" or \"short\""
           },
           "entryPrice": {
             "type": "number",
@@ -252,9 +258,10 @@
         ]
       },
       "annotations": {
-        "title": "Position Sizing",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Position Sizing"
       }
     },
     {
@@ -269,7 +276,8 @@
             "enum": [
               "long",
               "short"
-            ]
+            ],
+            "description": "Trade direction: \"long\" or \"short\""
           },
           "sizeBase": {
             "type": "number",
@@ -305,9 +313,10 @@
         ]
       },
       "annotations": {
-        "title": "Funding Cost",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Funding Cost"
       }
     },
     {
@@ -327,9 +336,11 @@
           },
           "input": {
             "type": "object",
+            "description": "Object with a \"fills\" array, e.g. { \"fills\": [{ \"price\": 60000, \"quantity\": 0.5 }, { \"price\": 58000, \"quantity\": 1 }] }",
             "properties": {
               "fills": {
                 "type": "array",
+                "description": "Buy/sell fills to average, each with a price and a quantity (at least 1)",
                 "items": {
                   "type": "object",
                   "properties": {
@@ -369,9 +380,10 @@
         ]
       },
       "annotations": {
-        "title": "Average Entry Price",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Average Entry Price"
       }
     },
     {
@@ -386,7 +398,8 @@
             "enum": [
               "long",
               "short"
-            ]
+            ],
+            "description": "Trade direction: \"long\" or \"short\""
           },
           "entryPrice": {
             "type": "number",
@@ -439,9 +452,10 @@
         ]
       },
       "annotations": {
-        "title": "Exit Target",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Exit Target"
       }
     },
     {
@@ -456,7 +470,8 @@
             "enum": [
               "long",
               "short"
-            ]
+            ],
+            "description": "Trade direction: \"long\" or \"short\""
           },
           "entryPrice": {
             "type": "number",
@@ -471,7 +486,7 @@
             "items": {
               "type": "number"
             },
-            "description": "List of price change percentages, e.g. [-10, -5, 0, 5, 10]"
+            "description": "List of price change percentages, e.g. [-10, -5, 0, 5, 10]. Must be at least -100 (exactly -100 only for linear contracts; inverse contracts need more than -100)"
           },
           "feeOpenPct": {
             "type": "number",
@@ -498,9 +513,10 @@
         ]
       },
       "annotations": {
-        "title": "Scenario Planning",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Scenario Planning"
       }
     },
     {
@@ -534,9 +550,10 @@
         ]
       },
       "annotations": {
-        "title": "Max Leverage",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Max Leverage"
       }
     },
     {
@@ -568,9 +585,10 @@
         ]
       },
       "annotations": {
-        "title": "Hedge Ratio",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Hedge Ratio"
       }
     },
     {
@@ -617,9 +635,10 @@
         ]
       },
       "annotations": {
-        "title": "Funding Arbitrage",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Funding Arbitrage"
       }
     },
     {
@@ -661,15 +680,16 @@
         ]
       },
       "annotations": {
-        "title": "Compound Funding",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Compound Funding"
       }
     },
     {
       "name": "workflow.run_pre_trade_check",
       "title": "Pre Trade Check",
-      "description": "Full pre-trade decision card: orchestrates position sizing, breakeven, liquidation, and funding cost in one call: the preferred tool whenever a full setup check is wanted, not just one metric. Use when user describes a full trade setup and asks \"should I take this trade?\" or \"run the numbers on this setup\". Provide exchange+symbol to fetch live funding rate automatically. If the user specifically gave an entry/stop/target and wants an R:R-graded verdict, use workflow.run_risk_reward instead. Returns: positionSize, breakeven, liquidationPrice, fundingCost, overnightBreakevenShift, verdict.",
+      "description": "Full pre-trade decision card: orchestrates position sizing, breakeven, liquidation, and funding cost in one call. Use when user describes a full trade setup and asks \"should I take this trade?\" or \"run the numbers on this setup\". Provide exchange+symbol to fetch live funding rate automatically. For an R:R-graded verdict on an entry, stop and target, see workflow.run_risk_reward. Returns: positionSize, breakeven, liquidationPrice, fundingCost, overnightBreakevenShift, verdict.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -686,7 +706,8 @@
             "enum": [
               "long",
               "short"
-            ]
+            ],
+            "description": "Trade direction: \"long\" or \"short\""
           },
           "entry_price": {
             "type": "number",
@@ -747,15 +768,16 @@
         ]
       },
       "annotations": {
-        "title": "Pre Trade Check",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Pre Trade Check"
       }
     },
     {
       "name": "workflow.run_risk_reward",
       "title": "Risk Reward",
-      "description": "Full risk:reward analysis: the single best tool when user describes a trade with entry, stop, AND target (all three). Calculates R:R ratio, position size, liquidation price, breakeven, and P&L at both stop and target. Returns a verdict: strong (3:1+) / good (2:1+) / marginal / poor, specifically graded on the R:R ratio. If the user instead wants a full setup check tied to a live exchange/symbol (including funding cost), use workflow.run_pre_trade_check instead; its verdict covers overall setup safety, not just R:R. Use when user asks \"is this trade worth taking?\" or \"what's my risk reward on this setup?\".",
+      "description": "Full risk:reward analysis: takes a trade with entry, stop, AND target (all three). Calculates R:R ratio, position size, liquidation price, breakeven, and P&L at both stop and target. Returns a verdict: strong (3:1+) / good (2:1+) / marginal / poor, specifically graded on the R:R ratio. For a full setup check tied to a live exchange/symbol (including funding cost), see workflow.run_pre_trade_check; its verdict covers overall setup safety, not just R:R. Use when user asks \"is this trade worth taking?\" or \"what's my risk reward on this setup?\".",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -764,7 +786,8 @@
             "enum": [
               "long",
               "short"
-            ]
+            ],
+            "description": "Trade direction: \"long\" or \"short\""
           },
           "entry_price": {
             "type": "number",
@@ -822,9 +845,10 @@
         ]
       },
       "annotations": {
-        "title": "Risk Reward",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Risk Reward"
       }
     },
     {
@@ -836,6 +860,7 @@
         "properties": {
           "positions": {
             "type": "array",
+            "description": "Open positions to aggregate (1 to 50). Each: { side, entry_price, mark_price, size, leverage }, plus optional fees, mmr, contractType, coin, label.",
             "minItems": 1,
             "maxItems": 50,
             "items": {
@@ -850,7 +875,8 @@
                   "enum": [
                     "long",
                     "short"
-                  ]
+                  ],
+                  "description": "Trade direction: \"long\" or \"short\""
                 },
                 "entry_price": {
                   "type": "number",
@@ -912,9 +938,10 @@
         ]
       },
       "annotations": {
-        "title": "Portfolio Risk",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Portfolio Risk"
       }
     },
     {
@@ -929,18 +956,22 @@
             "enum": [
               "long",
               "short"
-            ]
+            ],
+            "description": "Trade direction: \"long\" or \"short\""
           },
           "entries": {
             "type": "array",
+            "description": "Fills to average (2 to 20). Each: { price, size }, e.g. [{ \"price\": 60000, \"size\": 0.5 }, { \"price\": 58000, \"size\": 1 }]. Size is base-asset quantity for linear, USD notional (contracts) for inverse.",
             "items": {
               "type": "object",
               "properties": {
                 "price": {
-                  "type": "number"
+                  "type": "number",
+                  "description": "Fill price"
                 },
                 "size": {
-                  "type": "number"
+                  "type": "number",
+                  "description": "Fill size"
                 }
               },
               "required": [
@@ -974,9 +1005,10 @@
         ]
       },
       "annotations": {
-        "title": "DCA Entry",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "DCA Entry"
       }
     },
     {
@@ -991,7 +1023,8 @@
             "enum": [
               "long",
               "short"
-            ]
+            ],
+            "description": "Trade direction: \"long\" or \"short\""
           },
           "existing_entry_price": {
             "type": "number",
@@ -1049,9 +1082,10 @@
         ]
       },
       "annotations": {
-        "title": "Average Down",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Average Down"
       }
     },
     {
@@ -1066,7 +1100,8 @@
             "enum": [
               "long",
               "short"
-            ]
+            ],
+            "description": "Trade direction: \"long\" or \"short\""
           },
           "entry_price": {
             "type": "number",
@@ -1078,11 +1113,13 @@
           },
           "exits": {
             "type": "array",
+            "description": "Partial exit levels (2 to 10). Each: { price, pct }, e.g. [{ \"price\": 90000, \"pct\": 30 }, { \"price\": 95000, \"pct\": 70 }]; the pct values must not sum to more than 100.",
             "items": {
               "type": "object",
               "properties": {
                 "price": {
-                  "type": "number"
+                  "type": "number",
+                  "description": "Exit price for this level"
                 },
                 "pct": {
                   "type": "number",
@@ -1122,9 +1159,10 @@
         ]
       },
       "annotations": {
-        "title": "Scale Out",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Scale Out"
       }
     },
     {
@@ -1171,9 +1209,10 @@
         ]
       },
       "annotations": {
-        "title": "Carry Trade",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Carry Trade"
       }
     },
     {
@@ -1188,7 +1227,8 @@
             "enum": [
               "long",
               "short"
-            ]
+            ],
+            "description": "Trade direction: \"long\" or \"short\""
           },
           "entry_price": {
             "type": "number",
@@ -1232,9 +1272,58 @@
         ]
       },
       "annotations": {
-        "title": "Funding Breakeven",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Funding Breakeven"
+      }
+    },
+    {
+      "name": "workflow.run_crypto_profit",
+      "title": "Crypto Profit",
+      "description": "Profit or loss on a spot crypto trade (coins bought and sold outright, no leverage, no funding) after both fees. Give exactly one of investment (total cash spent, buy fee included) or quantity (coins bought). Each fee is a fraction of that fill's trade value (0.001 = 0.1%): the buy fee is paid on top of the coins' cost, the sell fee comes out of the sale value. For a leveraged perpetual futures position see workflow.run_pnl_planning. Use when user asks \"I bought BTC at $X, what is my profit if I sell at $Y?\" or \"what price do I need to sell at to break even after fees?\". Returns: quantity, totalCost, proceeds, totalFees, profit, roiPct and priceChangePct (fractions), priceMultiple, breakevenSellPrice, annualizedReturnPct (a fraction, only when holdingDays is given and is at least 30, null otherwise: annualizing a shorter hold gives meaningless figures).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "buyPrice": {
+            "type": "number",
+            "description": "Price paid per coin, in the quote currency (e.g. 60000 for BTC in USD)"
+          },
+          "sellPrice": {
+            "type": "number",
+            "description": "Price per coin at the sale, or the price to test, same currency"
+          },
+          "investment": {
+            "type": "number",
+            "description": "Total cash spent on the buy, buy fee included (e.g. 1000). Give this or quantity, not both"
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Number of coins bought (e.g. 0.5). Give this or investment, not both"
+          },
+          "buyFeePct": {
+            "type": "number",
+            "description": "Buy fee as a fraction of the trade value, 0 to 0.05 (0.001 = 0.1%). Default 0"
+          },
+          "sellFeePct": {
+            "type": "number",
+            "description": "Sell fee as a fraction of the trade value, 0 to 0.05 (0.001 = 0.1%). Default 0"
+          },
+          "holdingDays": {
+            "type": "number",
+            "description": "Optional: days the coins were held; 30 or more also returns the annualized return"
+          }
+        },
+        "required": [
+          "buyPrice",
+          "sellPrice"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Crypto Profit"
       }
     },
     {
@@ -1259,9 +1348,10 @@
         ]
       },
       "annotations": {
-        "title": "Bonding Curve",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Bonding Curve"
       }
     },
     {
@@ -1310,9 +1400,10 @@
         ]
       },
       "annotations": {
-        "title": "Impermanent Loss",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Impermanent Loss"
       }
     },
     {
@@ -1335,14 +1426,16 @@
             "enum": [
               "call",
               "put"
-            ]
+            ],
+            "description": "Option type: \"call\" or \"put\""
           },
           "position": {
             "type": "string",
             "enum": [
               "long",
               "short"
-            ]
+            ],
+            "description": "Option position: \"long\" (bought) or \"short\" (sold)"
           },
           "strike": {
             "type": "number",
@@ -1371,9 +1464,10 @@
         ]
       },
       "annotations": {
-        "title": "Options Payoff",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Options Payoff"
       }
     },
     {
@@ -1412,9 +1506,10 @@
         ]
       },
       "annotations": {
-        "title": "Black-Scholes Option Price and Greeks",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Black-Scholes Option Price and Greeks"
       }
     },
     {
@@ -1437,7 +1532,8 @@
             "enum": [
               "long",
               "short"
-            ]
+            ],
+            "description": "Option position: \"long\" (bought) or \"short\" (sold)"
           },
           "callStrike": {
             "type": "number",
@@ -1475,9 +1571,10 @@
         ]
       },
       "annotations": {
-        "title": "Straddle and Strangle",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Straddle and Strangle"
       }
     },
     {
@@ -1492,7 +1589,8 @@
             "enum": [
               "covered_call",
               "protective_put"
-            ]
+            ],
+            "description": "\"covered_call\" (hold the coin, sell a call against it) or \"protective_put\" (hold the coin, buy a put as insurance)"
           },
           "currency": {
             "type": "string",
@@ -1538,9 +1636,10 @@
         ]
       },
       "annotations": {
-        "title": "Covered Call and Protective Put",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Covered Call and Protective Put"
       }
     },
     {
@@ -1571,14 +1670,16 @@
                   "enum": [
                     "call",
                     "put"
-                  ]
+                  ],
+                  "description": "Option type: \"call\" or \"put\""
                 },
                 "position": {
                   "type": "string",
                   "enum": [
                     "long",
                     "short"
-                  ]
+                  ],
+                  "description": "Option position: \"long\" (bought) or \"short\" (sold)"
                 },
                 "strike": {
                   "type": "number",
@@ -1613,15 +1714,16 @@
         ]
       },
       "annotations": {
-        "title": "Spread Payoff",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Spread Payoff"
       }
     },
     {
       "name": "workflow.run_implied_volatility",
       "title": "Implied Volatility",
-      "description": "Solves for the volatility that makes Black-Scholes reproduce an observed option price (Newton-Raphson with a bisection fallback for cases where vega is too flat to converge, e.g. deep ITM/OTM or very short-dated). Checks the price against its no-arbitrage bounds first and refuses to solve (converged: false + error) rather than return a garbage number when the price is impossible for the given spot/strike/rate. Use when user asks \"what IV does this option price imply?\" or gives a market price and wants the volatility, not the reverse. Returns: impliedVolatilityPct, iterations, method (newton-raphson/bisection), converged, priceAtSolution.",
+      "description": "Solves for the volatility that makes Black-Scholes reproduce an observed option price (Newton-Raphson with a bisection fallback for cases where vega is too flat to converge, e.g. deep ITM/OTM or very short-dated). Checks the price against its no-arbitrage bounds first and refuses to solve (converged: false + error) rather than return a garbage number when the price is impossible for the given spot/strike/rate. Use when user asks \"what IV does this option price imply?\" or gives a market price and wants the volatility, not the reverse. Returns: impliedVolatilityPct, iterations, method (newton-raphson/bisection), converged, identifiable, warning, priceAtSolution. identifiable is false when many volatilities reproduce the price (deep ITM, far OTM): warning then says the returned volatility is one of them. When converged is false, identifiable is false and error explains.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -1630,7 +1732,8 @@
             "enum": [
               "call",
               "put"
-            ]
+            ],
+            "description": "Option type: \"call\" or \"put\""
           },
           "spot": {
             "type": "number",
@@ -1662,9 +1765,10 @@
         ]
       },
       "annotations": {
-        "title": "Implied Volatility",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Implied Volatility"
       }
     },
     {
@@ -1703,9 +1807,10 @@
         ]
       },
       "annotations": {
-        "title": "Window Fair Value",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Window Fair Value"
       }
     },
     {
@@ -1730,9 +1835,10 @@
         ]
       },
       "annotations": {
-        "title": "Forex Pip Value",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Forex Pip Value"
       }
     },
     {
@@ -1757,9 +1863,10 @@
         ]
       },
       "annotations": {
-        "title": "Forex Margin Level",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Forex Margin Level"
       }
     },
     {
@@ -1778,10 +1885,12 @@
             "enum": [
               "long",
               "short"
-            ]
+            ],
+            "description": "Trade direction: \"long\" or \"short\""
           },
           "entryPrice": {
-            "type": "number"
+            "type": "number",
+            "description": "Entry price in the pair's own quote terms, e.g. 1.0850 for EUR/USD"
           },
           "spreadPips": {
             "type": "number",
@@ -1800,9 +1909,10 @@
         ]
       },
       "annotations": {
-        "title": "Forex Breakeven",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Forex Breakeven"
       }
     },
     {
@@ -1821,13 +1931,16 @@
             "enum": [
               "long",
               "short"
-            ]
+            ],
+            "description": "Trade direction: \"long\" or \"short\""
           },
           "entryPrice": {
-            "type": "number"
+            "type": "number",
+            "description": "Entry price in the pair's own quote terms, e.g. 1.0850 for EUR/USD"
           },
           "exitPrice": {
-            "type": "number"
+            "type": "number",
+            "description": "Exit price, same quote convention as the entry price"
           },
           "units": {
             "type": "number",
@@ -1843,9 +1956,10 @@
         ]
       },
       "annotations": {
-        "title": "Forex PnL",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Forex PnL"
       }
     },
     {
@@ -1864,16 +1978,20 @@
             "enum": [
               "long",
               "short"
-            ]
+            ],
+            "description": "Trade direction: \"long\" or \"short\""
           },
           "entryPrice": {
-            "type": "number"
+            "type": "number",
+            "description": "Entry price in the pair's own quote terms, e.g. 1.0850 for EUR/USD"
           },
           "stopPrice": {
-            "type": "number"
+            "type": "number",
+            "description": "Stop-loss price, same quote convention as the entry price"
           },
           "targetPrice": {
-            "type": "number"
+            "type": "number",
+            "description": "Take-profit price, same quote convention as the entry price"
           }
         },
         "required": [
@@ -1885,9 +2003,10 @@
         ]
       },
       "annotations": {
-        "title": "Forex Risk Reward",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Forex Risk Reward"
       }
     },
     {
@@ -1906,10 +2025,12 @@
             "enum": [
               "long",
               "short"
-            ]
+            ],
+            "description": "Trade direction: \"long\" or \"short\""
           },
           "entryPrice": {
-            "type": "number"
+            "type": "number",
+            "description": "Entry price in the pair's own quote terms, e.g. 1.0850 for EUR/USD"
           },
           "units": {
             "type": "number",
@@ -1932,9 +2053,10 @@
         ]
       },
       "annotations": {
-        "title": "Forex Scenario",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Forex Scenario"
       }
     },
     {
@@ -1954,10 +2076,12 @@
               "type": "object",
               "properties": {
                 "price": {
-                  "type": "number"
+                  "type": "number",
+                  "description": "Fill price"
                 },
                 "units": {
-                  "type": "number"
+                  "type": "number",
+                  "description": "Fill size in base-currency units"
                 }
               },
               "required": [
@@ -1974,9 +2098,10 @@
         ]
       },
       "annotations": {
-        "title": "Forex Average Entry",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Forex Average Entry"
       }
     },
     {
@@ -2011,9 +2136,10 @@
         ]
       },
       "annotations": {
-        "title": "Forex Margin Required",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Forex Margin Required"
       }
     },
     {
@@ -2038,9 +2164,10 @@
         ]
       },
       "annotations": {
-        "title": "Forex Currency Converter",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Forex Currency Converter"
       }
     },
     {
@@ -2075,9 +2202,10 @@
         ]
       },
       "annotations": {
-        "title": "Forex Swap Cost",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Forex Swap Cost"
       }
     },
     {
@@ -2110,9 +2238,10 @@
         ]
       },
       "annotations": {
-        "title": "Forex Correlation",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Forex Correlation"
       }
     },
     {
@@ -2145,9 +2274,10 @@
         }
       },
       "annotations": {
-        "title": "VaR and CVaR",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "VaR and CVaR"
       }
     },
     {
@@ -2179,9 +2309,10 @@
         ]
       },
       "annotations": {
-        "title": "Sharpe Ratio Statistics",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Sharpe Ratio Statistics"
       }
     },
     {
@@ -2209,9 +2340,10 @@
         ]
       },
       "annotations": {
-        "title": "Hurst Exponent",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Hurst Exponent"
       }
     },
     {
@@ -2244,9 +2376,10 @@
         ]
       },
       "annotations": {
-        "title": "Cointegration Test",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Cointegration Test"
       }
     },
     {
@@ -2282,9 +2415,10 @@
         ]
       },
       "annotations": {
-        "title": "Portfolio Tearsheet",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Portfolio Tearsheet"
       }
     },
     {
@@ -2308,9 +2442,10 @@
         ]
       },
       "annotations": {
-        "title": "GARCH Volatility",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "GARCH Volatility"
       }
     },
     {
@@ -2350,9 +2485,10 @@
         }
       },
       "annotations": {
-        "title": "Risk Parity Weights",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Risk Parity Weights"
       }
     },
     {
@@ -2392,9 +2528,10 @@
         ]
       },
       "annotations": {
-        "title": "Deflated Sharpe Ratio",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Deflated Sharpe Ratio"
       }
     },
     {
@@ -2422,9 +2559,10 @@
         ]
       },
       "annotations": {
-        "title": "Kelly Growth-Security Frontier",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Kelly Growth-Security Frontier"
       }
     },
     {
@@ -2448,9 +2586,10 @@
         ]
       },
       "annotations": {
-        "title": "Return Unsmoothing",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Return Unsmoothing"
       }
     },
     {
@@ -2482,9 +2621,10 @@
         ]
       },
       "annotations": {
-        "title": "EVT Tail Risk",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "EVT Tail Risk"
       }
     },
     {
@@ -2542,9 +2682,10 @@
         ]
       },
       "annotations": {
-        "title": "Orderbook Impact",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Orderbook Impact"
       }
     },
     {
@@ -2606,9 +2747,10 @@
         ]
       },
       "annotations": {
-        "title": "Market Profile: Open Analysis",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "title": "Market Profile: Open Analysis"
       }
     },
     {
@@ -2670,9 +2812,10 @@
         ]
       },
       "annotations": {
-        "title": "Market Profile: Session Structure",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "title": "Market Profile: Session Structure"
       }
     },
     {
@@ -2738,9 +2881,10 @@
         ]
       },
       "annotations": {
-        "title": "Market Profile: Value Migration",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "title": "Market Profile: Value Migration"
       }
     },
     {
@@ -2806,9 +2950,10 @@
         ]
       },
       "annotations": {
-        "title": "Market Profile: Breakout Acceptance",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "title": "Market Profile: Breakout Acceptance"
       }
     },
     {
@@ -2828,25 +2973,26 @@
         ]
       },
       "annotations": {
-        "title": "Token Risk Check",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "title": "Token Risk Check"
       }
     },
     {
       "name": "workflow.run_swap_price_impact",
       "title": "Swap Price Impact",
-      "description": "Live price-impact quote for a Solana token swap: routed through Jupiter (the same aggregator real swaps use) across every pool it knows about, not a single-pool estimate. Use when user asks \"how much slippage will I eat swapping X tokens?\" or \"what will I actually get if I sell N tokens?\". Returns: outputAmount, priceImpactPct, effectivePrice, marketPriceUsd, liquidityUsd, routable (false + error if the size can't be routed at all).",
+      "description": "Live price-impact quote for a Solana token swap: routed through Jupiter (the same aggregator real swaps use) across every pool it knows about, not a single-pool estimate. Works in both directions: side \"sell\" (default) sells a token into USDC or SOL, side \"buy\" spends USDC or SOL to buy the token. Use when user asks \"how much slippage will I eat swapping X tokens?\", \"what will I actually get if I sell N tokens?\" or \"what do I get buying this token with 500 SOL?\". Returns: side, outputAmount (quote asset when selling, tokens when buying), priceImpactPct, effectivePrice (quote asset per token in both directions), marketPriceUsd, liquidityUsd, routable (false + error if the size can't be routed at all).",
       "inputSchema": {
         "type": "object",
         "properties": {
           "mint": {
             "type": "string",
-            "description": "Solana mint address of the token being sold (base58)"
+            "description": "Solana mint address of the token being sold or bought (base58)"
           },
           "amount": {
             "type": "number",
-            "description": "Amount of the token to swap, in human units (not raw base units)"
+            "description": "Amount to swap, in human units (not raw base units): tokens when side is sell, units of outputAsset to spend when side is buy"
           },
           "outputAsset": {
             "type": "string",
@@ -2854,7 +3000,15 @@
               "USDC",
               "SOL"
             ],
-            "description": "Asset to receive. Default USDC."
+            "description": "The quote asset: received when selling, paid with when buying. Default USDC."
+          },
+          "side": {
+            "type": "string",
+            "enum": [
+              "sell",
+              "buy"
+            ],
+            "description": "sell: sell the token for outputAsset (default). buy: spend outputAsset to buy the token."
           }
         },
         "required": [
@@ -2863,9 +3017,10 @@
         ]
       },
       "annotations": {
-        "title": "Swap Price Impact",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "title": "Swap Price Impact"
       }
     },
     {
@@ -2919,9 +3074,10 @@
         ]
       },
       "annotations": {
-        "title": "Market Cap Comparison",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "title": "Market Cap Comparison"
       }
     },
     {
@@ -2999,9 +3155,10 @@
         ]
       },
       "annotations": {
-        "title": "Impermanent Loss (Live)",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "title": "Impermanent Loss (Live)"
       }
     },
     {
@@ -3033,15 +3190,16 @@
         ]
       },
       "annotations": {
-        "title": "Wallet Flag Check",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "title": "Wallet Flag Check"
       }
     },
     {
       "name": "workflow.run_odds_converter",
       "title": "Odds Converter",
-      "description": "Converts a probability into decimal odds, American odds, and breakeven win rate: either from a manually supplied probability, or fetched live from Kalshi, Polymarket, ADI Predictstreet, Limitless, or Myriad (five independent crypto-price prediction market venues, all public keyless market data). When a Kalshi, Polymarket, Limitless, or Myriad source is supplied, also returns the vig (the exchange's built-in edge), computed from the market's own YES+NO prices, not estimated; ADI Predictstreet's crypto contracts currently have no live trading volume on any venue, so this returns available:false with an explanation rather than a fake price (use workflow.run_window_fair_value for a theoretical price on those instead). Use when user asks \"what odds does a 35% probability work out to?\" or \"what's the vig on this Kalshi/Polymarket/Limitless/Myriad market?\". Provide exactly one of probability/kalshiTicker/polymarketSlug/adiSymbol/limitlessSlug/myriadSlug. Returns: probability, decimalOdds, americanOdds, breakevenWinRatePct, vigPct (null unless a live two-sided source was used), source (manual/kalshi/polymarket/adi/limitless/myriad), identifier, label.",
+      "description": "Converts one probability into decimal odds, American odds, and breakeven win rate: either from a manually supplied probability, or from one market read live from Kalshi, Polymarket, ADI Predictstreet, Limitless, or Myriad (five independent crypto-price prediction market venues, all public keyless market data). One market on one venue per call; it does not compare prices across venues (to compare the same bet on two or more venues, see workflow.run_spread_reader). When a Kalshi, Polymarket, Limitless, or Myriad source is supplied, also returns the vig (the exchange's built-in edge), computed from the market's own YES+NO prices, not estimated; ADI Predictstreet's crypto contracts currently have no live trading volume on any venue, so this returns available:false with an explanation rather than a fake price (use workflow.run_window_fair_value for a theoretical price on those instead). Use when user asks \"what odds does a 35% probability work out to?\" or \"what's the vig on this Kalshi/Polymarket/Limitless/Myriad market?\". Provide exactly one of probability/kalshiTicker/polymarketSlug/adiSymbol/limitlessSlug/myriadSlug. Returns: probability, decimalOdds, americanOdds, breakevenWinRatePct, vigPct (null unless a live two-sided source was used), source (manual/kalshi/polymarket/adi/limitless/myriad), identifier, label.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -3051,11 +3209,11 @@
           },
           "kalshiTicker": {
             "type": "string",
-            "description": "A Kalshi market ticker (e.g. KXBTCY-27JAN0100-T149999.99) to fetch a live price from."
+            "description": "A Kalshi market ticker (e.g. KXBTCY-27JAN0100-T149999.99) to fetch a live price from. One market only; for the same bet on several venues use workflow.run_spread_reader."
           },
           "polymarketSlug": {
             "type": "string",
-            "description": "A Polymarket market slug, from the market URL (e.g. will-bitcoin-reach-100k-in-september-2026), to fetch a live price from."
+            "description": "A Polymarket market slug, from the market URL (e.g. will-bitcoin-reach-100k-in-september-2026), to fetch a live price from. One market only; for the same bet on several venues use workflow.run_spread_reader."
           },
           "adiSymbol": {
             "type": "string",
@@ -3073,15 +3231,16 @@
         "required": []
       },
       "annotations": {
-        "title": "Odds Converter",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "title": "Odds Converter"
       }
     },
     {
       "name": "workflow.run_spread_reader",
       "title": "Spread Reader",
-      "description": "Reads the same real-world bet's live price from 2-5 prediction-market venues at once (Kalshi, Polymarket, ADI Predictstreet, Limitless, Myriad) and reports the spread between the cheapest and most expensive. The caller supplies each venue's own identifier for what they've confirmed is the same underlying bet; this tool never auto-matches events across venues, only reads and compares prices for identifiers you provide. Use when user asks \"is this bet priced differently on Kalshi vs Polymarket?\" or \"which venue has the best price on this?\". Returns: quotes[] (venue, identifier, label, probabilityPct, available, error), availableCount, cheapestVenue, mostExpensiveVenue, spreadPct (percentage points, null if fewer than 2 quotes resolved).",
+      "description": "Reads the same real-world bet's live price from 2-5 prediction-market venues at once (Kalshi, Polymarket, ADI Predictstreet, Limitless, Myriad) in a single call and reports the spread between the cheapest and most expensive. Takes every venue's identifier together in quotes[], for example one Kalshi ticker and one Polymarket slug for the same bet, and returns the venue with the lowest yes midpoint price, before fees and depth. The caller supplies each venue's own identifier for what they've confirmed is the same underlying bet; this tool never auto-matches events across venues, only reads and compares prices for identifiers you provide. For the odds, breakeven win rate or vig of a single market, see workflow.run_odds_converter. Use when user asks \"is this bet priced differently on Kalshi vs Polymarket?\" or \"which venue has the best price on this?\". Returns: quotes[] (venue, identifier, label, probabilityPct, available, error), availableCount, cheapestVenue, mostExpensiveVenue, spreadPct (percentage points, null if fewer than 2 quotes resolved).",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -3100,7 +3259,8 @@
                     "adi",
                     "limitless",
                     "myriad"
-                  ]
+                  ],
+                  "description": "Prediction-market venue this quote comes from"
                 },
                 "identifier": {
                   "type": "string",
@@ -3112,7 +3272,7 @@
                 "identifier"
               ]
             },
-            "description": "One entry per venue you want to compare: 2 to 5 total. Each must genuinely be the same real-world bet; this tool does not verify that for you."
+            "description": "One entry per venue you want to compare: 2 to 5 total, all in this one call (a Kalshi ticker and a Polymarket slug for the same bet are two entries). Each must genuinely be the same real-world bet; this tool does not verify that for you."
           }
         },
         "required": [
@@ -3120,9 +3280,10 @@
         ]
       },
       "annotations": {
-        "title": "Spread Reader",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "title": "Spread Reader"
       }
     },
     {
@@ -3147,7 +3308,8 @@
                     "adi",
                     "limitless",
                     "myriad"
-                  ]
+                  ],
+                  "description": "Prediction-market venue this quote comes from"
                 },
                 "identifier": {
                   "type": "string",
@@ -3184,9 +3346,10 @@
         ]
       },
       "annotations": {
-        "title": "Cross Venue Arbitrage",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "title": "Cross Venue Arbitrage"
       }
     },
     {
@@ -3212,9 +3375,10 @@
         "required": []
       },
       "annotations": {
-        "title": "Market Implied Odds",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "title": "Market Implied Odds"
       }
     },
     {
@@ -3238,9 +3402,10 @@
         ]
       },
       "annotations": {
-        "title": "Black-Scholes Option Price and Greeks (Live)",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "title": "Black-Scholes Option Price and Greeks (Live)"
       }
     },
     {
@@ -3270,9 +3435,10 @@
         ]
       },
       "annotations": {
-        "title": "Forex Pip Value (Live)",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "title": "Forex Pip Value (Live)"
       }
     },
     {
@@ -3312,9 +3478,10 @@
         ]
       },
       "annotations": {
-        "title": "Forex Margin Required (Live)",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "title": "Forex Margin Required (Live)"
       }
     },
     {
@@ -3329,10 +3496,12 @@
             "description": "Currency pair in BASE/QUOTE format, e.g. \"EUR/USD\""
           },
           "entryPrice": {
-            "type": "number"
+            "type": "number",
+            "description": "Entry price in the pair's own quote terms, e.g. 1.0850 for EUR/USD"
           },
           "stopPrice": {
-            "type": "number"
+            "type": "number",
+            "description": "Stop-loss price, same quote convention as the entry price"
           },
           "riskAmount": {
             "type": "number",
@@ -3352,9 +3521,10 @@
         ]
       },
       "annotations": {
-        "title": "Forex Position Size (Live)",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "title": "Forex Position Size (Live)"
       }
     },
     {
@@ -3384,9 +3554,10 @@
         ]
       },
       "annotations": {
-        "title": "Forex Currency Converter (Live)",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "title": "Forex Currency Converter (Live)"
       }
     },
     {
@@ -3426,9 +3597,10 @@
         ]
       },
       "annotations": {
-        "title": "Forex Swap Cost (Live)",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "title": "Forex Swap Cost (Live)"
       }
     },
     {
@@ -3457,9 +3629,38 @@
         ]
       },
       "annotations": {
-        "title": "Forex Correlation (Live)",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "title": "Forex Correlation (Live)"
+      }
+    },
+    {
+      "name": "workflow.run_price_consensus",
+      "title": "Price Consensus",
+      "description": "Cross-exchange agreement check for one perpetual futures price: fetches the same asset USDT/USDC-margined perpetual from a reference set of 7 liquid exchanges (Binance, Bybit, OKX, Gate, KuCoin, Hyperliquid, MEXC; the chosen one is compared against the rest) and reports the median of the others, the spread across all, and how far the chosen exchange sits from that median. Says the exchanges disagree instead of guessing: status is agree (under 0.25%), warn (0.25% to 1%), diverge (1% or more) or insufficient (fewer than 3 other exchanges returned a comparable contract; inverse, dated and unlisted contracts are not compared, and that is not a verdict on the price). Use before acting on a live price: \"is this Bybit BTC price in line with the market?\" Symbol is the perp symbol as that exchange names it (e.g. BTCUSDT on bybit, ETH-USDT-SWAP on okx). Returns: status, summary, median, peerMedian, spreadPct, deviationPct, sources, quotes (price per exchange), thresholds_pct, as_of.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "exchange": {
+            "type": "string",
+            "description": "Exchange code of the price being checked, e.g. bybit, binance, okx, gate, kucoin, hyperliquid, mexc"
+          },
+          "symbol": {
+            "type": "string",
+            "description": "That exchange's own perpetual symbol, e.g. BTCUSDT (bybit/binance), ETH-USDT-SWAP (okx), BTCUSDC (hyperliquid)"
+          }
+        },
+        "required": [
+          "exchange",
+          "symbol"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "title": "Price Consensus"
       }
     },
     {
@@ -3504,9 +3705,10 @@
         ]
       },
       "annotations": {
-        "title": "Prediction Market Edge",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "title": "Prediction Market Edge"
       }
     },
     {
@@ -3519,9 +3721,10 @@
         "required": []
       },
       "annotations": {
-        "title": "Verify Calculations",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Verify Calculations"
       }
     },
     {
@@ -3534,11 +3737,12 @@
         "required": []
       },
       "annotations": {
-        "title": "Signing Public Key",
         "readOnlyHint": true,
-        "destructiveHint": false
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Signing Public Key"
       }
     }
   ],
-  "version": "2.14.0"
+  "version": "2.15.0"
 }
