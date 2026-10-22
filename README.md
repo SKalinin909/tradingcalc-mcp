@@ -54,6 +54,17 @@ MCP transport: **Streamable HTTP** (MCP spec 2024-11-05)
 
 ## Quick Start
 
+One command or one config entry per client. Prerequisites: an MCP client; Node.js 18 or newer only for the Claude
+Desktop bridge and the skill installer. No account, no API key.
+
+| Client | Install |
+|---|---|
+| Claude Code | `claude mcp add --transport http tradingcalc https://tradingcalc.io/api/mcp` |
+| Gemini CLI | `gemini extensions install https://github.com/SKalinin909/tradingcalc-mcp` |
+| Coding agents with skills (Claude Code, Cursor, Copilot) | `npx skills add SKalinin909/tradingcalc-mcp` |
+| Claude Desktop, Cursor, VS Code | config entry below |
+| Any other client | plain HTTP POST, see "Direct HTTP" below |
+
 ### Claude Desktop
 
 Add to `claude_desktop_config.json`:
@@ -239,7 +250,7 @@ Agents can verify all the canonical test vectors before trusting results:
 }
 ```
 
-Response: `{ "status": "pass", "passed": 43, "failed": 0, "total": 43 }`
+Response: `{ "status": "pass", "passed": N, "failed": 0, "total": N }`, where N is the current number of canonical vectors (live count in the badge at the top).
 
 Live proof: [tradingcalc.io/verify](https://tradingcalc.io/verify)
 
