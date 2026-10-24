@@ -103,7 +103,7 @@
     {
       "name": "workflow.run_liquidation_safety",
       "title": "Liquidation Safety",
-      "description": "Calculate the liquidation price for an isolated-margin futures position. Use when user asks \"where will I get liquidated?\" or \"how close is my liq price?\". Returns: liquidationPrice, distancePct (how far from entry).",
+      "description": "Calculate the liquidation price for an isolated-margin futures position with one flat maintenance margin rate (mmr, which you supply from your exchange's tier). It is a generic flat-rate model, for linear and inverse alike, not any one exchange's engine: no tiered maintenance amounts, no liquidation fee, no cross-margin (shared collateral) logic, so it does not apply to cross-margin accounts and can differ from an exchange's own figure. Use when user asks \"where will I get liquidated?\" or \"how close is my liq price?\". Returns: liquidationPrice, distancePct (how far from entry).",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -267,7 +267,7 @@
     {
       "name": "workflow.run_funding_cost",
       "title": "Funding Cost",
-      "description": "Calculate the total funding cost (or income) for holding a perpetual futures position. Use when user asks \"how much funding will I pay holding X days?\" or \"is funding eating my profit?\". Returns: totalFundingUsdt (negative = you pay, positive = you receive), perIntervalUsdt.",
+      "description": "Calculate the total funding cost (or income) for holding a perpetual futures position. Use when user asks \"how much funding will I pay holding X days?\" or \"is funding eating my profit?\". Returns: totalCost (positive = you pay, negative = you receive; in the coin for inverse), costPerDay, annualPct, totalPeriods, breakevenShift (size of the price move whose PnL equals the funding: up for a positive rate, down for a negative one, for either side).",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -322,7 +322,7 @@
     {
       "name": "primitive.average_entry",
       "title": "Average Entry Price",
-      "description": "Calculate the weighted average entry price from multiple buy/sell fills (DCA): the bare number only, no breakeven or per-fill breakdown. Use when user asks only \"what's my average entry?\" and wants just that figure. For breakeven and a per-level summary too, use workflow.run_dca_entry instead. Returns: averagePrice, totalSize, totalCost.",
+      "description": "Calculate the weighted average entry price from multiple buy/sell fills (DCA): the bare number only, no breakeven or per-fill breakdown. Use when user asks only \"what's my average entry?\" and wants just that figure. Each fill is { price, quantity } here (workflow.run_dca_entry calls the same field size). For breakeven and a per-level summary too, use workflow.run_dca_entry instead. Returns: averagePrice, totalSize, totalCost.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -522,7 +522,7 @@
     {
       "name": "workflow.run_max_leverage",
       "title": "Max Leverage",
-      "description": "Calculate the maximum safe leverage based on account size, max acceptable drawdown, and asset daily volatility. Use when user asks \"what's the max leverage I should use on BTC?\" or \"how much leverage is safe given 3% daily volatility?\". Returns: maxLeverage, marginAtRisk.",
+      "description": "Calculate the maximum safe leverage based on account size, max acceptable drawdown, and asset daily volatility. Use when user asks \"what's the max leverage I should use on BTC?\" or \"how much leverage is safe given 3% daily volatility?\". Returns: maxLeverage (maxDrawdownPct / (volatilityPct + mmr x 100), rounded down to 0.1, never below 1x), marginAtRisk (accountSize x maxDrawdownPct / 100, in USDT), safeMargin (USDT) and liquidationBuffer (percent). maxDrawdownPct and volatilityPct are percents (10 means 10%); mmr is a fraction (0.005 is 0.5%).",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -559,7 +559,7 @@
     {
       "name": "primitive.hedge_ratio",
       "title": "Hedge Ratio",
-      "description": "Calculate the short perpetual futures position size needed to hedge a spot holding. Use when user asks \"how much should I short to hedge my BTC?\" or \"what margin do I need for a 100% hedge?\". Returns: hedgeNotional, requiredMargin, estimatedFundingCost.",
+      "description": "Calculate the short perpetual futures position size needed to hedge a spot holding. USDT-linear only: sizes and costs are in USD, there is no contractType and no coin-margined (inverse) mode. Use when user asks \"how much should I short to hedge my BTC?\" or \"what margin do I need for a 100% hedge?\". Returns: hedgeNotional, requiredMargin, estimatedFundingCost.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -624,7 +624,7 @@
               8,
               1
             ],
-            "description": "Funding interval: 8 (standard) or 1 (Hyperliquid)"
+            "description": "Funding interval: 8 (standard) or 1 (Hyperliquid, dYdX, Kraken: per-hour rates)"
           }
         },
         "required": [
@@ -644,12 +644,13 @@
     {
       "name": "workflow.run_compound_funding",
       "title": "Compound Funding",
-      "description": "Project capital growth from reinvesting perpetual futures funding income (compounding carry). Use when user asks \"how much will I make compounding 0.01% funding for 90 days?\" or \"what's my APY on this carry position?\". Returns: finalCapital, totalEarned, apy, growthTable.",
+      "description": "Project capital growth from reinvesting perpetual futures funding income (compounding carry). Use when user asks \"how much will I make compounding 0.01% funding for 90 days?\" or \"what's my APY on this carry position?\". Funding received is split by reinvestPct (the rest is withdrawn and still counts as earned); funding paid comes out of capital in full, and the capital never goes below 0. Returns: finalCapital, totalWithdrawn, endValue, totalEarned, totalEarnedPct, annualizedAPY, dailyEarnings, snapshots.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "initialCapital": {
             "type": "number",
+            "exclusiveMinimum": 0,
             "description": "Starting capital in USDT"
           },
           "fundingRatePct": {
@@ -662,15 +663,19 @@
               8,
               1
             ],
-            "description": "Funding interval: 8 (standard) or 1 (Hyperliquid)"
+            "description": "Funding interval: 8 (standard) or 1 (Hyperliquid, dYdX, Kraken: per-hour rates)"
           },
           "durationDays": {
             "type": "number",
-            "description": "Number of days to project"
+            "maximum": 3650,
+            "exclusiveMinimum": 0,
+            "description": "Number of days to project, up to 3650"
           },
           "reinvestPct": {
             "type": "number",
-            "description": "Percentage of earnings reinvested each interval. 100 = full compounding, 0 = no reinvestment. Default 100."
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Percentage of funding received that is reinvested each interval, 0-100 (the rest is withdrawn and counts as earned; funding paid always comes out of capital). 100 = full compounding. Default 100."
           }
         },
         "required": [
@@ -695,7 +700,7 @@
         "properties": {
           "exchange": {
             "type": "string",
-            "description": "Exchange code, e.g. \"binance\" or \"bybit\". Used to fetch live funding rate if funding_rate is omitted."
+            "description": "Exchange code, e.g. \"binance\" or \"bybit\". Used to fetch the live funding rate if funding_rate is omitted, and to set funding_interval_hours when that is omitted (1 for Hyperliquid, dYdX and Kraken, whose rates are per hour; pass funding_interval_hours: 8 if your rate is per 8 hours)."
           },
           "symbol": {
             "type": "string",
@@ -731,7 +736,15 @@
           },
           "funding_rate": {
             "type": "number",
-            "description": "Funding rate per 8h as decimal, e.g. 0.0001. If omitted, fetched live from exchange."
+            "description": "Funding rate per funding interval as decimal, e.g. 0.0001. If omitted, fetched live from exchange."
+          },
+          "funding_interval_hours": {
+            "type": "number",
+            "enum": [
+              8,
+              1
+            ],
+            "description": "Hours per funding payment: 8 or 1 (Hyperliquid, dYdX and Kraken, whose rate is per hour). Omitted: taken from exchange when given, else 8. When funding_rate is also omitted and fetched live, the exchange interval is always used, since the fetched rate is quoted per it."
           },
           "hold_hours": {
             "type": "number",
@@ -947,7 +960,7 @@
     {
       "name": "workflow.run_dca_entry",
       "title": "DCA Entry",
-      "description": "DCA entry planner: weighted average entry price, breakeven, and per-level contribution from multiple fill prices and sizes. Compared with primitive.average_entry, this one adds output for the case where breakeven or the per-level breakdown is also wanted, not just the bare average. Use when user bought at several prices and asks \"what's my average entry?\" or \"where is my DCA breakeven?\". Returns: averageEntry, breakeven, per-level summary.",
+      "description": "DCA entry planner: weighted average entry price, breakeven, and per-level contribution from multiple fill prices and sizes. Each fill is { price, size } here (primitive.average_entry calls the same field quantity). Compared with primitive.average_entry, this one adds output for the case where breakeven or the per-level breakdown is also wanted, not just the bare average. Use when user bought at several prices and asks \"what's my average entry?\" or \"where is my DCA breakeven?\". Returns: averageEntry, breakeven, per-level summary.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -1240,7 +1253,15 @@
           },
           "funding_rate": {
             "type": "number",
-            "description": "Funding rate per 8h period (decimal, e.g. 0.0001)"
+            "description": "Funding rate per funding interval (decimal, e.g. 0.0001)"
+          },
+          "funding_interval_hours": {
+            "type": "number",
+            "enum": [
+              8,
+              1
+            ],
+            "description": "Hours per funding payment: 8 (default) or 1 (Hyperliquid, dYdX and Kraken, whose rate is per hour)"
           },
           "hold_hours": {
             "type": "number",
@@ -1774,7 +1795,7 @@
     {
       "name": "workflow.run_window_fair_value",
       "title": "Window Fair Value",
-      "description": "Theoretical fair value for a time-windowed crypto up/down contract (the shape ADI Predictstreet and Kalshi-style daily crypto markets use: pays out based on whether the settlement price finishes at/above or below a reference price pinned at window open, by a fixed close time): a cash-or-nothing digital option, priced with the standard N(d2) formula. Use this when there's no live market price to read (e.g. a venue's contract has real terms but zero trading volume) instead of a live-market odds tool. Volatility is a required manual input; there is no live implied-vol market on these contracts to pull it from. Use when user asks \"what should this up/down contract be worth?\" or \"what's the fair probability BTC finishes above $X in N minutes?\". Returns: d1, d2, probAbovePct, probBelowPct, fairPriceAboveCents, fairPriceBelowCents (cents convention, directly comparable to how these venues quote a contract).",
+      "description": "Theoretical fair value for a time-windowed crypto up/down contract (the shape ADI Predictstreet and Kalshi-style daily crypto markets use: pays out based on whether the settlement price finishes at/above or below a reference price pinned at window open, by a fixed close time): a cash-or-nothing digital option, priced with the standard N(d2) formula. It gives the probability at the close time only, not the probability of touching a level at any point before it (first passage). Time convention: a year is 365 days. Use this when there's no live market price to read (e.g. a venue's contract has real terms but zero trading volume) instead of a live-market odds tool. Volatility is a required manual input; there is no live implied-vol market on these contracts to pull it from. Use when user asks \"what should this up/down contract be worth?\" or \"what's the fair probability BTC finishes above $X in N minutes?\". Returns: d1, d2, probAbovePct, probBelowPct, fairPriceAboveCents, fairPriceBelowCents (cents convention, directly comparable to how these venues quote a contract).",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -2283,7 +2304,7 @@
     {
       "name": "workflow.run_sharpe_stats",
       "title": "Sharpe Ratio Statistics",
-      "description": "Sharpe ratio with the Lo (2002) serial-correlation-aware annualization correction (the naive sqrt(periods_per_year) scaling overstates or understates the true annualized Sharpe when returns are autocorrelated), plus the Probabilistic Sharpe Ratio (Bailey & Lopez de Prado): the probability the true Sharpe exceeds a benchmark, adjusted for the sample's skewness/kurtosis and length, not just its point estimate. Use when user asks \"what's my real annualized Sharpe, not the naive one?\" or \"how confident can I be this Sharpe ratio is actually good?\". Returns: sharpe_period, sharpe_annualized_naive, sharpe_annualized_lo, autocorrelation_lag1, psr, skewness, kurtosis.",
+      "description": "Sharpe ratio with the Lo (2002) serial-correlation-aware annualization correction, computed in its lag-1 form rather than the full multi-lag sum (the naive sqrt(periods_per_year) scaling overstates or understates the true annualized Sharpe when returns are autocorrelated), plus the Probabilistic Sharpe Ratio (Bailey & Lopez de Prado): the probability the true Sharpe exceeds a benchmark, adjusted for the sample's skewness/kurtosis and length, not just its point estimate. Use when user asks \"what's my real annualized Sharpe, not the naive one?\" or \"how confident can I be this Sharpe ratio is actually good?\". Returns: sharpe_period, sharpe_annualized_naive, sharpe_annualized_lo, autocorrelation_lag1, psr, skewness, kurtosis.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -2297,7 +2318,9 @@
           },
           "periods_per_year": {
             "type": "number",
-            "description": "Periods per year for annualization (default 365, crypto convention - trades every day)"
+            "minimum": 1,
+            "maximum": 100000000,
+            "description": "Periods per year for annualization (default 365, crypto convention - trades every day). Any number from 1 to 100 million, e.g. 365.25."
           },
           "benchmark_sharpe": {
             "type": "number",
@@ -2385,7 +2408,7 @@
     {
       "name": "workflow.run_portfolio_tearsheet",
       "title": "Portfolio Tearsheet",
-      "description": "Core risk/return tearsheet from a single return series: annualized return (compounded, not linear) and volatility, Sharpe (plain + Lo 2002-corrected + Pezier-White skew/kurtosis-adjusted), Sortino, max drawdown, Calmar ratio, the drawdown-ratio cluster (Ulcer Index/Martin ratio, Pain Index/Pain ratio, Burke ratio + modified), Omega-Sharpe ratio, Upside Potential Ratio, skewness, kurtosis, Probabilistic Sharpe Ratio, win rate, best/worst single-period return. Use when user asks for a full risk summary/report on a strategy or portfolio's returns, not just one metric. Returns all of the above in one call.",
+      "description": "Core risk/return tearsheet from a single return series: annualized return (compounded, not linear) and volatility, Sharpe (plain + Lo 2002-corrected + Pezier-White skew/kurtosis-adjusted), Sortino, max drawdown, Calmar ratio, the drawdown-ratio cluster (Ulcer Index/Martin ratio, Pain Index/Pain ratio, Burke ratio + modified), Omega-Sharpe ratio, Upside Potential Ratio, skewness, kurtosis, Probabilistic Sharpe Ratio, win rate, best/worst single-period return. Use when user asks for a full risk summary/report on a strategy or portfolio's returns, not just one metric. Returns all of the above in one call. Returns are decimals (0.02 is 2%), at least 3 periods; the call returns an error when the series never draws down (Calmar undefined) or no period falls below mar (Sortino undefined).",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -2399,7 +2422,9 @@
           },
           "periods_per_year": {
             "type": "number",
-            "description": "Periods per year for annualization (default 365)"
+            "minimum": 1,
+            "maximum": 100000000,
+            "description": "Periods per year for annualization (default 365). Any number from 1 to 100 million, e.g. 365.25."
           },
           "mar": {
             "type": "number",
@@ -2494,7 +2519,7 @@
     {
       "name": "workflow.run_dsr",
       "title": "Deflated Sharpe Ratio",
-      "description": "Deflated Sharpe Ratio (Bailey & Lopez de Prado): given how many strategy variants you tried (and how correlated they are), what Sharpe ratio would the *best of N* clear by luck alone, and does your actual strategy still clear that higher bar? Use when user asks \"is my backtested Sharpe ratio real, or did I get lucky trying many variants?\" or \"how many independent trials does this really represent?\". Provide either trial_sharpes[] (the N trials' own observed Sharpe ratios, most rigorous) or n_trials (+ optional avg_correlation to correct for correlated trials via Kish's design effect). Returns: expected_max_sharpe (the luck-alone threshold), dsr (probability your strategy's true Sharpe exceeds it, 0-1), n_trials_effective.",
+      "description": "Deflated Sharpe Ratio (Bailey & Lopez de Prado): given how many strategy variants you tried (and how correlated they are), what Sharpe ratio would the *best of N* clear by luck alone, and does your actual strategy still clear that higher bar? Use when user asks \"is my backtested Sharpe ratio real, or did I get lucky trying many variants?\" or \"how many independent trials does this really represent?\". Provide either trial_sharpes[] (the N trials' own observed Sharpe ratios, most rigorous) or n_trials (+ optional avg_correlation to correct for correlated trials via Kish's design effect). Two limits to know. n_trials assumes the paper's illustrative case (trial Sharpes with mean 0 and variance 1, in per-period units), which is a very high bar for a low-frequency series: the threshold is about 1.6 at N=10, 2.5 at N=100 and 3.3 at N=1000, while a daily series has a per-period Sharpe of order 0.05, so dsr comes out effectively 0; use trial_sharpes there. trial_sharpes centers the threshold on the trials' own mean Sharpe plus their dispersion times the expected-maximum factor; this answers \"does my strategy beat the best of N trials drawn from the spread I observed\", not the zero-skill-null variant (mean fixed at 0) used in some texts; the two thresholds differ by exactly the trials' mean Sharpe. Returns: expected_max_sharpe (the luck-alone threshold), dsr (probability your strategy's true Sharpe exceeds it, 0-1), n_trials_effective.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -2516,7 +2541,7 @@
           },
           "n_trials": {
             "type": "number",
-            "description": "Number of strategy variants tried, if trial_sharpes were not tracked individually"
+            "description": "Number of strategy variants tried, if trial_sharpes were not tracked individually. Assumes trial Sharpes with mean 0 and variance 1 (per-period units): too strict for daily series, prefer trial_sharpes there."
           },
           "avg_correlation": {
             "type": "number",
@@ -2691,7 +2716,7 @@
     {
       "name": "workflow.run_open_analysis",
       "title": "Market Profile: Open Analysis",
-      "description": "Market Profile open analysis: where and how price opened vs the prior session value area. Use for \"how did BTC open today?\" / \"what does the open imply for the session?\". Returns: open_location, open_type (OD/OTD/ORR/OAIR) with description/implication, confidence, key_levels (VAH/VAL/VPOC/IB), tails (session-high/low rejection tails and single prints), scenario_framing (bullish/bearish/neutral), invalidation level.",
+      "description": "Market Profile open analysis: where and how price opened vs the prior session value area. Use for \"how did BTC open today?\" / \"what does the open imply for the session?\". Returns: open_location, open_type (OD/OTD/ORR/OAIR) with description/implication, confidence, key_levels (VAH/VAL/VPOC/IB), tails (session-high/low rejection tails and single prints), scenario_framing (bullish/bearish/neutral), invalidation level. Candles come from the venue when candles[] is omitted (past sessions are cached, so repeats are fast); supplying candles[] makes the run network-free and reproducible. session_date must be a completed UTC session, before today; a session with no candles returns an error.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -2709,7 +2734,7 @@
           },
           "session_date": {
             "type": "string",
-            "description": "Session date YYYY-MM-DD (UTC)"
+            "description": "Session date YYYY-MM-DD (UTC); must be before today (a completed session)"
           },
           "timeframe": {
             "type": "string",
@@ -2756,7 +2781,7 @@
     {
       "name": "workflow.run_session_structure",
       "title": "Market Profile: Session Structure",
-      "description": "Market Profile day-type classifier: trend / balance / neutral_trend / normal / normal_var, from TPO, initial balance, range extension and value migration. Use for \"is this a trend day or a balance day?\". Returns: structure (the day-type label), description, bias, key_signals, key_levels (VAH/VAL/VPOC/IB/session high-low), tails (session-high/low rejection tails and single prints), scenario_framing, invalidation level.",
+      "description": "Market Profile day-type classifier: trend / balance / neutral_trend / normal / normal_var, from TPO, initial balance, range extension and value migration. Use for \"is this a trend day or a balance day?\". Returns: structure (the day-type label), description, bias, key_signals, key_levels (VAH/VAL/VPOC/IB/session high-low), tails (session-high/low rejection tails and single prints), scenario_framing, invalidation level. Candles come from the venue when candles[] is omitted (past sessions are cached, so repeats are fast); supplying candles[] makes the run network-free and reproducible. session_date must be a completed UTC session, before today; a session with no candles returns an error.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -2774,7 +2799,7 @@
           },
           "session_date": {
             "type": "string",
-            "description": "Session date YYYY-MM-DD (UTC)"
+            "description": "Session date YYYY-MM-DD (UTC); must be before today (a completed session)"
           },
           "timeframe": {
             "type": "string",
@@ -2821,7 +2846,7 @@
     {
       "name": "workflow.run_value_migration",
       "title": "Market Profile: Value Migration",
-      "description": "Market Profile value-area migration across sessions: is value migrating up, down, or overlapping (directional conviction vs balance)? Use for \"is value moving higher day over day?\". Returns: state, direction, migration_pct, key_levels (current vs. prior session VAH/VAL/VPOC), tails (session-high/low rejection tails and single prints), scenario_framing, invalidation level.",
+      "description": "Market Profile value-area migration across sessions: is value migrating up, down, or overlapping (directional conviction vs balance)? Use for \"is value moving higher day over day?\". Returns: state, direction, migration_pct, key_levels (current vs. prior session VAH/VAL/VPOC), tails (session-high/low rejection tails and single prints), scenario_framing, invalidation level. Candles come from the venue when candles[] is omitted (past sessions are cached, so repeats are fast); supplying candles[] makes the run network-free and reproducible. session_date must be a completed UTC session, before today; a session with no candles returns an error.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -2839,7 +2864,7 @@
           },
           "session_date": {
             "type": "string",
-            "description": "Session date YYYY-MM-DD (UTC)"
+            "description": "Session date YYYY-MM-DD (UTC); must be before today (a completed session)"
           },
           "timeframe": {
             "type": "string",
@@ -2890,7 +2915,7 @@
     {
       "name": "workflow.run_breakout_acceptance",
       "title": "Market Profile: Breakout Acceptance",
-      "description": "Market Profile breakout acceptance: did price accept (hold) beyond the value area / range, or reject back inside (fakeout)? Optional buy/sell delta. Use for \"did the break above VAH get accepted?\". Returns: state, accepted (boolean), direction, confidence, key_levels (VAH/VAL/VPOC), scenario_framing, invalidation level.",
+      "description": "Market Profile breakout acceptance: did price accept (hold) beyond the value area / range, or reject back inside (fakeout)? Optional buy/sell delta. Use for \"did the break above VAH get accepted?\". Returns: state, accepted (boolean), direction, confidence, key_levels (VAH/VAL/VPOC), scenario_framing, invalidation level. Candles come from the venue when candles[] is omitted (past sessions are cached, so repeats are fast); supplying candles[] makes the run network-free and reproducible. session_date must be a completed UTC session, before today; a session with no candles returns an error.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -2908,7 +2933,7 @@
           },
           "session_date": {
             "type": "string",
-            "description": "Session date YYYY-MM-DD (UTC)"
+            "description": "Session date YYYY-MM-DD (UTC); must be before today (a completed session)"
           },
           "timeframe": {
             "type": "string",
@@ -3714,7 +3739,7 @@
     {
       "name": "system.verify",
       "title": "Verify Calculations",
-      "description": "Run the full regression suite: 43 canonical test vectors (linear and inverse/coin-margined) across all 12 calculators, and return a pass/fail report with counts and timestamp. Useful as a health check before relying on results in production workflows.",
+      "description": "Run the full regression suite: 46 canonical test vectors (linear and inverse/coin-margined) across all 12 calculators, and return a pass/fail report with counts and timestamp. Useful as a health check before relying on results in production workflows.",
       "inputSchema": {
         "type": "object",
         "properties": {},
