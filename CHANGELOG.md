@@ -360,9 +360,6 @@ None.
 - `/pricing` — code examples updated to `/v1/primitives` and `/v1/workflows` (was `/api/mcp` jsonrpc)
 - `/pre-trade-check` — empty state panel in results column; form Tailwind-only (removed inline `C.*` styles)
 
-### Fixed
-- MCP `client_name` in `mcp_tool_call` PostHog events — was always `null` for authenticated clients; `initialize` now stores client name under API key hash in addition to IP hash
-
 ---
 
 ## [1.3.0] — 2026-04-05 — M1 Platform Foundation
