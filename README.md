@@ -26,7 +26,7 @@ Ask Claude, Cursor or any MCP client trade questions and get exact numbers back,
 > "What's my 95% Value at Risk on this monthly return series?"
 > "What's my PnL if I buy 0.5 BTC at $80k and sell at $95k with 5x leverage?"
 
-## What it covers (77 tools)
+## What it covers (90 tools)
 
 | Domain | Examples |
 |---|---|
@@ -64,6 +64,7 @@ Desktop bridge and the skill installer. No account, no API key.
 | Gemini CLI | `gemini extensions install https://github.com/SKalinin909/tradingcalc-mcp` |
 | Coding agents with skills (Claude Code, Cursor, Copilot) | `npx skills add SKalinin909/tradingcalc-mcp` |
 | Claude Desktop, Cursor, VS Code | config entry below |
+| Cline | `"type": "streamableHttp"` config entry, see "Cline" below |
 | Any other client | plain HTTP POST, see "Direct HTTP" below |
 
 ### Claude Desktop
@@ -90,6 +91,23 @@ Add to `claude_desktop_config.json`:
   }
 }
 ```
+
+### Cline
+
+Add to `cline_mcp_settings.json` (MCP Servers, Configure). Set `type` explicitly: without it Cline reads the URL as the legacy SSE transport.
+
+```json
+{
+  "mcpServers": {
+    "tradingcalc": {
+      "type": "streamableHttp",
+      "url": "https://tradingcalc.io/api/mcp"
+    }
+  }
+}
+```
+
+No API key and no `npx` step. Setup notes for agents are in [llms-install.md](llms-install.md).
 
 ### Agent Skill
 
@@ -202,7 +220,7 @@ After connecting, just ask naturally: the AI picks the right tool automatically:
 
 ---
 
-## Tools (77)
+## Tools (90)
 
 Tool naming follows the `workflow.run_*` / `primitive.*` / `system.*` namespace convention.
 Old flat names (`pnl`, `liquidation`, etc.) are accepted for backward compatibility. All tools are
