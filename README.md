@@ -5,6 +5,7 @@
 [![Verified vectors](https://img.shields.io/endpoint?url=https%3A%2F%2Ftradingcalc.io%2Fapi%2Fverify%2Fbadge&style=flat-square)](https://tradingcalc.io/verify)
 [![Remote MCP](https://img.shields.io/badge/MCP-streamable%20HTTP-blue?style=flat-square)](https://docs.tradingcalc.io/api)
 [![MCP Badge](https://lobehub.com/badge/mcp/skalinin909-tradingcalc-mcp)](https://lobehub.com/mcp/skalinin909-tradingcalc-mcp)
+[![mcptry](https://mcptry.com/badge/io.github.SKalinin909/tradingcalc)](https://mcptry.com/servers/io.github.SKalinin909/tradingcalc)
 
 An LLM guesses trading maths. This server computes it: the same inputs always return the same numbers, every
 result carries a signature you can check, and the core formulas are tested against public vectors (live count in the
