@@ -59,6 +59,7 @@ for (const t of manifest.tools) {
   const what = [];
   if (t.description !== l.description) what.push('description');
   if (JSON.stringify(t.inputSchema) !== JSON.stringify(l.inputSchema)) what.push('inputSchema');
+  if (JSON.stringify(t.annotations) !== JSON.stringify(l.annotations)) what.push('annotations');
   if (what.length) problems.push(`lhm.plugin.json: ${t.name} differs from live tools/list (${what.join(', ')})`);
 }
 for (const l of tools) if (!manifest.tools.some((t) => t.name === l.name)) problems.push(`lhm.plugin.json: live tool ${l.name} is missing`);
