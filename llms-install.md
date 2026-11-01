@@ -18,7 +18,7 @@ TradingCalc is a remote MCP server (Streamable HTTP). There is nothing to build 
 
 `type` must be `streamableHttp`. Without it Cline treats the URL as the legacy SSE transport and the connection fails.
 
-3. Check the connection: the server should list 90 tools. A quick test is calling `system.verify`, which returns `status: pass`.
+3. Check the connection: the server should list 91 tools. A quick test is calling `system.verify`, which returns `status: pass`.
 
 Anonymous use is limited to 100 calls a day; a free API key raises it to 200 and goes in a header: `"headers": { "Authorization": "Bearer <key>" }`. Details: https://docs.tradingcalc.io/api
 

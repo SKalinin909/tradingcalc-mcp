@@ -55,6 +55,9 @@ for (const file of COUNT_FILES) {
   for (const m of text.matchAll(/\b(\d{2,3}) (?:MCP |verified |canonical |deterministic )?tools\b/g)) {
     if (Number(m[1]) !== toolCount) problems.push(`${file}: "${m[0]}" but the live server has ${toolCount} tools`);
   }
+  for (const m of text.matchAll(/^#+ (?:Tools|What it covers) \((\d{2,3})\b/gm)) {
+    if (Number(m[1]) !== toolCount) problems.push(`${file}: heading "${m[0]}" but the live server has ${toolCount} tools`);
+  }
   for (const m of text.matchAll(/\b(\d{2,3}) (?:canonical |test |verified )*(?:test )?vectors\b/g)) {
     if (Number(m[1]) !== vectorCount) problems.push(`${file}: "${m[0]}" but system.verify runs ${vectorCount} vectors`);
   }

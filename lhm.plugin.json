@@ -1,7 +1,7 @@
 {
   "author": "TradingCalc",
   "cloudEndpoint": "https://tradingcalc.io/api/mcp",
-  "description": "90 deterministic tools across options, forex, quant risk/stats, prediction markets, on-chain safety, and crypto futures: Deribit BTC/ETH options (options_payoff, black_scholes, black_scholes_live, straddle_strangle, covered_call_protective_put, implied_volatility), forex (pip value, margin level, breakeven, pnl, risk/reward, scenario, average entry, position size, margin required, currency converter, swap/rollover cost, correlation - manual + live-FX-rate variants), risk/stats (var_cvar, sharpe_stats, hurst_exponent, cointegration, portfolio_tearsheet, garch, risk_parity, dsr, kelly_frontier, unsmoothing, evt_tail_risk, orderbook_impact), prediction markets across Kalshi, Polymarket, Limitless, Myriad and ADI Predictstreet's crypto categories (odds_converter, market_implied_odds, prediction_market_edge, window_fair_value, spread_reader), chain-agnostic on-chain (token_risk_check, swap_price_impact, bonding_curve on Solana; market_cap_comparison and wallet_flag_check on Solana + 5 EVM chains), trade planning (pnl, breakeven, exit_target, scenario, dca_entry, scale_out), risk (liquidation, position_sizing, max_leverage, risk_reward), funding & carry (funding_cost, funding_arb, compound_funding, funding_breakeven, carry_trade), market structure (open_analysis, session_structure, value_migration, breakout_acceptance), crypto spot (crypto_profit), cross-exchange price agreement (price_consensus), primitives (average_entry, hedge_ratio), and integrated decision (pre_trade_check, portfolio_risk). Formulas normalized across 17 exchanges, linear and inverse contracts. Every response signed with ECDSA P-256. Not AI estimates, exact numbers your trading bot can trust.",
+  "description": "91 deterministic tools across options, forex, quant risk/stats, prediction markets, on-chain safety, and crypto futures: Deribit BTC/ETH options (options_payoff, black_scholes, black_scholes_live, straddle_strangle, covered_call_protective_put, implied_volatility), forex (pip value, margin level, breakeven, pnl, risk/reward, scenario, average entry, position size, margin required, currency converter, swap/rollover cost, correlation - manual + live-FX-rate variants), risk/stats (var_cvar, sharpe_stats, hurst_exponent, cointegration, portfolio_tearsheet, garch, risk_parity, dsr, kelly_frontier, unsmoothing, evt_tail_risk, orderbook_impact), prediction markets across Kalshi, Polymarket, Limitless, Myriad and ADI Predictstreet's crypto categories (odds_converter, market_implied_odds, prediction_market_edge, window_fair_value, spread_reader), chain-agnostic on-chain (token_risk_check, swap_price_impact, bonding_curve on Solana; market_cap_comparison and wallet_flag_check on Solana + 5 EVM chains), trade planning (pnl, breakeven, exit_target, scenario, dca_entry, scale_out), risk (liquidation, position_sizing, max_leverage, risk_reward), funding & carry (funding_cost, funding_arb, compound_funding, funding_breakeven, carry_trade), market structure (open_analysis, session_structure, value_migration, breakout_acceptance), crypto spot (crypto_profit), cross-exchange price agreement (price_consensus), primitives (average_entry, hedge_ratio), and integrated decision (pre_trade_check, portfolio_risk). Formulas normalized across 17 exchanges, linear and inverse contracts. Every response signed with ECDSA P-256. Not AI estimates, exact numbers your trading bot can trust.",
   "homepage": "https://tradingcalc.io",
   "identifier": "skalinin909-tradingcalc-mcp",
   "name": "tradingcalc-mcp",
@@ -1850,6 +1850,52 @@
         "destructiveHint": false,
         "openWorldHint": false,
         "title": "Black-Scholes Option Price and Greeks"
+      }
+    },
+    {
+      "name": "workflow.run_option_greeks",
+      "title": "Option Greeks",
+      "description": "First and second order Greeks of a European option from Black-Scholes-Merton, manual inputs only (no live data): everything workflow.run_black_scholes returns (price, delta, gamma, vega, theta, rho) plus the higher-order Greeks vanna, vomma (volga), charm, veta, speed, zomma and color, with an optional continuous dividend yield for stocks and ETFs. Use when the user asks how delta changes when volatility or time moves (vanna, charm), how vega changes (vomma, veta) or how gamma changes (speed, zomma, color), or for an \"option greeks calculator\". Units: vannaPerVolPct = change of delta per 1 volatility point; vommaPerVolPct = change of vegaPerPct per 1 volatility point; charmCallPerDay/charmPutPerDay = change of delta when one calendar day passes; vetaPerDay = change of vegaPerPct when one calendar day passes; speedPerUsd = change of gamma per 1 unit of spot; zommaPerVolPct = change of gamma per 1 volatility point; colorPerDay = change of gamma when one calendar day passes. Time Greeks are the change as time passes (the derivative with respect to time to expiry, sign flipped); one input moves, the others stay fixed. Vanna, vomma, veta, speed, zomma and color are the same for the call and the put; charm differs by the dividend term only. A calendar day is 1/365 year.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "spot": {
+            "type": "number",
+            "description": "Underlying spot price"
+          },
+          "strike": {
+            "type": "number",
+            "description": "Strike price, same units as spot"
+          },
+          "daysToExpiry": {
+            "type": "number",
+            "description": "Calendar days until expiry (can be fractional), 0.001 to 36500"
+          },
+          "volatilityPct": {
+            "type": "number",
+            "description": "Annualized implied volatility in percentage points, e.g. 60 for 60%, 0.01 to 1000"
+          },
+          "riskFreeRatePct": {
+            "type": "number",
+            "description": "Risk-free rate in percentage points, 0 to 100. Default 0."
+          },
+          "dividendYieldPct": {
+            "type": "number",
+            "description": "Continuous dividend yield in percent per year, 0 to 100. Default 0."
+          }
+        },
+        "required": [
+          "spot",
+          "strike",
+          "daysToExpiry",
+          "volatilityPct"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Option Greeks"
       }
     },
     {
@@ -4455,5 +4501,5 @@
       }
     }
   ],
-  "version": "2.15.0"
+  "version": "2.16.0"
 }
