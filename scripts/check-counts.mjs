@@ -1,6 +1,7 @@
 // Run before every release: node scripts/check-counts.mjs
 // Compares what this repo states (tool count, vector count, the LobeHub tools array) with the live server,
 // and fails on any count in catalog metadata (NO_COUNT_FILES below).
+// Optional TRADINGCALC_API_KEY lifts the anonymous 100/day limit.
 // Exit 0 when everything agrees, 1 on any difference, 2 when the server could not be read.
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -20,7 +21,10 @@ const NO_COUNT_FILES = [
 async function rpc(method, params) {
   const res = await fetch(ENDPOINT, {
     method: 'POST',
-    headers: { 'content-type': 'application/json', accept: 'application/json, text/event-stream' },
+    headers: {
+      'content-type': 'application/json', accept: 'application/json, text/event-stream',
+      ...(process.env.TRADINGCALC_API_KEY ? { authorization: `Bearer ${process.env.TRADINGCALC_API_KEY}` } : {}),
+    },
     body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }),
   });
   if (!res.ok) throw new Error(`${method}: HTTP ${res.status}`);
