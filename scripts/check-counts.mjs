@@ -71,6 +71,10 @@ for (const file of NO_COUNT_FILES) {
   }
 }
 
+// The MCP registry rejects a server.json description longer than 100 characters (HTTP 422).
+const registryDesc = JSON.parse(readFileSync(join(ROOT, 'server.json'), 'utf8')).description;
+if (registryDesc.length > 100) problems.push(`server.json: description is ${registryDesc.length} characters, the registry allows 100`);
+
 const manifest = JSON.parse(readFileSync(join(ROOT, 'lhm.plugin.json'), 'utf8'));
 const liveByName = new Map(tools.map((t) => [t.name, t]));
 for (const t of manifest.tools) {
