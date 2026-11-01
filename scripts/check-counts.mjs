@@ -1,5 +1,6 @@
 // Run before every release: node scripts/check-counts.mjs
-// Compares what this repo states (tool count, vector count, the LobeHub tools array) with the live server.
+// Compares what this repo states (tool count, vector count, the LobeHub tools array) with the live server,
+// and fails on any count in catalog metadata (NO_COUNT_FILES below).
 // Exit 0 when everything agrees, 1 on any difference, 2 when the server could not be read.
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -46,7 +47,7 @@ if (verify.status !== 'pass') problems.push(`system.verify status is ${verify.st
 
 for (const file of COUNT_FILES) {
   let text;
-  try { text = readFileSync(join(ROOT, file), 'utf8'); } catch { continue; }
+  try { text = readFileSync(join(ROOT, file), 'utf8'); } catch { problems.push(`${file}: file not found`); continue; }
   for (const m of text.matchAll(/\b(\d{2,3}) (?:MCP |verified |canonical |deterministic )?tools\b/g)) {
     if (Number(m[1]) !== toolCount) problems.push(`${file}: "${m[0]}" but the live server has ${toolCount} tools`);
   }
@@ -58,7 +59,7 @@ for (const file of COUNT_FILES) {
 for (const file of NO_COUNT_FILES) {
   let text;
   try { text = readFileSync(join(ROOT, file), 'utf8'); } catch { problems.push(`${file}: file not found`); continue; }
-  for (const m of text.matchAll(/\b\d{2,3}\+? (?:MCP |verified |canonical |deterministic |test |free )*(?:tools|vectors|exchanges)\b/g)) {
+  for (const m of text.matchAll(/\b\d[\d,]*\+?(?:-| )(?:[a-z-]+ ){0,3}?(?:tools?|vectors?|exchanges?|calculators?|workflows?|domains?)\b/gi)) {
     problems.push(`${file}: "${m[0]}" - catalog metadata must not state a count`);
   }
 }
