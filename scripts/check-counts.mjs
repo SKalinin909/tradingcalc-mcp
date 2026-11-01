@@ -7,8 +7,12 @@ import { dirname, join } from 'node:path';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const ENDPOINT = process.env.TRADINGCALC_MCP_URL || 'https://tradingcalc.io/api/mcp';
-const COUNT_FILES = [
-  'README.md', 'SKILL.md', 'server.json', 'package.json', 'gemini-extension.json', 'lhm.plugin.json',
+// Files that may state a count; each count must equal the live server.
+const COUNT_FILES = ['README.md', 'SKILL.md', 'llms-install.md', 'lhm.plugin.json'];
+// Catalog metadata: no tool, vector or exchange count at all (owner decision 2026-11-01, S0357/S0358).
+// A number there goes stale at every new tool and every edit is a new catalog review.
+const NO_COUNT_FILES = [
+  'server.json', 'package.json', 'gemini-extension.json',
   'plugin/README.md', 'plugin/skills/tradingcalc/SKILL.md', 'plugin/.claude-plugin/plugin.json',
 ];
 
@@ -48,6 +52,14 @@ for (const file of COUNT_FILES) {
   }
   for (const m of text.matchAll(/\b(\d{2,3}) (?:canonical |test |verified )*(?:test )?vectors\b/g)) {
     if (Number(m[1]) !== vectorCount) problems.push(`${file}: "${m[0]}" but system.verify runs ${vectorCount} vectors`);
+  }
+}
+
+for (const file of NO_COUNT_FILES) {
+  let text;
+  try { text = readFileSync(join(ROOT, file), 'utf8'); } catch { problems.push(`${file}: file not found`); continue; }
+  for (const m of text.matchAll(/\b\d{2,3}\+? (?:MCP |verified |canonical |deterministic |test |free )*(?:tools|vectors|exchanges)\b/g)) {
+    problems.push(`${file}: "${m[0]}" - catalog metadata must not state a count`);
   }
 }
 

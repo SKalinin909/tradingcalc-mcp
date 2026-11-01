@@ -1,6 +1,6 @@
 # TradingCalc plugin for Claude
 
-Exact trading math for Claude, from a remote MCP server with 90 deterministic tools. Instead of
+Exact trading math for Claude, from a remote MCP server with deterministic tools (the current list and count are on tradingcalc.io and in the MCP tools/list reply). Instead of
 estimating a number, Claude calls a calculator and reports the result: the same inputs always give the
 same outputs.
 
@@ -14,7 +14,7 @@ same outputs.
   Kelly growth-security frontier, GARCH, risk parity, Hurst exponent, cointegration and a portfolio
   tearsheet.
 - **Crypto futures:** PnL, liquidation price, breakeven, position sizing, funding cost and a full
-  pre-trade check across 17 exchanges, including coin-margined (inverse) contracts.
+  pre-trade check across the supported exchanges, including coin-margined (inverse) contracts.
 - Also on-chain token and wallet checks and prediction-market odds.
 
 The plugin bundles one skill that tells Claude when to use each tool, and the connection to the
