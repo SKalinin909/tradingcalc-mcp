@@ -6,6 +6,15 @@ Format: **Tool Changes · Verification Changes · MCP/API Changes · Breaking Ch
 
 ---
 
+## [2.16.0] - 2026-11-01
+
+Fourteen new tools since 2.15.0. The current tool list is on https://tradingcalc.io and in the MCP `tools/list` reply.
+
+### Tool Changes
+- **Time value of money:** `workflow.run_present_value`, `workflow.run_future_value`, `workflow.run_npv`, `workflow.run_irr`, `workflow.run_cagr`, `workflow.run_apy_apr_converter`, `workflow.run_bond_price` (price, Macaulay and modified duration, convexity, DV01).
+- **Options:** `workflow.run_option_greeks` (first and second order Greeks: vanna, vomma, charm, veta, speed, zomma, color), `workflow.run_barrier_touch` (probability of touching a level at any time), `workflow.run_american_option` (binomial tree, early exercise), `workflow.run_options_position` (US-style equity, ETF and index option legs), `workflow.run_strategy_picker` (option strategies ranked for a price and volatility view).
+- **Technical and risk:** `workflow.run_fibonacci_levels`, `workflow.run_monte_carlo` (portfolio simulation with contributions or withdrawals).
+
 ## [2.15.0] - 2026-10-22
 
 Catch-up release for the tools and description fixes shipped on the main site since 2.14.0. Tool count 75 to 77.

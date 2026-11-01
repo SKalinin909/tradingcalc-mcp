@@ -1,6 +1,6 @@
 {
   "name": "tradingcalc",
-  "version": "2.15.0",
+  "version": "2.16.0",
   "description": "Deterministic options, forex, risk, on-chain, prediction-market, and crypto futures math. Current tool list: tradingcalc.io and MCP tools/list. Not AI estimates.",
   "mcpServers": {
     "tradingcalc": {
