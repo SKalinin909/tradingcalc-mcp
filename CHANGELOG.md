@@ -6,6 +6,18 @@ Format: **Tool Changes · Verification Changes · MCP/API Changes · Breaking Ch
 
 ---
 
+## [2.17.0] - 2026-11-06
+
+Catch-up release: tool count 91 to 100, canonical test vectors 53 to 60. The current tool list is on https://tradingcalc.io and in the MCP `tools/list` reply.
+
+### Tool Changes
+- **Spot:** `workflow.run_spot_dca`, `workflow.run_average_buy_price`, `workflow.run_target_sell_price`.
+- **Options:** `workflow.run_cash_secured_put`, `workflow.run_max_pain`.
+- **Statistics:** `workflow.run_event_study`.
+- **Perpetuals and prediction markets:** `workflow.run_liquidation_live`, `workflow.run_ladder_max_leg`.
+- **System:** `system.batch` runs up to 10 tool calls in one request, each result separately signed.
+- Tool descriptions of the options, forex, prediction-market and risk tools now state their assumptions and what they do not cover.
+
 ## [2.16.0] - 2026-11-01
 
 Fourteen new tools since 2.15.0. The current tool list is on https://tradingcalc.io and in the MCP `tools/list` reply.
