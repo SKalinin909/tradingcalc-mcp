@@ -9,7 +9,7 @@ license: MIT
 ## What this skill does
 
 Gives you exact answers to trading math questions instead of a language-model estimate. The
-TradingCalc MCP server exposes 91 deterministic tools across options, forex, risk statistics,
+TradingCalc MCP server exposes 100 deterministic tools across options, forex, risk statistics,
 crypto futures, on-chain token checks and prediction markets. The same inputs always return the
 same outputs, and the 12 core calculators are checked against canonical test vectors on a
 public page (`https://tradingcalc.io/verify`).
@@ -56,6 +56,10 @@ Crypto futures and perpetuals
 Also available: on-chain token and wallet checks (`workflow.run_token_risk_check`,
 `workflow.run_wallet_flag_check`, `workflow.run_swap_price_impact`) and prediction-market odds
 (`workflow.run_odds_converter`, `workflow.run_prediction_market_edge`).
+Time value of money (`workflow.run_npv`, `workflow.run_irr`, `workflow.run_bond_price`, `workflow.run_cagr`), spot
+trades (`workflow.run_crypto_profit`, `workflow.run_spot_dca`, `workflow.run_target_sell_price`), more options
+(`workflow.run_option_greeks`, `workflow.run_barrier_touch`, `workflow.run_american_option`,
+`workflow.run_cash_secured_put`, `workflow.run_max_pain`) and `system.batch` for up to 10 calls in one request.
 
 For a coin-margined (inverse) contract such as Bybit `BTCUSD` or Deribit `BTC-PERPETUAL`, pass
 `contractType: "inverse"`. Inverse math is not linear math with a flipped sign (it uses

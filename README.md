@@ -27,16 +27,17 @@ Ask Claude, Cursor or any MCP client trade questions and get exact numbers back,
 > "What's my 95% Value at Risk on this monthly return series?"
 > "What's my PnL if I buy 0.5 BTC at $80k and sell at $95k with 5x leverage?"
 
-## What it covers (91 tools)
+## What it covers (100 tools)
 
 | Domain | Examples |
 |---|---|
-| Options | Black-Scholes price and Greeks (manual, or checked live against a Deribit BTC/ETH option), payoff and breakeven, straddle and strangle, vertical spreads, covered call and protective put, implied volatility |
+| Options | Black-Scholes price and Greeks (manual, or checked live against a Deribit BTC/ETH option), payoff and breakeven, straddle and strangle, vertical spreads, covered call, protective put and cash-secured put, implied volatility, barrier touch, American options, max pain, strategy picker |
 | Forex | Position size from a risk amount, pip value, margin, swap cost, currency conversion, pair correlation, with live-rate variants for the account currency |
 | Risk and statistics | VaR and CVaR, Sharpe with the Lo 2002 correction, Deflated Sharpe, Kelly frontier, GARCH(1,1), risk parity, Hurst exponent, cointegration, portfolio tearsheet, EVT tail risk |
 | Prediction markets | Odds and vig, market-implied odds, edge sizing, spread and arbitrage checks across Kalshi, Polymarket, Limitless and Myriad |
 | On-chain | Solana token and wallet checks, swap price impact, pump.fun bonding curve, impermanent loss |
-| Crypto spot | Profit or loss on a coin bought and sold outright, after both fees |
+| Crypto spot | Profit or loss on a coin bought and sold outright after both fees, DCA, average buy price, target sell price |
+| Time value of money | Present and future value, NPV, IRR, CAGR, APY and APR, bond price and duration |
 | Crypto futures | PnL, liquidation price, breakeven, funding cost, position size, risk/reward, linear and coin-margined contracts |
 
 Access via **MCP** (Claude Desktop, Cursor, VS Code and other clients) or a plain HTTP POST to the MCP endpoint. No
@@ -221,7 +222,7 @@ After connecting, just ask naturally: the AI picks the right tool automatically:
 
 ---
 
-## Tools (91)
+## Tools (100)
 
 Tool naming follows the `workflow.run_*` / `primitive.*` / `system.*` namespace convention.
 Old flat names (`pnl`, `liquidation`, etc.) are accepted for backward compatibility. All tools are
@@ -229,20 +230,21 @@ free via MCP, no signup; 100 calls/day anonymously, 200/day with a free API key.
 
 | Category | Tools |
 |---|---|
-| Options (Deribit BTC/ETH, coin-settled) | Options payoff & breakeven, Black-Scholes price/Greeks (manual + live), higher-order Greeks (vanna, vomma, charm, veta, speed, zomma, color), straddle/strangle, vertical spread & iron condor, covered call/protective put, implied volatility solver (7) |
-| Forex (quote-currency + live account-currency conversion) | Pip value, margin level, breakeven, PnL, risk/reward, scenario, average entry, position size, margin required, currency converter, swap/rollover cost, correlation/hedge ratio: manual + live-FX-rate variants (17) |
-| Risk/Stats | VaR/CVaR (+ Modified VaR), Sharpe ratio (Lo 2002 + PSR), Hurst exponent, cointegration, portfolio tearsheet, GARCH(1,1), risk parity, Deflated Sharpe Ratio, Kelly growth-security frontier, return unsmoothing, EVT tail risk, order-book impact (12) |
-| Prediction Markets (Kalshi, Polymarket, Limitless, Myriad, ADI Predictstreet crypto categories) | Odds converter, market-implied odds, prediction-market edge, window fair value, cross-venue spread reader, cross-venue arbitrage (6) |
+| Options (Deribit BTC/ETH, coin-settled; US-style equity legs) | Options payoff & breakeven, Black-Scholes price/Greeks (manual + live), higher-order Greeks (vanna, vomma, charm, veta, speed, zomma, color), straddle/strangle, vertical spread & iron condor, covered call/protective put, cash-secured put, implied volatility solver, barrier touch, American option, options position, strategy picker, max pain (14) |
+| Forex (quote-currency + live account-currency conversion) | Pip value, margin level, breakeven, PnL, risk/reward, scenario, average entry, position size, margin required, currency converter, swap/rollover cost, correlation, Fibonacci levels: manual + live-FX-rate variants (18) |
+| Risk/Stats | VaR/CVaR (+ Modified VaR), Sharpe ratio (Lo 2002 + PSR), Hurst exponent, cointegration, portfolio tearsheet, GARCH(1,1), risk parity, Deflated Sharpe Ratio, Kelly growth-security frontier, return unsmoothing, EVT tail risk, Monte Carlo, event study, order-book impact (14) |
+| Prediction Markets (Kalshi, Polymarket, Limitless, Myriad, ADI Predictstreet crypto categories) | Odds converter, market-implied odds, prediction-market edge, window fair value, cross-venue spread reader, cross-venue arbitrage, ladder max leg (7) |
 | On-chain (Solana + 5 EVM chains, per tool) | Token risk check, swap price impact, bonding curve, market cap comparison, wallet flag check, impermanent loss (manual + live) (7) |
+| Time value of money | Present value, future value, NPV, IRR, CAGR, APY/APR converter, bond price (7) |
 | Trade Planning | PnL, break-even, exit target, scenario, DCA entry, scale-out, average down (7) |
-| Risk & Margin | Liquidation safety, position sizing, max leverage, risk/reward (4) |
+| Risk & Margin | Liquidation safety (manual + live), position sizing, max leverage, risk/reward (5) |
 | Funding & Carry | Funding cost, funding arbitrage, compound funding, funding break-even, carry trade (5) |
 | Market Structure (Market Profile) | Open analysis, session structure, value migration, breakout acceptance (4) |
 | Primitives | Average entry, hedge ratio (2) |
-| Crypto spot | Crypto profit: profit or loss on a spot trade after both fees (1) |
+| Crypto spot | Crypto profit (spot trade after both fees), spot DCA, average buy price, target sell price (4) |
 | Cross-exchange | Price consensus: how far one perpetual futures price sits from 7 reference exchanges (1) |
 | Integrated Decision | Pre-trade check (sizing + liquidation + breakeven + funding + go/no-go in one call), portfolio risk review (2) |
-| System | `system.verify` - run the canonical test vectors, get a pass/fail report; `system.pubkey` - get the public key to verify signed responses offline (2) |
+| System | `system.verify` - run the canonical test vectors, get a pass/fail report; `system.pubkey` - get the public key to verify signed responses offline; `system.batch` - run several tool calls in one request (3) |
 
 Full tool-by-tool reference (every input/output schema, request/response examples, per-tool
 descriptions): **[docs.tradingcalc.io/api](https://docs.tradingcalc.io/api)**
